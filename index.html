@@ -8,6 +8,17 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
 body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden}
 
+/* ============ 手机端拦截层 ============ */
+#mobileBlockLayer{position:fixed;inset:0;z-index:9999999;background:#0a0a12;display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;color:#fff;font-family:"Consolas","Courier New",monospace}
+#mobileBlockLayer.show{display:flex}
+#mobileBlockLayer .block-icon{font-size:100px;line-height:1;color:#ff3b30;margin-bottom:30px;filter:drop-shadow(0 0 40px rgba(255,59,48,.7));animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+#mobileBlockLayer .block-title{font-size:26px;font-weight:900;color:#ff3b30;letter-spacing:6px;margin-bottom:20px}
+#mobileBlockLayer .block-sub{font-size:14px;color:#ccc;line-height:2;margin-bottom:26px;max-width:520px}
+#mobileBlockLayer .block-sub b{color:#ff5555}
+#mobileBlockLayer .block-code{font-size:12px;color:#666;background:#1a1a1a;padding:10px 22px;border-radius:8px;border:1px solid #333;letter-spacing:2px;margin-bottom:30px}
+#mobileBlockLayer .block-hint{font-size:12px;color:#555;line-height:1.8;max-width:480px}
+
 /* ============ 加载页 ============ */
 #loadingScreen{position:fixed;inset:0;background:#0a0a12;z-index:3000000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;transition:opacity .6s}
 #loadingScreen.hide{opacity:0;pointer-events:none}
@@ -202,6 +213,22 @@ body.ui-hidden #soundToggleBtn:hover{opacity:1}
 </head>
 <body>
 
+<!-- ============ 手机端拦截层 ============ -->
+<div id="mobileBlockLayer">
+  <div class="block-icon">⛔</div>
+  <div class="block-title">设备不兼容</div>
+  <div class="block-sub">
+    检测到你正在使用<b>手机端 / 平板</b>访问本网站。<br>
+    本网站仅支持<b>电脑端</b>浏览器访问，无论品牌。<br>
+    请使用 Windows / macOS / Linux 电脑打开。
+  </div>
+  <div class="block-code">ERROR_CODE: 0x00A1 UNSUPPORTED_DEVICE</div>
+  <div class="block-hint">
+    你已被踢出，请用电脑访问本网站。<br>
+    如有疑问请联系作者。
+  </div>
+</div>
+
 <!-- ============ 加载页 ============ -->
 <div id="loadingScreen">
   <div class="brand">说 话 大 厅</div>
@@ -362,12 +389,12 @@ body.ui-hidden #soundToggleBtn:hover{opacity:1}
     <div style="width:80px"></div>
   </div>
   <div style="padding:40px;max-width:600px;margin:0 auto;line-height:2;color:#a0a8b8;font-size:14px">
-    <p>说话大厅 v1.8</p>
+    <p>说话大厅 v1.9</p>
     <p>基于 WebRTC 的 P2P 聊天工具。</p>
     <p>消息点对点直传，不经过任何中转服务器。</p>
     <p>房间码为 8 位随机字符，约 1.1 万亿种组合。</p>
     <p>房主专属：违禁词、踢人、拉黑、临时封禁、修改房间信息。</p>
-    <p>右键消息/服务器，或点卡片右侧 ⋮ 管理。</p>
+    <p>仅支持电脑端访问，手机端自动拦截。</p>
     <p style="margin-top:20px;color:#6a7080;">技术栈：Trystero + WebRTC</p>
   </div>
 </div>
@@ -479,7 +506,65 @@ body.ui-hidden #soundToggleBtn:hover{opacity:1}
 
 <script>
 // ============================================================
-// 全局状态
+// 【最优先】设备检测：手机/平板直接拦截，不执行任何后续逻辑
+// ============================================================
+(function(){
+  var mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|HarmonyOS|Mobile|Windows Phone|MicroMessenger|QQ\/|UCBrowser|Quark|MiuiBrowser|VivoBrowser|OppoBrowser|HuaweiBrowser|SamsungBrowser|HeyTapBrowser|baidubrowser/i;
+  var ua = navigator.userAgent || '';
+  var uaHit = mobileRegex.test(ua);
+
+  // 触摸设备 + 小屏，辅助判断
+  var maxTouch = navigator.maxTouchPoints || 0;
+  var touchHit = ('ontouchstart' in window) && (maxTouch > 1);
+  var sw = Math.min(window.screen.width || 9999, window.screen.height || 9999);
+  var iw = Math.min(window.innerWidth || 9999, window.innerHeight || 9999);
+  var smallScreen = (sw < 768) || (iw < 768);
+
+  // 综合判定：UA 命中，或者触摸+小屏
+  var isMobileDevice = uaHit || (touchHit && smallScreen);
+
+  if(isMobileDevice){
+    window.__BLOCKED_DEVICE__ = true;
+    // 立即显示拦截层
+    var blockLayer = document.getElementById('mobileBlockLayer');
+    if(blockLayer){
+      blockLayer.classList.add('show');
+      blockLayer.style.display = 'flex';
+    }
+    // 隐藏其他所有可能弹出的层
+    var ids = ['loadingScreen','startOverlay','introLayer'];
+    for(var i=0;i<ids.length;i++){
+      var el = document.getElementById(ids[i]);
+      if(el){ el.style.display = 'none'; }
+    }
+    // 冻结 body
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    // 移除 app 内容（不渲染）
+    var app = document.querySelector('.app');
+    if(app) app.style.display = 'none';
+    var bg = document.getElementById('bgVideo');
+    if(bg) bg.style.display = 'none';
+    var bg2 = document.getElementById('bgMask');
+    if(bg2) bg2.style.display = 'none';
+    var ui1 = document.getElementById('uiToggleBtn');
+    if(ui1) ui1.style.display = 'none';
+    var ui2 = document.getElementById('soundToggleBtn');
+    if(ui2) ui2.style.display = 'none';
+    // 直接返回，后面所有代码都不执行
+    return;
+  }
+})();
+
+// 如果被拦截，直接结束整个 script 执行
+if(window.__BLOCKED_DEVICE__){
+  // 用一个空的执行体，阻止后续代码运行
+  // 由于脚本是顺序执行的，这里用 throw 中断最干净
+  throw new Error('BLOCKED_DEVICE');
+}
+
+// ============================================================
+// 以下代码仅在电脑端执行
 // ============================================================
 var currentRoom = null;
 var currentCode = '';
@@ -521,19 +606,17 @@ var ASSETS = [
 ];
 
 // ============================================================
-// 预加载：把三个文件全部缓存到 Cache Storage
+// 预加载
 // ============================================================
 async function preloadAll(onProgress){
   var cache;
   try {
     cache = await caches.open(CACHE_NAME);
   } catch(e){
-    // 不支持 Cache API（老浏览器或 file://），直接跳过
     onProgress(100, '缓存不受支持，跳过');
     return false;
   }
 
-  // 第一步：检查缓存状态 + 获取文件大小
   var totalBytes = 0;
   var loadedBytes = 0;
   var fileSizes = {};
@@ -548,7 +631,6 @@ async function preloadAll(onProgress){
       loadedBytes += fileSizes[f];
     } else {
       allCached = false;
-      // 通过 HEAD 拿大小
       try {
         var head = await fetch(f, { method: 'HEAD' });
         var cl = parseInt(head.headers.get('Content-Length') || '0', 10);
@@ -569,7 +651,6 @@ async function preloadAll(onProgress){
 
   onProgress(Math.round(loadedBytes / totalBytes * 100), '检查缓存...');
 
-  // 第二步：下载缺失的文件
   for(var j=0;j<ASSETS.length;j++){
     var file = ASSETS[j];
     var existing = await cache.match(file);
@@ -581,7 +662,6 @@ async function preloadAll(onProgress){
       var resForCache = res.clone();
       var cachePromise = cache.put(file, resForCache);
 
-      // 带进度读取流
       if(res.body && res.body.getReader){
         var reader = res.body.getReader();
         while(true){
@@ -606,9 +686,6 @@ async function preloadAll(onProgress){
   return true;
 }
 
-// ============================================================
-// 从缓存取文件，生成 Blob URL
-// ============================================================
 async function setSrcFromCache(el, filename){
   if(!el) return;
   try {
@@ -616,7 +693,6 @@ async function setSrcFromCache(el, filename){
     var res = await cache.match(filename);
     if(res){
       var blob = await res.blob();
-      // 如果已经有旧的 blob url 就先释放
       if(el.dataset.blobUrl){
         try{ URL.revokeObjectURL(el.dataset.blobUrl); }catch(e){}
       }
@@ -632,9 +708,6 @@ async function setSrcFromCache(el, filename){
   return false;
 }
 
-// ============================================================
-// 加载页 UI 更新
-// ============================================================
 function updateLoadUI(pct, text){
   var p = document.getElementById('loadPercent');
   var f = document.getElementById('loadFill');
@@ -644,15 +717,11 @@ function updateLoadUI(pct, text){
   if(s && text) s.textContent = text;
 }
 
-// ============================================================
-// 启动流程
-// ============================================================
 var INTRO_DONE_KEY = 'speaking-intro-done-session';
 var introStarted = false;
 var introFinished = false;
 
 window.addEventListener('load', async function(){
-  // 依次执行：预加载 → 显示开始按钮
   var ok = true;
   try {
     await preloadAll(updateLoadUI);
@@ -661,15 +730,12 @@ window.addEventListener('load', async function(){
     ok = false;
   }
 
-  // 等 400ms 让用户看到 100%
   await new Promise(function(r){ setTimeout(r, 400); });
 
-  // 隐藏加载页
   var ls = document.getElementById('loadingScreen');
   ls.classList.add('hide');
   setTimeout(function(){ ls.style.display = 'none'; }, 700);
 
-  // 刷新时（已进入过本次会话）直接跳过开场
   var isFirstOpen = !sessionStorage.getItem(INTRO_DONE_KEY);
   if(!isFirstOpen){
     introFinished = true;
@@ -677,16 +743,12 @@ window.addEventListener('load', async function(){
     return;
   }
 
-  // 首次打开：显示"点击开始播放"
   var so = document.getElementById('startOverlay');
   so.style.display = 'flex';
 
   updateSoundBtn();
 });
 
-// ============================================================
-// 用户点击"点击开始播放"
-// ============================================================
 async function startPlayback(){
   if(introStarted) return;
   introStarted = true;
@@ -695,21 +757,17 @@ async function startPlayback(){
   var bgVideo = document.getElementById('bgVideo');
   var bgMusic = document.getElementById('bgMusic');
 
-  // 屏蔽背景视频和音乐
   try{ bgVideo.pause(); bgVideo.currentTime = 0; }catch(e){}
   try{ bgMusic.pause(); bgMusic.currentTime = 0; }catch(e){}
 
-  // 隐藏遮罩
   var ov = document.getElementById('startOverlay');
   ov.classList.add('hide');
   setTimeout(function(){ ov.style.display = 'none'; }, 500);
 
-  // 从缓存加载开场视频
   await setSrcFromCache(introVideo, ASSETS[0]);
   await setSrcFromCache(bgVideo, ASSETS[1]);
   await setSrcFromCache(bgMusic, ASSETS[2]);
 
-  // 显示开场层
   var introLayer = document.getElementById('introLayer');
   introLayer.classList.add('active');
   introLayer.style.display = 'flex';
@@ -718,7 +776,6 @@ async function startPlayback(){
   introVideo.volume = 1.0;
   try{ introVideo.currentTime = 0; }catch(e){}
 
-  // 等待视频元数据加载，避免卡顿
   if(introVideo.readyState < 2){
     await new Promise(function(resolve){
       var done = false;
@@ -732,7 +789,6 @@ async function startPlayback(){
   var playPromise = introVideo.play();
   if(playPromise && playPromise.catch){
     playPromise.catch(function(){
-      // 声音被拦 → 静音播放
       introVideo.muted = true;
       introVideo.play().catch(function(){ finishIntro(); });
     });
@@ -767,14 +823,10 @@ function skipIntro(){
   finishIntro();
 }
 
-// ============================================================
-// 进入主界面
-// ============================================================
 function afterIntro(){
   var bgVideo = document.getElementById('bgVideo');
   var bgMusic = document.getElementById('bgMusic');
 
-  // 主界面视频/音乐：确保从缓存加载
   setSrcFromCache(bgVideo, ASSETS[1]).then(function(){
     setSrcFromCache(bgMusic, ASSETS[2]).then(function(){
       bgVideo.muted = isMuted;
@@ -784,7 +836,6 @@ function afterIntro(){
       try{ bgVideo.currentTime = 0; }catch(e){}
       try{ bgMusic.currentTime = 0; }catch(e){}
 
-      // 同时播放
       var vp = bgVideo.play();
       var mp = bgMusic.play();
 
@@ -816,9 +867,6 @@ function playHomeAnimations(){
   });
 }
 
-// ============================================================
-// 声音开关
-// ============================================================
 function toggleSound(){
   var introVideo = document.getElementById('introVideo');
   var bgVideo = document.getElementById('bgVideo');
@@ -843,9 +891,6 @@ function updateSoundBtn(){
   else { btn.textContent = '🔊'; btn.classList.remove('muted'); }
 }
 
-// ============================================================
-// 其他通用
-// ============================================================
 function toast(msg){
   var t = document.getElementById('toast');
   if(!t) return;
