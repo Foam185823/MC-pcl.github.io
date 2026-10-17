@@ -3,52 +3,92 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>我的世界 · 网页联机大厅</title>
+<title>游戏大厅 · 单机联机版</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
-body{background:#0b0c10;color:#e8e8f0;height:100vh;overflow:hidden}
-
-/* 移动端拦截 */
+body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden}
+/* 手机端拦截 */
 #mobileBlock{position:fixed;inset:0;z-index:9999999;background:#0a0a12;display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;color:#fff;font-family:monospace}
 #mobileBlock.show{display:flex}
 
-/* 开场动画 */
+/* 开场动画与视频 */
 #startOverlay{position:fixed;inset:0;background:#000;z-index:2000000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:30px;transition:opacity .5s}
 #startOverlay.hide{opacity:0;pointer-events:none}
-#startOverlay .title{font-size:48px;font-weight:900;letter-spacing:4px;background:linear-gradient(135deg,#6ee7b7,#3b82f6,#a855f7);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 60px rgba(59,130,246,.4)}
-#startOverlay .startBtn{padding:16px 50px;background:linear-gradient(135deg,#3b82f6,#6ee7b7);color:#fff;border:none;border-radius:12px;font-size:18px;font-weight:700;cursor:pointer;letter-spacing:2px;box-shadow:0 8px 32px rgba(59,130,246,.4);transition:all .3s}
-#startOverlay .startBtn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(59,130,246,.6)}
+#startOverlay .title{font-size:48px;font-weight:900;letter-spacing:8px;background:linear-gradient(135deg,#4a6cf7,#a855f7,#ec4899);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 60px rgba(74,108,247,.5);animation:floatUp 2s ease-in-out infinite}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+#startOverlay .startBtn{padding:18px 60px;background:linear-gradient(135deg,#3a5cdf,#4a6cf7);color:#fff;border:none;border-radius:50px;font-size:18px;font-weight:700;cursor:pointer;letter-spacing:4px;box-shadow:0 8px 32px rgba(74,108,247,.6);transition:all .3s}
+#startOverlay .startBtn:hover{transform:scale(1.05);box-shadow:0 12px 48px rgba(74,108,247,.8)}
+
+#introLayer{position:fixed;inset:0;background:#000;z-index:999999;display:none;align-items:center;justify-content:center;opacity:1;transition:opacity .8s ease}
+#introLayer.active{display:flex}
+#introLayer.fade-out{opacity:0;pointer-events:none}
+#introVideo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+#introSkip{position:absolute;right:24px;bottom:24px;padding:8px 18px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.3);border-radius:20px;color:#fff;font-size:12px;cursor:pointer;backdrop-filter:blur(8px);transition:all .2s;z-index:3;opacity:.7}
+#introSkip:hover{background:rgba(0,0,0,.8);opacity:1}
 
 /* 背景视频与遮罩 */
-#bgVideo{position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:0;pointer-events:none;background:#000;opacity:.35}
-#bgMask{position:fixed;inset:0;z-index:1;background:radial-gradient(circle at center,rgba(11,12,16,.4),rgba(11,12,16,.85));pointer-events:none}
+#bgVideo{position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:0;pointer-events:none;background:#000}
+#bgMask{position:fixed;inset:0;z-index:1;background:linear-gradient(180deg,rgba(10,10,20,.08) 0%,rgba(10,10,20,.35) 100%);pointer-events:none}
+
+/* 左下角按钮 */
+#uiToggleBtn{position:fixed;left:20px;bottom:20px;z-index:5000;width:46px;height:46px;border-radius:50%;background:rgba(30,32,48,.85);border:1px solid rgba(74,108,247,.5);color:#e8e8f0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;backdrop-filter:blur(12px);transition:all .3s;box-shadow:0 4px 16px rgba(0,0,0,.4);user-select:none}
+#uiToggleBtn:hover{background:rgba(74,108,247,.5);transform:scale(1.08)}
+#uiToggleBtn.hidden-mode{background:rgba(30,32,48,.4);border-color:rgba(74,108,247,.3);opacity:.5}
+#soundToggleBtn{position:fixed;left:80px;bottom:20px;z-index:5000;width:46px;height:46px;border-radius:50%;background:rgba(30,32,48,.85);border:1px solid rgba(74,108,247,.5);color:#e8e8f0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;backdrop-filter:blur(12px);transition:all .3s;box-shadow:0 4px 16px rgba(0,0,0,.4);user-select:none}
+#soundToggleBtn:hover{background:rgba(74,108,247,.5);transform:scale(1.08)}
+#soundToggleBtn.muted{background:rgba(58,28,28,.85);border-color:rgba(255,128,128,.5);color:#ff8080}
+body.ui-hidden .app .screen.active > *{opacity:0;pointer-events:none;transition:opacity .4s}
+body.ui-hidden #uiToggleBtn{opacity:.5}
+body.ui-hidden #soundToggleBtn{opacity:.5}
+
+/* 设置与头像面板 */
+.panel { position: fixed; z-index: 5000; background: rgba(21,22,30,.95); backdrop-filter: blur(20px); border: 1px solid rgba(74,108,247,.3); border-radius: 14px; padding: 20px; width: 300px; display: none; box-shadow: 0 10px 40px rgba(0,0,0,.6); }
+.panel.show { display: block; animation: popIn .2s cubic-bezier(.16,1,.3,1); }
+@keyframes popIn { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: scale(1); } }
+#settingsPanel { left: 20px; bottom: 80px; transform-origin: bottom left; }
+#profilePanel { right: 20px; top: 20px; transform-origin: top right; }
+.panel h3 { font-size: 15px; color: #fff; margin-bottom: 16px; text-align: center; letter-spacing: 1px; }
+.panel label { display: block; font-size: 12px; color: #8890a0; margin-bottom: 6px; margin-top: 12px; font-weight: 600; }
+.panel input[type=range] { width: 100%; margin-top: 4px; }
+.panel .toggle-row { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 13px; color: #e8e8f0; }
+.panel input[type=checkbox] { width: 18px; height: 18px; cursor: pointer; }
+
+/* 头像与昵称设置 */
+#topAvatarBtn { position: fixed; right: 20px; top: 20px; z-index: 5000; display: flex; align-items: center; gap: 10px; padding: 6px 14px; background: rgba(30,32,48,.85); border: 1px solid rgba(74,108,247,.3); border-radius: 30px; cursor: pointer; backdrop-filter: blur(12px); transition: all .2s; }
+#topAvatarBtn:hover { border-color: #4a6cf7; box-shadow: 0 0 16px rgba(74,108,247,.3); }
+#topAvatarBtn .avatar-img { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#4a6cf7,#a855f7); display: flex; align-items: center; justify-content: center; font-size: 18px; overflow: hidden; }
+#topAvatarBtn .avatar-img img { width: 100%; height: 100%; object-fit: cover; }
+#topAvatarBtn .nick-text { font-size: 13px; font-weight: 600; color: #e8e8f0; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.avatar-picker { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.avatar-option { width: 40px; height: 40px; border-radius: 50%; background: rgba(26,28,40,.9); border: 2px solid rgba(74,108,247,.25); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; transition: all .15s; overflow: hidden; }
+.avatar-option:hover { border-color: #4a6cf7; transform: scale(1.08); }
+.avatar-option.selected { border-color: #4a6cf7; box-shadow: 0 0 0 3px rgba(74,108,247,.3); }
 
 /* 通用布局 */
 .app{width:100vw;height:100vh;position:relative;z-index:2;display:flex;flex-direction:column}
-.screen{display:none;flex-direction:column;flex:1;padding:30px 40px;overflow-y:auto}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;padding:40px;overflow-y:auto}
 .screen.active{display:flex}
+#screenHome{justify-content:center;align-items:center;padding:0}
+.home-content{width:100%;max-width:420px;display:flex;flex-direction:column;gap:14px}
+.mc-title{font-size:56px;font-weight:900;text-align:center;color:#fff;margin-bottom:50px;letter-spacing:6px;background:linear-gradient(135deg,#4a6cf7,#a855f7,#ec4899);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 4px 20px rgba(74,108,247,.5));opacity:0;transform:translateY(-30px);transition:all 1s cubic-bezier(.16,1,.3,1)}
+.mc-title.anim-in{opacity:1;transform:translateY(0)}
+.slide-btn{opacity:0;transition:all .8s cubic-bezier(.16,1,.3,1);will-change:transform,opacity}
+.slide-btn.from-left{transform:translateX(-120vw)}
+.slide-btn.from-right{transform:translateX(120vw)}
+.slide-btn.slide-done{opacity:1;transform:translateX(0)}
+.mc-btn{width:100%;padding:16px 22px;background:rgba(30,32,48,.85);color:#e8e8f0;border:2px solid rgba(74,108,247,.4);border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;transition:all .3s cubic-bezier(.16,1,.3,1);letter-spacing:2px;backdrop-filter:blur(12px);position:relative;overflow:hidden;text-shadow:0 1px 4px rgba(0,0,0,.6)}
+.mc-btn:hover{transform:translateY(-3px) scale(1.02);border-color:#4a6cf7;box-shadow:0 12px 40px rgba(74,108,247,.5)}
+.mc-btn.primary{background:linear-gradient(135deg,rgba(58,92,223,.9),rgba(74,108,247,.9));border-color:#4a6cf7;color:#fff}
+.mc-btn.danger{background:rgba(58,28,28,.9);border-color:rgba(255,128,128,.4);color:#ff8080}
+
+/* 服务器与列表 */
 .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-shrink:0}
 .topbar h1{font-size:22px;font-weight:800;letter-spacing:1px;color:#fff}
 .btn-icon{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#ccc;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s}
 .btn-icon:hover{background:rgba(59,130,246,.2);border-color:#3b82f6;color:#fff}
-
-/* 主菜单 */
-#screenHome{justify-content:center;align-items:center;padding:0}
-.home-box{width:100%;max-width:420px;display:flex;flex-direction:column;gap:14px}
-.home-title{font-size:56px;font-weight:900;text-align:center;letter-spacing:6px;background:linear-gradient(135deg,#6ee7b7,#3b82f6,#a855f7);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:30px;filter:drop-shadow(0 4px 20px rgba(59,130,246,.4))}
-.mc-btn{width:100%;padding:16px 22px;background:rgba(30,32,48,.85);color:#e8e8f0;border:2px solid rgba(59,130,246,.3);border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;transition:all .3s;letter-spacing:2px;backdrop-filter:blur(12px);position:relative;overflow:hidden}
-.mc-btn:hover{transform:translateY(-2px);border-color:#3b82f6;box-shadow:0 12px 40px rgba(59,130,246,.4)}
-.mc-btn.primary{background:linear-gradient(135deg,rgba(59,130,246,.9),rgba(110,231,183,.8));border-color:transparent;color:#fff}
-.mc-btn.primary:hover{box-shadow:0 16px 50px rgba(59,130,246,.6)}
-.mc-btn.danger{background:rgba(58,28,28,.9);border-color:rgba(255,128,128,.3);color:#ff8080}
-.mc-btn.danger:hover{background:rgba(90,32,32,.9);box-shadow:0 12px 40px rgba(255,80,80,.4)}
-
-/* 列表容器 */
 .list-container{flex:1;overflow-y:auto;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(15,15,25,.7);backdrop-filter:blur(20px);padding:12px;max-width:900px;width:100%;margin:0 auto}
 .list-container::-webkit-scrollbar{width:6px}
 .list-container::-webkit-scrollbar-thumb{background:rgba(59,130,246,.4);border-radius:3px}
-
-/* 卡片 */
 .item-card{display:flex;align-items:center;padding:16px;background:rgba(255,255,255,.03);border:2px solid transparent;border-radius:12px;margin-bottom:8px;cursor:pointer;transition:all .2s;position:relative}
 .item-card:hover{background:rgba(255,255,255,.06);transform:translateX(4px)}
 .item-card.selected{border-color:#3b82f6;background:rgba(59,130,246,.1);box-shadow:0 0 20px rgba(59,130,246,.15)}
@@ -56,9 +96,6 @@ body{background:#0b0c10;color:#e8e8f0;height:100vh;overflow:hidden}
 .card-info{flex:1;min-width:0}
 .card-name{font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card-desc{font-size:12px;color:#8890a0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card-tag{font-size:11px;padding:2px 8px;border-radius:6px;background:rgba(110,231,183,.15);color:#6ee7b7;border:1px solid rgba(110,231,183,.3);margin-left:8px}
-
-/* 底部操作栏 */
 .action-bar{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;justify-content:center}
 .btn-sm{padding:10px 18px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#ccc;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit}
 .btn-sm:hover:not(:disabled){background:rgba(59,130,246,.2);border-color:#3b82f6;color:#fff}
@@ -78,22 +115,18 @@ body{background:#0b0c10;color:#e8e8f0;height:100vh;overflow:hidden}
 #gameHud{position:absolute;top:20px;left:20px;z-index:11;color:#fff;font-family:monospace;font-size:13px;line-height:1.8;text-shadow:0 2px 6px #000;pointer-events:none}
 #gamePing{color:#6ee7b7;font-weight:700;margin-top:6px;display:none}
 #gameHint{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);z-index:11;color:rgba(255,255,255,.4);font-size:13px;pointer-events:none}
-
-/* 暂停菜单 */
 #pauseMenu{position:absolute;inset:0;z-index:20;background:rgba(11,12,16,.8);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;cursor:default}
 #pauseMenu.show{display:flex}
 #pauseMenu h2{color:#fff;font-size:32px;margin-bottom:20px;letter-spacing:4px;font-weight:900}
 #pauseMenu button{width:320px;padding:14px;background:rgba(255,255,255,.06);color:#e8e8f0;border:1px solid rgba(255,255,255,.1);border-radius:10px;font-size:15px;cursor:pointer;transition:all .2s;font-family:inherit;font-weight:600}
 #pauseMenu button:hover{background:rgba(59,130,246,.2);border-color:#3b82f6;color:#fff}
-
-/* 快捷栏 */
 #inventoryBar{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:11;display:flex;gap:4px;padding:4px;background:rgba(0,0,0,.5);border-radius:8px;border:2px solid rgba(255,255,255,.15)}
 .inv-slot{width:42px;height:42px;background:rgba(30,30,30,.7);border:2px solid rgba(255,255,255,.2);border-radius:4px;display:flex;align-items:center;justify-content:center;position:relative}
 .inv-slot.selected{border-color:#fff;box-shadow:0 0 8px rgba(255,255,255,.4)}
 .inv-slot img{width:32px;height:32px;object-fit:contain;image-rendering:pixelated}
 .inv-slot .slot-num{position:absolute;top:1px;left:3px;font-size:10px;color:#aaa;font-family:monospace}
 
-/* 表单弹窗 */
+/* 弹窗表单 */
 .modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:600}
 .modal-mask.show{display:flex}
 .modal{background:rgba(21,22,30,.98);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:28px;width:460px;max-width:92vw;box-shadow:0 20px 60px rgba(0,0,0,.8)}
@@ -104,7 +137,6 @@ body{background:#0b0c10;color:#e8e8f0;height:100vh;overflow:hidden}
 .modal .hint{font-size:11px;color:#666;margin-top:6px;line-height:1.5}
 .modal .btn-row{display:flex;justify-content:flex-end;gap:10px;margin-top:24px}
 
-/* Toast */
 .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(60px);background:rgba(30,32,48,.95);backdrop-filter:blur(12px);border:1px solid rgba(59,130,246,.3);border-radius:10px;padding:12px 24px;font-size:13px;color:#e8e8f0;opacity:0;transition:all .3s;pointer-events:none;z-index:999999;box-shadow:0 8px 32px rgba(0,0,0,.5)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
@@ -113,23 +145,59 @@ body{background:#0b0c10;color:#e8e8f0;height:100vh;overflow:hidden}
 
 <div id="mobileBlock"><div style="font-size:60px;margin-bottom:20px;">🚫</div><div style="font-size:20px;font-weight:bold;">手机端玩不了这个</div><div style="margin-top:10px;color:#888;">换电脑来吧，兄弟</div></div>
 
+<!-- 开场视频 -->
 <div id="startOverlay">
   <div class="title">我的世界 · 网页版</div>
-  <button class="startBtn" onclick="startApp()">开始游戏</button>
+  <button class="startBtn" onclick="startPlayback()">开始游戏</button>
+</div>
+<div id="introLayer">
+  <video id="introVideo" playsinline preload="auto"></video>
+  <div id="introSkip" onclick="skipIntro()">跳过 ▶</div>
 </div>
 
-<video id="bgVideo" loop muted autoplay playsinline></video>
+<!-- 背景视频与音乐 -->
+<video id="bgVideo" loop playsinline preload="auto"></video>
+<audio id="bgMusic" loop preload="auto"></audio>
 <div id="bgMask"></div>
 
-<div class="app">
+<!-- UI 控件 -->
+<div id="uiToggleBtn" onclick="toggleUI()" title="隐藏/显示UI">👁</div>
+<div id="soundToggleBtn" onclick="toggleSound()" title="静音/取消">🔊</div>
 
+<div id="settingsPanel" class="panel">
+  <h3>⚙️ 游戏设置</h3>
+  <div class="toggle-row"><span>背景音乐</span><input type="checkbox" id="musicToggle" checked onchange="toggleMusic()"></div>
+  <label>音量大小</label>
+  <input type="range" id="volumeSlider" min="0" max="100" value="50" oninput="changeVolume(this.value)">
+  <div class="toggle-row"><span>隐藏所有UI</span><button class="btn-sm" onclick="toggleUI(); closeSettings();">切换</button></div>
+  <div class="btn-row" style="justify-content:center;margin-top:20px;"><button class="btn-sm" onclick="closeSettings()">关闭</button></div>
+</div>
+
+<div id="topAvatarBtn" onclick="toggleProfile()">
+  <div class="avatar-img" id="topAvatarImg">😀</div>
+  <div class="nick-text" id="topNickText">史蒂夫</div>
+</div>
+
+<div id="profilePanel" class="panel">
+  <h3>👤 个人资料</h3>
+  <label>你的昵称</label>
+  <input type="text" id="profileNickInput" maxlength="12" placeholder="输入昵称" style="width:100%;background:rgba(15,15,25,.9);color:#e8e8f0;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px;font-size:14px;outline:none;">
+  <label>选个头像</label>
+  <div class="avatar-picker" id="avatarPicker"></div>
+  <div class="btn-row" style="justify-content:center;margin-top:20px;">
+    <button class="btn-sm" onclick="closeProfile()">取消</button>
+    <button class="btn-sm green" onclick="saveProfile()">保存</button>
+  </div>
+</div>
+
+<div class="app">
   <!-- 主菜单 -->
   <div class="screen active" id="screenHome">
-    <div class="home-box">
-      <div class="home-title">我的世界</div>
-      <button class="mc-btn primary" onclick="goScreen('screenSingleplayer')">🌍 单人世界</button>
-      <button class="mc-btn" onclick="goScreen('screenMultiplayer')">🌐 多人联机</button>
-      <button class="mc-btn" onclick="showAbout()">ℹ️ 这玩意咋用</button>
+    <div class="home-content">
+      <div class="mc-title" id="homeTitle">我的世界</div>
+      <button class="mc-btn primary slide-btn from-left" onclick="goScreen('screenSingleplayer')">🌍 单人世界</button>
+      <button class="mc-btn slide-btn from-right" onclick="goScreen('screenMultiplayer')">🌐 多人联机</button>
+      <button class="mc-btn slide-btn from-left" onclick="showAbout()">ℹ️ 这玩意咋用</button>
     </div>
   </div>
 
@@ -162,7 +230,6 @@ body{background:#0b0c10;color:#e8e8f0;height:100vh;overflow:hidden}
       <button class="btn-sm" id="btnJoinServer" onclick="joinSelectedServer()" disabled>▶ 进入服务器</button>
     </div>
   </div>
-
 </div>
 
 <!-- 游戏视图 -->
@@ -213,7 +280,7 @@ body{background:#0b0c10;color:#e8e8f0;height:100vh;overflow:hidden}
   <div class="modal">
     <h3>对局域网开放</h3>
     <div style="color:#8890a0;font-size:12px;line-height:1.6;margin-bottom:16px;">
-      先去把你的映射软件（NatGo / FRP / 花生壳啥的）开好，把生成的公网地址粘下面。端口随便填，别跟别的程序打架就行。
+      先去把你的映射软件（NatGo / FRP 等）开好，把生成的公网地址粘下面。端口随便填，别跟别的程序打架就行。
     </div>
     <label>游戏端口</label>
     <div style="display:flex;gap:8px;">
@@ -254,17 +321,89 @@ if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|HarmonyOS|Mobi
   throw new Error('Mobile Blocked');
 }
 
-// ================= 全局状态 =================
-var worlds = JSON.parse(localStorage.getItem('mc_worlds_v4') || '[]');
-var servers = JSON.parse(localStorage.getItem('mc_servers_v4') || '[]');
+// ================= 全局变量 =================
+var worlds = JSON.parse(localStorage.getItem('mc_worlds_v5') || '[]');
+var servers = JSON.parse(localStorage.getItem('mc_servers_v5') || '[]');
 var selectedWorldIdx = -1, selectedServerIdx = -1;
 var currentRoom = null, currentAddress = '', currentNick = localStorage.getItem('mc_nick') || '史蒂夫';
+var currentAvatar = localStorage.getItem('mc_avatar') || '😀';
 var isHost = false;
 var sendChat = null, sendPing = null, sendPong = null;
-var pingTimer = null, joinRoomFn = null, trysteroReady = false;
+var joinRoomFn = null, trysteroReady = false;
 var myPeerId = '';
+var isMuted = false, uiHidden = false;
+var isIntroFinished = false;
 
-// ================= 界面导航 =================
+// ================= 资源路径（可以自己换） =================
+var ASSETS = ['进入主界面后的背景视频.mp4', '背景视频.mp4', '背景音乐.mp3'];
+
+// ================= 启动与动画 =================
+window.addEventListener('load', function() {
+  updateMyMini();
+  renderWorlds();
+  renderServers();
+  ensureTrystero();
+  
+  // 检查是否已经开过场
+  var isFirst = !sessionStorage.getItem('mc_intro_done_v5');
+  if(!isFirst){ 
+    isIntroFinished = true; 
+    afterIntro(); 
+    return; 
+  }
+  document.getElementById('startOverlay').style.display = 'flex'; 
+});
+
+async function startPlayback(){
+  var iv = document.getElementById('introVideo');
+  var bv = document.getElementById('bgVideo');
+  var bm = document.getElementById('bgMusic');
+  
+  var ov = document.getElementById('startOverlay'); 
+  ov.classList.add('hide'); 
+  setTimeout(() => ov.style.display = 'none', 500);
+  
+  iv.src = ASSETS[0]; bv.src = ASSETS[1]; bm.src = ASSETS[2];
+  var il = document.getElementById('introLayer'); 
+  il.classList.add('active'); il.style.display = 'flex';
+  iv.muted = false; iv.volume = 1.0;
+  
+  try { await iv.play(); } catch(e) { finishIntro(); }
+  
+  sessionStorage.setItem('mc_intro_done_v5', '1');
+  iv.onended = finishIntro;
+  setTimeout(() => { if(il.classList.contains('active')) finishIntro(); }, 30000);
+}
+
+function finishIntro(){
+  if(isIntroFinished) return; 
+  isIntroFinished = true;
+  var il = document.getElementById('introLayer'), iv = document.getElementById('introVideo');
+  try { iv.pause(); } catch(e) {}
+  il.classList.add('fade-out');
+  setTimeout(() => {
+    il.classList.remove('active'); il.style.display = 'none'; 
+    afterIntro();
+  }, 800);
+}
+function skipIntro(){ finishIntro(); }
+
+function afterIntro(){
+  var bv = document.getElementById('bgVideo');
+  var bm = document.getElementById('bgMusic');
+  bv.muted = isMuted; bv.volume = 0.5;
+  bm.muted = isMuted; bm.volume = 0.3;
+  bv.play().catch(()=>{});
+  bm.play().catch(()=>{});
+  
+  // 主界面动画
+  var t = document.getElementById('homeTitle');
+  var bs = document.querySelectorAll('.slide-btn');
+  setTimeout(() => t.classList.add('anim-in'), 200);
+  bs.forEach((b, i) => { setTimeout(() => b.classList.add('slide-done'), 400 + i * 150); });
+}
+
+// ================= 界面与设置 =================
 function goScreen(id){
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -284,7 +423,65 @@ function toast(msg){
   t._t = setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// ================= 单人世界 =================
+function toggleUI(){
+  uiHidden = !uiHidden;
+  document.body.classList.toggle('ui-hidden', uiHidden);
+  var btn = document.getElementById('uiToggleBtn');
+  if(uiHidden){ btn.classList.add('hidden-mode'); } else { btn.classList.remove('hidden-mode'); }
+}
+function toggleSound(){
+  isMuted = !isMuted;
+  var bv = document.getElementById('bgVideo'), bm = document.getElementById('bgMusic');
+  bv.muted = isMuted; bm.muted = isMuted;
+  var btn = document.getElementById('soundToggleBtn');
+  if(isMuted){ btn.textContent = '🔇'; btn.classList.add('muted'); } else { btn.textContent = '🔊'; btn.classList.remove('muted'); }
+}
+
+function toggleSettings(){
+  var p = document.getElementById('settingsPanel');
+  p.classList.toggle('show');
+  closeProfile();
+}
+function closeSettings(){ document.getElementById('settingsPanel').classList.remove('show'); }
+
+// ================= 头像与昵称 =================
+var AVATARS = ['😀','😎','🐱','🐶','🦊','🐼','🐸','🦄','👻','🤖','🐧','🐨','🐯','🦁','🐵','🐙'];
+function toggleProfile(){
+  var p = document.getElementById('profilePanel');
+  p.classList.toggle('show');
+  closeSettings();
+  
+  if(p.classList.contains('show')){
+    document.getElementById('profileNickInput').value = currentNick;
+    var picker = document.getElementById('avatarPicker');
+    var h = '';
+    AVATARS.forEach(av => {
+      var cls = av === currentAvatar ? 'avatar-option selected' : 'avatar-option';
+      h += `<div class="${cls}" onclick="pickAvatar('${av}')">${av}</div>`;
+    });
+    picker.innerHTML = h;
+  }
+}
+function closeProfile(){ document.getElementById('profilePanel').classList.remove('show'); }
+function pickAvatar(av){
+  currentAvatar = av;
+  document.querySelectorAll('.avatar-option').forEach(o => o.classList.toggle('selected', o.textContent === av));
+}
+function saveProfile(){
+  var nick = document.getElementById('profileNickInput').value.trim() || '史蒂夫';
+  currentNick = nick;
+  localStorage.setItem('mc_nick', nick);
+  localStorage.setItem('mc_avatar', currentAvatar);
+  updateMyMini();
+  closeProfile();
+  toast('资料已保存');
+}
+function updateMyMini(){
+  document.getElementById('topAvatarImg').textContent = currentAvatar;
+  document.getElementById('topNickText').textContent = currentNick;
+}
+
+// ================= 单人世界逻辑 =================
 function renderWorlds(){
   var box = document.getElementById('worldList');
   if(worlds.length === 0){
@@ -319,7 +516,7 @@ function doCreateWorld(){
   var name = document.getElementById('worldNameInput').value.trim() || '新的世界';
   var seed = document.getElementById('worldSeedInput').value.trim() || Math.random().toString(36).substring(2, 8);
   worlds.push({ name, seed, lastPlayed: new Date().toLocaleDateString() });
-  localStorage.setItem('mc_worlds_v4', JSON.stringify(worlds));
+  localStorage.setItem('mc_worlds_v5', JSON.stringify(worlds));
   closeModal('modalCreateWorld');
   selectedWorldIdx = worlds.length - 1;
   renderWorlds();
@@ -329,7 +526,7 @@ function deleteSelectedWorld(){
   if(selectedWorldIdx < 0) return;
   if(!confirm('删了可就找不回来了，确定？')) return;
   worlds.splice(selectedWorldIdx, 1);
-  localStorage.setItem('mc_worlds_v4', JSON.stringify(worlds));
+  localStorage.setItem('mc_worlds_v5', JSON.stringify(worlds));
   selectedWorldIdx = -1;
   renderWorlds();
   document.getElementById('btnPlayWorld').disabled = true;
@@ -343,34 +540,29 @@ function playSelectedWorld(){
 function enterWorld(i){
   var w = worlds[i];
   w.lastPlayed = new Date().toLocaleDateString();
-  localStorage.setItem('mc_worlds_v4', JSON.stringify(worlds));
+  localStorage.setItem('mc_worlds_v5', JSON.stringify(worlds));
   launchGame(w.name, w.seed, false);
 }
 
 // ================= 局域网开放 =================
 function openLanSettings(){
   if(selectedWorldIdx < 0) return;
-  document.getElementById('lanPortInput').value = Math.floor(Math.random() * (25600 - 25565 + 1)) + 25565;
+  document.getElementById('lanPortInput').value = Math.floor(Math.random() * 10000) + 25565;
   document.getElementById('lanAddressInput').value = '';
   document.getElementById('modalLan').classList.add('show');
 }
 function randomPort(){
-  document.getElementById('lanPortInput').value = Math.floor(Math.random() * (30000 - 20000 + 1)) + 20000;
+  document.getElementById('lanPortInput').value = Math.floor(Math.random() * 10000) + 20000;
 }
 async function doOpenLan(){
   var addr = document.getElementById('lanAddressInput').value.trim();
-  if(!addr){
-    toast('得把映射软件给的地址填进来啊');
-    return;
-  }
+  if(!addr){ toast('得把映射软件给的地址填进来啊'); return; }
   closeModal('modalLan');
   currentAddress = addr;
   currentNick = '房主';
   isHost = true;
   
-  // 模拟一下权限请求的体感（不真弹窗骚扰，但给个提示）
   toast('正在尝试建立连接...');
-  
   var w = worlds[selectedWorldIdx];
   launchGame(w.name, w.seed, true);
   
@@ -414,7 +606,7 @@ function doAddServer(){
   var addr = document.getElementById('addServerAddr').value.trim();
   if(!addr){ toast('地址不能空着'); return; }
   servers.push({ name, addr });
-  localStorage.setItem('mc_servers_v4', JSON.stringify(servers));
+  localStorage.setItem('mc_servers_v5', JSON.stringify(servers));
   closeModal('modalAddServer');
   selectedServerIdx = servers.length - 1;
   renderServers();
@@ -426,13 +618,13 @@ function joinSelectedServer(){
 function joinServer(i){
   var s = servers[i];
   currentAddress = s.addr;
-  currentNick = '玩家';
+  currentNick = currentNick; // 用保存的名字
   isHost = false;
   connectToRoom(s.addr, currentNick, false);
   launchGame(s.name, 'remote', true);
 }
 
-// ================= WebRTC 联机核心 =================
+// ================= WebRTC 联机 =================
 async function ensureTrystero(){
   if(trysteroReady) return true;
   try {
@@ -450,7 +642,7 @@ async function connectToRoom(addr, nick, host){
 
   try {
     currentRoom = joinRoomFn({
-      appId: 'mc-web-ip-direct-v4',
+      appId: 'mc-web-ip-direct-v5',
       rtcConfig: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }
     }, addr);
   } catch(e){
@@ -460,7 +652,6 @@ async function connectToRoom(addr, nick, host){
 
   myPeerId = currentRoom.selfId || 'local';
 
-  // 延迟
   var pingA = currentRoom.makeAction('ping');
   var pongA = currentRoom.makeAction('pong');
   sendPing = pingA[0]; sendPong = pongA[0];
@@ -471,7 +662,6 @@ async function connectToRoom(addr, nick, host){
     document.getElementById('gamePing').style.color = '#6ee7b7';
   });
 
-  // 聊天
   var msgA = currentRoom.makeAction('msg');
   sendChat = msgA[0];
   msgA[1]((d) => addMessage(d.text, d.sender, false));
@@ -482,20 +672,12 @@ async function connectToRoom(addr, nick, host){
     if(host) setInterval(() => { if(sendPing) sendPing({ ts: Date.now() }); }, 3000);
   });
 
-  currentRoom.onPeerLeave(() => {
-    toast('人走了');
-  });
+  currentRoom.onPeerLeave(() => toast('人走了'));
 
-  if(host){
-    // 房主自己也得发个包来测自己的连通性
-    setInterval(() => { if(sendPing) sendPing({ ts: Date.now() }); }, 3000);
-  }
+  if(host) setInterval(() => { if(sendPing) sendPing({ ts: Date.now() }); }, 3000);
 }
 
-function addMessage(text, sender, isSelf){
-  // 简单在游戏里提示一下，不做复杂聊天框了，免得臃肿
-  console.log(`[${sender}]: ${text}`);
-}
+function addMessage(text, sender, isSelf){ console.log(`[${sender}]: ${text}`); }
 
 // ================= 游戏引擎 =================
 var gameActive = false;
@@ -614,24 +796,11 @@ function saveAndQuit(){
   goHome();
 }
 
-// ================= 启动 =================
-function startApp(){
-  var ov = document.getElementById('startOverlay');
-  ov.classList.add('hide');
-  setTimeout(() => ov.style.display = 'none', 500);
-  // 随便放个背景视频，有就播，没有拉倒
-  var bg = document.getElementById('bgVideo');
-  bg.src = '背景视频.mp4'; // 你本地的文件名
-  bg.play().catch(() => {});
-  ensureTrystero();
-}
-
 function showAbout(){
   alert('咋联机？\n\n房主：单人世界 -> 选中一个 -> 对局域网开放 -> 填端口和映射地址 -> 开服。\n\n朋友：多人联机 -> 添加服务器 -> 把房主发的地址粘进去 -> 进服。\n\n就这么简单，别搞复杂了。');
 }
 </script>
 
-<!-- Three.js -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 </body>
 </html>
