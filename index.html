@@ -11,12 +11,12 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
 #mobileBlock{position:fixed;inset:0;z-index:9999999;background:#0a0a12;display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;color:#fff;font-family:monospace}
 #mobileBlock.show{display:flex}
 
-/* ================= 开场视频逻辑（完全保留） ================= */
-#startOverlay{position:fixed;inset:0;background:#000;z-index:2000000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:30px;transition:opacity .5s}
+/* ================= 开场视频绝对死写在 HTML 里 ================= */
+#startOverlay{position:fixed;inset:0;background:#000;z-index:2000000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:30px;transition:opacity .5s}
 #startOverlay.hide{opacity:0;pointer-events:none}
-#startOverlay .title{font-size:48px;font-weight:900;letter-spacing:8px;background:linear-gradient(135deg,#4a6cf7,#a855f7,#ec4899);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 60px rgba(74,108,247,.5);animation:floatUp 2s ease-in-out infinite}
+#startOverlay .title{font-size:48px;font-weight:900;letter-spacing:8px;background:linear-gradient(135deg,#4a6cf7,#a855f7,#ec4899);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 60px rgba(74,108,247,.5);animation:floatUp 2s ease-in-out infinite;z-index:2}
 @keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-#startOverlay .startBtn{padding:18px 60px;background:linear-gradient(135deg,#3a5cdf,#4a6cf7);color:#fff;border:none;border-radius:50px;font-size:18px;font-weight:700;cursor:pointer;letter-spacing:4px;box-shadow:0 8px 32px rgba(74,108,247,.6);transition:all .3s}
+#startOverlay .startBtn{padding:18px 60px;background:linear-gradient(135deg,#3a5cdf,#4a6cf7);color:#fff;border:none;border-radius:50px;font-size:18px;font-weight:700;cursor:pointer;letter-spacing:4px;box-shadow:0 8px 32px rgba(74,108,247,.6);transition:all .3s;z-index:2}
 #startOverlay .startBtn:hover{transform:scale(1.05);box-shadow:0 12px 48px rgba(74,108,247,.8)}
 
 #introLayer{position:fixed;inset:0;background:#000;z-index:999999;display:none;align-items:center;justify-content:center;opacity:1;transition:opacity .8s ease}
@@ -26,10 +26,9 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
 #introSkip{position:absolute;right:24px;bottom:24px;padding:8px 18px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.3);border-radius:20px;color:#fff;font-size:12px;cursor:pointer;backdrop-filter:blur(8px);transition:all .2s;z-index:3;opacity:.7}
 #introSkip:hover{background:rgba(0,0,0,.8);opacity:1}
 
-/* 背景视频（如果没有视频文件，背景自动变成动态星云，绝不黑屏） */
-#bgVideo{position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:0;pointer-events:none;background:#0b0c10; opacity: 0.6;}
-#bgMask{position:fixed;inset:0;z-index:1;background:linear-gradient(180deg,rgba(10,10,20,.4) 0%,rgba(10,10,20,.8) 100%);pointer-events:none; animation: bgFallback 10s infinite alternate;}
-@keyframes bgFallback { 0% { background: radial-gradient(circle at 50% 50%, #1a1c2e, #0b0c10); } 100% { background: radial-gradient(circle at 50% 50%, #131b2e, #0b0c10); } }
+/* 背景视频 */
+#bgVideo{position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:0;pointer-events:none;background:#000;}
+#bgMask{position:fixed;inset:0;z-index:1;background:linear-gradient(180deg,rgba(10,10,20,.4) 0%,rgba(10,10,20,.8) 100%);pointer-events:none;}
 
 /* 右上角头像 */
 #topAvatarBtn { position: fixed; right: 20px; top: 20px; z-index: 5000; display: flex; align-items: center; gap: 10px; padding: 6px 14px; background: rgba(30,32,48,.85); border: 1px solid rgba(74,108,247,.3); border-radius: 30px; cursor: pointer; backdrop-filter: blur(12px); transition: all .2s; }
@@ -55,7 +54,7 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
 .screen{display:none;flex-direction:column;flex:1;padding:30px 40px;overflow-y:auto}
 .screen.active{display:flex}
 .home-box{width:100%;max-width:420px;display:flex;flex-direction:column;gap:14px;margin:auto}
-.home-title{font-size:56px;font-weight:900;text-align:center;letter-spacing:6px;background:linear-gradient(135deg,#6ee7b7,#3b82f6,#a855f7);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:30px}
+.home-title{font-size:56px;font-weight:900;text-align:center;letter-spacing:6px;background:linear-gradient(135deg,#6ee7b7,#3b82f6,#a855f7);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:30px; text-shadow: 0 4px 20px rgba(0,0,0,0.5);}
 .mc-btn{width:100%;padding:16px 22px;background:rgba(30,32,48,.85);color:#e8e8f0;border:2px solid rgba(59,130,246,.3);border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;transition:all .3s;letter-spacing:2px;backdrop-filter:blur(12px)}
 .mc-btn:hover{transform:translateY(-2px);border-color:#3b82f6;box-shadow:0 12px 40px rgba(59,130,246,.4)}
 .mc-btn.primary{background:linear-gradient(135deg,rgba(59,130,246,.9),rgba(110,231,183,.8));border-color:transparent;color:#fff}
@@ -147,19 +146,22 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
 
 <div id="mobileBlock"><div style="font-size:60px;margin-bottom:20px;">🚫</div><div style="font-size:20px;font-weight:bold;">手机端玩不了这个</div><div style="margin-top:10px;color:#888;">换电脑来吧，兄弟</div></div>
 
-<!-- 开场视频逻辑（完全保留） -->
+<!-- ================= 视频直接写死在 HTML 内 ================= -->
+<!-- 背景视频，直接静音循环铺底 -->
+<video id="bgVideo" src="背景视频.mp4" loop muted playsinline autoplay style="position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:0;pointer-events:none;"></video>
+<div id="bgMask" style="position:fixed;inset:0;z-index:1;background:linear-gradient(180deg,rgba(10,10,20,.4) 0%,rgba(10,10,20,.85) 100%);pointer-events:none;"></div>
+
 <div id="startOverlay">
   <div class="title">我的世界 · 网页版</div>
   <button class="startBtn" onclick="startPlayback()">开始游戏</button>
 </div>
+
+<!-- 开场视频 -->
 <div id="introLayer">
-  <video id="introVideo" playsinline preload="auto"></video>
+  <!-- 视频路径直接写死 -->
+  <video id="introVideo" src="进入主界面后的背景视频.mp4" playsinline></video>
   <div id="introSkip" onclick="finishIntro()">跳过 ▶</div>
 </div>
-
-<!-- 背景视频 -->
-<video id="bgVideo" loop playsinline preload="auto"></video>
-<div id="bgMask"></div>
 
 <div id="topAvatarBtn" onclick="toggleProfile()">
   <div class="avatar-img" id="topAvatarImg">😀</div>
@@ -323,8 +325,8 @@ if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|HarmonyOS|Mobi
   throw new Error('Mobile Blocked');
 }
 
-var worlds = JSON.parse(localStorage.getItem('mc_worlds_v18') || '[]');
-var servers = JSON.parse(localStorage.getItem('mc_servers_v18') || '[]');
+var worlds = JSON.parse(localStorage.getItem('mc_worlds_v19') || '[]');
+var servers = JSON.parse(localStorage.getItem('mc_servers_v19') || '[]');
 var selectedWorldIdx = -1, selectedServerIdx = -1;
 var currentRoom = null, currentAddress = '';
 var currentNick = localStorage.getItem('mc_nick') || '史蒂夫';
@@ -384,31 +386,25 @@ var blockTextures = {
 };
 var STEVE_SKIN_URL = 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.1/assets/minecraft/textures/entity/steve.png';
 
-var VIDEO_INTRO = '进入主界面后的背景视频.mp4'; 
-var VIDEO_BG = '背景视频.mp4';
-
 // 加载器与缓存
 var textureLoader = new THREE.TextureLoader();
 textureLoader.setCrossOrigin('anonymous');
 var textureCache = {};
 
-// 核心：自己画贴图，彻底防止红块黑块
+// 自己画贴图，彻底防止红块黑块
 function createColorCanvasTexture(color, isGrass) {
     var canvas = document.createElement('canvas');
     canvas.width = 16; canvas.height = 16;
     var ctx = canvas.getContext('2d');
     ctx.fillStyle = color;
     ctx.fillRect(0, 0, 16, 16);
-    // 加点噪点模拟像素风
     for(var i=0; i<50; i++) {
         ctx.fillStyle = Math.random() > 0.5 ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)';
         ctx.fillRect(Math.floor(Math.random()*16), Math.floor(Math.random()*16), 1, 1);
     }
     if(isGrass) {
-        ctx.fillStyle = '#8b5a2b'; // 泥土底
-        ctx.fillRect(0, 4, 16, 12);
-        ctx.fillStyle = '#55aa55'; // 草地顶
-        ctx.fillRect(0, 0, 16, 4);
+        ctx.fillStyle = '#8b5a2b'; ctx.fillRect(0, 4, 16, 12);
+        ctx.fillStyle = '#55aa55'; ctx.fillRect(0, 0, 16, 4);
     }
     var tex = new THREE.CanvasTexture(canvas);
     tex.magFilter = THREE.NearestFilter; tex.minFilter = THREE.NearestFilter;
@@ -418,8 +414,6 @@ function createColorCanvasTexture(color, isGrass) {
 function getTexture(type) {
   if(textureCache[type]) return textureCache[type];
   var url = blockTextures[type] || blockTextures['stone'];
-  
-  // 预设颜色兜底
   var fallbackColor = '#888888';
   if (type === 'grass_block') fallbackColor = '#55aa55';
   else if (type === 'dirt') fallbackColor = '#8b5a2b';
@@ -433,7 +427,6 @@ function getTexture(type) {
   else if (type === 'oak_leaves') fallbackColor = '#33aa33';
 
   var tex = textureLoader.load(url, function(t) { t.needsUpdate = true; }, undefined, function(err) {
-      // 图片加载失败（被墙或断网），立即用 Canvas 画一个替代
       tex.image = createColorCanvasTexture(fallbackColor, type === 'grass_block').image;
       tex.needsUpdate = true;
   });
@@ -504,42 +497,45 @@ function saveGameState() {
 // ================= 视频与资料 =================
 window.addEventListener('load', function() {
   updateMyMini(); renderWorlds(); renderServers(); initHotbarUI();
-  // 绝对不拦截，每次都显示开始按钮，确保用户能触发点击播放开场视频
-  document.getElementById('startOverlay').style.display = 'flex'; 
 });
 
-async function startPlayback(){
-  var iv = document.getElementById('introVideo'), bv = document.getElementById('bgVideo');
-  var ov = document.getElementById('startOverlay'); ov.classList.add('hide'); setTimeout(() => ov.style.display = 'none', 500);
+function startPlayback(){
+  var iv = document.getElementById('introVideo');
+  var ov = document.getElementById('startOverlay'); 
+  ov.classList.add('hide'); 
+  setTimeout(() => ov.style.display = 'none', 500);
   
-  iv.src = VIDEO_INTRO; 
-  bv.src = VIDEO_BG; 
+  var il = document.getElementById('introLayer'); 
+  il.classList.add('active'); il.style.display = 'flex';
   
-  var il = document.getElementById('introLayer'); il.classList.add('active'); il.style.display = 'flex';
-  iv.muted = false; iv.volume = 1.0;
+  iv.muted = false; 
+  iv.volume = 1.0;
   
-  try { 
-      await iv.play(); 
-  } catch(e) { 
-      iv.muted = true; 
-      iv.play().catch(()=> finishIntro()); 
+  var playPromise = iv.play();
+  if (playPromise !== undefined) {
+      playPromise.then(_ => {
+          // 播放成功
+      }).catch(error => {
+          // 只有在浏览器禁止带声音自动播放时，才静音播放
+          iv.muted = true;
+          iv.play();
+      });
   }
   
-  iv.onended = finishIntro; 
-  setTimeout(() => { if(il.classList.contains('active')) finishIntro(); }, 25000);
+  iv.onended = finishIntro;
+  // 绝对不写自动跳过的 timeout！让用户看完或者自己点跳过。
 }
 
 function finishIntro(){
-  if(isIntroFinished) return; isIntroFinished = true;
+  if(isIntroFinished) return; 
+  isIntroFinished = true;
   var il = document.getElementById('introLayer'), iv = document.getElementById('introVideo');
   try { iv.pause(); } catch(e) {}
-  il.classList.add('fade-out'); setTimeout(() => { il.classList.remove('active'); il.style.display = 'none'; afterIntro(); }, 800);
-}
-
-function afterIntro(){ 
-    var bv = document.getElementById('bgVideo'); 
-    bv.volume = 0.5; 
-    bv.play().catch(()=>{}); 
+  il.classList.add('fade-out'); 
+  setTimeout(() => { 
+      il.classList.remove('active'); 
+      il.style.display = 'none'; 
+  }, 800);
 }
 
 function updateMyMini(){
@@ -588,17 +584,17 @@ function selectWorld(i){ selectedWorldIdx = i; renderWorlds(); document.getEleme
 function openCreateWorld(){ document.getElementById('worldNameInput').value = ''; document.getElementById('worldSeedInput').value = ''; document.getElementById('modalCreateWorld').classList.add('show'); }
 function doCreateWorld(){
   var name = document.getElementById('worldNameInput').value.trim() || '新的世界'; var seed = document.getElementById('worldSeedInput').value.trim() || Math.random().toString(36).substring(2, 8);
-  worlds.push({ name, seed, lastPlayed: new Date().toLocaleDateString() }); localStorage.setItem('mc_worlds_v18', JSON.stringify(worlds)); closeModal('modalCreateWorld');
+  worlds.push({ name, seed, lastPlayed: new Date().toLocaleDateString() }); localStorage.setItem('mc_worlds_v19', JSON.stringify(worlds)); closeModal('modalCreateWorld');
   selectedWorldIdx = worlds.length - 1; renderWorlds(); toast('世界建好了，进吧');
 }
 function deleteSelectedWorld(){
   if(selectedWorldIdx < 0) return; if(!confirm('删了可就找不回来了，确定？')) return;
-  worlds.splice(selectedWorldIdx, 1); localStorage.setItem('mc_worlds_v18', JSON.stringify(worlds)); selectedWorldIdx = -1; renderWorlds();
+  worlds.splice(selectedWorldIdx, 1); localStorage.setItem('mc_worlds_v19', JSON.stringify(worlds)); selectedWorldIdx = -1; renderWorlds();
   document.getElementById('btnPlayWorld').disabled = true; document.getElementById('btnOpenLan').disabled = true; document.getElementById('btnDeleteWorld').disabled = true;
 }
 function playSelectedWorld(){ if(selectedWorldIdx >= 0) enterWorld(selectedWorldIdx); }
 function enterWorld(i){
-  var w = worlds[i]; w.lastPlayed = new Date().toLocaleDateString(); localStorage.setItem('mc_worlds_v18', JSON.stringify(worlds)); launchGame(w.name, w.seed, false);
+  var w = worlds[i]; w.lastPlayed = new Date().toLocaleDateString(); localStorage.setItem('mc_worlds_v19', JSON.stringify(worlds)); launchGame(w.name, w.seed, false);
 }
 
 // ================= 局域网与联机 =================
@@ -629,7 +625,7 @@ function openAddServer(){ document.getElementById('addServerName').value = ''; d
 function doAddServer(){
   var name = document.getElementById('addServerName').value.trim() || '兄弟的服'; var addr = document.getElementById('addServerAddr').value.trim();
   if(!addr){ toast('端口不能空着'); return; }
-  servers.push({ name, addr }); localStorage.setItem('mc_servers_v18', JSON.stringify(servers)); closeModal('modalAddServer');
+  servers.push({ name, addr }); localStorage.setItem('mc_servers_v19', JSON.stringify(servers)); closeModal('modalAddServer');
   selectedServerIdx = servers.length - 1; renderServers(); toast('服务器加好了');
 }
 function joinSelectedServer(){ if(selectedServerIdx >= 0) joinServer(selectedServerIdx); }
@@ -649,7 +645,7 @@ async function connectToRoom(addr, host){
   if(currentRoom){ try { currentRoom.leave(); } catch(e){} }
 
   try {
-    currentRoom = joinRoomFn({ appId: 'mc-web-final-v18', rtcConfig: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } }, addr);
+    currentRoom = joinRoomFn({ appId: 'mc-web-final-v19', rtcConfig: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } }, addr);
   } catch(e){ toast('端口格式有误，无法建立连接'); return; }
 
   myPeerId = currentRoom.selfId || 'local';
@@ -707,12 +703,11 @@ function executeCommand(cmd) {
   addGameChatMessage('系统', '😀', result);
 }
 
-// ================= 游戏引擎与 AABB 物理 =================
+// ================= 游戏引擎与真实物理 =================
 function launchGame(worldName, seed, isMultiplayer){
   if(!renderer) initEngine();
   document.getElementById('gameView').classList.add('show'); gameActive = true;
   
-  // 恢复上次退出的位置和视角
   var saved = localStorage.getItem('mc_saved_state');
   if (saved) {
       try {
@@ -744,7 +739,6 @@ function initEngine(){
   generateWorld(); 
   playerModel = createPlayerModelMesh(); scene.add(playerModel);
   
-  // 方块高亮线框
   var geo = new THREE.EdgesGeometry(new THREE.BoxGeometry(1.002, 1.002, 1.002)); 
   var mat = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 }); 
   highlightBox = new THREE.LineSegments(geo, mat); highlightBox.visible = false; scene.add(highlightBox);
@@ -782,19 +776,15 @@ function generateChunk(cx, cz) {
     for(var z = 0; z < CHUNK_SIZE; z++) {
       var wx = startX + x;
       var wz = startZ + z;
-      // 基于噪声的波浪地形
       var h = Math.floor(Math.sin(wx * 0.1) * 4 + Math.cos(wz * 0.1) * 4 + 12);
       
-      // 最底层基岩
       addBlock(wx, 0, wz, 'bedrock');
       
-      // 填充泥土和石头
       for(var y = 1; y < h; y++) {
         var type = y === h - 1 ? 'grass_block' : (y > h - 4 ? 'dirt' : 'stone');
         addBlock(wx, y, wz, type);
       }
       
-      // 种树
       if (Math.random() < 0.01 && h > 5) { 
         generateTree(wx, h, wz);
       }
@@ -900,7 +890,6 @@ function updateCameraModeText(){
   document.getElementById('gameMode').textContent = '模式: ' + text;
 }
 
-// 真实 AABB 包围盒物理引擎
 var lastFrameTime = performance.now();
 var justJumped = false;
 
@@ -936,7 +925,6 @@ function loop(){
   if (isSneaking) speed = SNEAK_SPEED; 
   else if (isSprinting) speed = SPRINT_SPEED;
   
-  // 水平移动计算
   var forward = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw)); var right = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
   var moveVec = new THREE.Vector3(0,0,0);
   if(keys['KeyW']) moveVec.add(forward);
@@ -953,7 +941,6 @@ function loop(){
       if (!isColliding(playerPos.x, playerPos.y, nextZ)) playerPos.z = nextZ;
   }
   
-  // 垂直移动 (重力)
   velocityY -= GRAVITY * tickDelta;
   if(velocityY < -50) velocityY = -50; 
   
@@ -961,12 +948,10 @@ function loop(){
   
   if (isColliding(playerPos.x, nextY, playerPos.z)) {
       if (velocityY < 0) {
-          // 落地
           playerPos.y = Math.floor(nextY + 1.5) + 1.5 - 0.01; 
           velocityY = 0;
           isGrounded = true;
       } else if (velocityY > 0) {
-          // 撞头
           velocityY = 0;
       }
   } else {
@@ -974,7 +959,6 @@ function loop(){
       isGrounded = false;
   }
   
-  // 跳跃
   if(keys['Space']) {
       if (isGrounded && !justJumped) {
           velocityY = JUMP_VELOCITY;
@@ -985,28 +969,23 @@ function loop(){
       justJumped = false; 
   }
 
-  // 掉入虚空重置
   if (playerPos.y < -20) {
       playerPos.set(8, 25, 8);
       velocityY = 0;
       addGameChatMessage('系统', '😀', '你掉入了虚空！');
   }
 
-  // 更新模型位置
   playerModel.position.copy(playerPos); playerModel.position.y -= 1.5; playerModel.rotation.y = yaw;
   if(sendPos && Date.now() - lastPosSendTime > 100) { lastPosSendTime = Date.now(); sendPos({ pos: playerPos, yaw: yaw }); }
 
-  // 相机视角
   if(cameraMode === 0){ camera.position.copy(playerPos); camera.position.y += 0.6; playerModel.visible = false; } 
   else if(cameraMode === 1){ var offset = new THREE.Vector3(Math.sin(yaw) * 4, 2, Math.cos(yaw) * 4); camera.position.copy(playerPos).add(offset); camera.lookAt(playerPos); playerModel.visible = true; } 
   else { var offset = new THREE.Vector3(-Math.sin(yaw) * 4, 2, -Math.cos(yaw) * 4); camera.position.copy(playerPos).add(offset); camera.lookAt(playerPos); playerModel.visible = true; }
   camera.rotation.order = 'YXZ'; camera.rotation.y = yaw; camera.rotation.x = pitch;
 
-  // 方块高亮
   raycaster.setFromCamera(new THREE.Vector2(0, 0), camera); var targetHits = raycaster.intersectObjects(blocks);
   if(targetHits.length > 0 && targetHits[0].distance < 8){ highlightBox.position.copy(targetHits[0].object.position); highlightBox.visible = true; } else { highlightBox.visible = false; }
 
-  // 更新 HUD
   document.getElementById('gameCoord').textContent = `X: ${playerPos.x.toFixed(1)} Y: ${playerPos.y.toFixed(1)} Z: ${playerPos.z.toFixed(1)}`;
   
   renderer.render(scene, camera);
