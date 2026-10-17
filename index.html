@@ -11,6 +11,7 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
 #mobileBlock{position:fixed;inset:0;z-index:9999999;background:#0a0a12;display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;color:#fff;font-family:monospace}
 #mobileBlock.show{display:flex}
 
+/* ================= 开场视频绝对严格保留 ================= */
 #startOverlay{position:fixed;inset:0;background:#000;z-index:2000000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:30px;transition:opacity .5s}
 #startOverlay.hide{opacity:0;pointer-events:none}
 #startOverlay .title{font-size:48px;font-weight:900;letter-spacing:8px;background:linear-gradient(135deg,#4a6cf7,#a855f7,#ec4899);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 60px rgba(74,108,247,.5);animation:floatUp 2s ease-in-out infinite}
@@ -25,9 +26,11 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
 #introSkip{position:absolute;right:24px;bottom:24px;padding:8px 18px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.3);border-radius:20px;color:#fff;font-size:12px;cursor:pointer;backdrop-filter:blur(8px);transition:all .2s;z-index:3;opacity:.7}
 #introSkip:hover{background:rgba(0,0,0,.8);opacity:1}
 
-#bgVideo{position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:0;pointer-events:none;background:#000}
+/* 背景视频 */
+#bgVideo{position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:0;pointer-events:none;background:#000;opacity:0.7}
 #bgMask{position:fixed;inset:0;z-index:1;background:linear-gradient(180deg,rgba(10,10,20,.08) 0%,rgba(10,10,20,.35) 100%);pointer-events:none}
 
+/* 右上角头像 */
 #topAvatarBtn { position: fixed; right: 20px; top: 20px; z-index: 5000; display: flex; align-items: center; gap: 10px; padding: 6px 14px; background: rgba(30,32,48,.85); border: 1px solid rgba(74,108,247,.3); border-radius: 30px; cursor: pointer; backdrop-filter: blur(12px); transition: all .2s; }
 #topAvatarBtn:hover { border-color: #4a6cf7; box-shadow: 0 0 16px rgba(74,108,247,.3); }
 #topAvatarBtn .avatar-img { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#4a6cf7,#a855f7); display: flex; align-items: center; justify-content: center; font-size: 18px; overflow: hidden; }
@@ -143,6 +146,7 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
 
 <div id="mobileBlock"><div style="font-size:60px;margin-bottom:20px;">🚫</div><div style="font-size:20px;font-weight:bold;">手机端玩不了这个</div><div style="margin-top:10px;color:#888;">换电脑来吧，兄弟</div></div>
 
+<!-- 开场视频逻辑（绝对严格保留） -->
 <div id="startOverlay">
   <div class="title">我的世界 · 网页版</div>
   <button class="startBtn" onclick="startPlayback()">开始游戏</button>
@@ -152,6 +156,7 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
   <div id="introSkip" onclick="finishIntro()">跳过 ▶</div>
 </div>
 
+<!-- 背景视频 -->
 <video id="bgVideo" loop playsinline preload="auto"></video>
 <div id="bgMask"></div>
 
@@ -317,8 +322,8 @@ if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|HarmonyOS|Mobi
   throw new Error('Mobile Blocked');
 }
 
-var worlds = JSON.parse(localStorage.getItem('mc_worlds_v15') || '[]');
-var servers = JSON.parse(localStorage.getItem('mc_servers_v15') || '[]');
+var worlds = JSON.parse(localStorage.getItem('mc_worlds_v17') || '[]');
+var servers = JSON.parse(localStorage.getItem('mc_servers_v17') || '[]');
 var selectedWorldIdx = -1, selectedServerIdx = -1;
 var currentRoom = null, currentAddress = '';
 var currentNick = localStorage.getItem('mc_nick') || '史蒂夫';
@@ -359,11 +364,10 @@ var SPRINT_SPEED = 5.612;
 var SNEAK_SPEED = 1.295;
 
 // 区块设置
-var renderDistance = 2; // 2x2 区块，保证性能
+var renderDistance = 2;
 var CHUNK_SIZE = 16;
-var blockMeshes = []; 
 
-// 可靠的贴图直链 (使用 raw.githubusercontent.com 并强制 CORS)
+// 可靠的贴图直链
 var blockTextures = {
   'grass_block': 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.1/assets/minecraft/textures/block/grass_block_top.png',
   'dirt': 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.1/assets/minecraft/textures/block/dirt.png',
@@ -391,18 +395,18 @@ var FALLBACK_TEXTURE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCA
 function getTexture(type) {
   if(textureCache[type]) return textureCache[type];
   var url = blockTextures[type] || blockTextures['stone'];
-  var tex = textureLoader.load(url, function(t) { 
-      t.needsUpdate = true; 
-  }, undefined, function(err) {
-      console.warn('纹理加载失败，已兜底: ' + type);
-      tex.image = new Image();
-      tex.image.src = FALLBACK_TEXTURE;
-      tex.needsUpdate = true;
+  
+  // 核心防红块：强制底色为白色，加载失败时回退到纯白图片，并赋予基础颜色
+  var color = 0xffffff;
+  if (type === 'grass_block') color = 0x55aa55;
+  if (type === 'dirt') color = 0x8b5a2b;
+  if (type === 'stone') color = 0x888888;
+  
+  var tex = textureLoader.load(url, function(t) { t.needsUpdate = true; }, undefined, function(err) {
+      tex.image = new Image(); tex.image.src = FALLBACK_TEXTURE; tex.needsUpdate = true;
   });
-  tex.magFilter = THREE.NearestFilter;
-  tex.minFilter = THREE.NearestFilter;
-  textureCache[type] = tex;
-  return tex;
+  tex.magFilter = THREE.NearestFilter; tex.minFilter = THREE.NearestFilter;
+  textureCache[type] = tex; return tex;
 }
 
 // ================= 快捷键与拦截 =================
@@ -457,37 +461,41 @@ document.getElementById('gamemodeSwitcher').addEventListener('click', function(e
 
 // 退出前保存位置和视角
 window.addEventListener('beforeunload', function (e) {
-    if (gameActive) { 
-        saveGameState(); 
-        e.preventDefault(); e.returnValue = '游戏正在运行中，确定要离开吗？'; return e.returnValue; 
-    }
+    if (gameActive) { saveGameState(); e.preventDefault(); e.returnValue = '游戏正在运行中，确定要离开吗？'; return e.returnValue; }
 });
 
 function saveGameState() {
-    var state = {
-        x: playerPos.x, y: playerPos.y, z: playerPos.z,
-        yaw: yaw, pitch: pitch
-    };
+    var state = { x: playerPos.x, y: playerPos.y, z: playerPos.z, yaw: yaw, pitch: pitch };
     localStorage.setItem('mc_saved_state', JSON.stringify(state));
 }
 
 // ================= 视频与资料 =================
 window.addEventListener('load', function() {
   updateMyMini(); renderWorlds(); renderServers(); initHotbarUI();
-  var isFirst = !sessionStorage.getItem('mc_intro_done_v15');
-  if(!isFirst){ isIntroFinished = true; afterIntro(); return; }
+  // 取消 sessionStorage 拦截，每次都显示开始界面
   document.getElementById('startOverlay').style.display = 'flex'; 
 });
 
 async function startPlayback(){
   var iv = document.getElementById('introVideo'), bv = document.getElementById('bgVideo');
   var ov = document.getElementById('startOverlay'); ov.classList.add('hide'); setTimeout(() => ov.style.display = 'none', 500);
-  iv.src = VIDEO_INTRO; bv.src = VIDEO_BG; 
+  
+  // 强制设置本地视频文件源
+  iv.src = VIDEO_INTRO; 
+  bv.src = VIDEO_BG; 
+  
   var il = document.getElementById('introLayer'); il.classList.add('active'); il.style.display = 'flex';
   iv.muted = false; iv.volume = 1.0;
-  try { await iv.play(); } catch(e) { iv.muted = true; iv.play().catch(()=> finishIntro()); }
-  sessionStorage.setItem('mc_intro_done_v15', '1');
-  iv.onended = finishIntro; setTimeout(() => { if(il.classList.contains('active')) finishIntro(); }, 25000);
+  
+  try { 
+      await iv.play(); 
+  } catch(e) { 
+      iv.muted = true; 
+      iv.play().catch(()=> finishIntro()); 
+  }
+  
+  iv.onended = finishIntro; 
+  setTimeout(() => { if(il.classList.contains('active')) finishIntro(); }, 25000);
 }
 
 function finishIntro(){
@@ -497,7 +505,11 @@ function finishIntro(){
   il.classList.add('fade-out'); setTimeout(() => { il.classList.remove('active'); il.style.display = 'none'; afterIntro(); }, 800);
 }
 
-function afterIntro(){ var bv = document.getElementById('bgVideo'); bv.volume = 0.5; bv.play().catch(()=>{}); }
+function afterIntro(){ 
+    var bv = document.getElementById('bgVideo'); 
+    bv.volume = 0.5; 
+    bv.play().catch(()=>{}); 
+}
 
 function updateMyMini(){
   var imgEl = document.getElementById('topAvatarImg');
@@ -545,17 +557,17 @@ function selectWorld(i){ selectedWorldIdx = i; renderWorlds(); document.getEleme
 function openCreateWorld(){ document.getElementById('worldNameInput').value = ''; document.getElementById('worldSeedInput').value = ''; document.getElementById('modalCreateWorld').classList.add('show'); }
 function doCreateWorld(){
   var name = document.getElementById('worldNameInput').value.trim() || '新的世界'; var seed = document.getElementById('worldSeedInput').value.trim() || Math.random().toString(36).substring(2, 8);
-  worlds.push({ name, seed, lastPlayed: new Date().toLocaleDateString() }); localStorage.setItem('mc_worlds_v15', JSON.stringify(worlds)); closeModal('modalCreateWorld');
+  worlds.push({ name, seed, lastPlayed: new Date().toLocaleDateString() }); localStorage.setItem('mc_worlds_v17', JSON.stringify(worlds)); closeModal('modalCreateWorld');
   selectedWorldIdx = worlds.length - 1; renderWorlds(); toast('世界建好了，进吧');
 }
 function deleteSelectedWorld(){
   if(selectedWorldIdx < 0) return; if(!confirm('删了可就找不回来了，确定？')) return;
-  worlds.splice(selectedWorldIdx, 1); localStorage.setItem('mc_worlds_v15', JSON.stringify(worlds)); selectedWorldIdx = -1; renderWorlds();
+  worlds.splice(selectedWorldIdx, 1); localStorage.setItem('mc_worlds_v17', JSON.stringify(worlds)); selectedWorldIdx = -1; renderWorlds();
   document.getElementById('btnPlayWorld').disabled = true; document.getElementById('btnOpenLan').disabled = true; document.getElementById('btnDeleteWorld').disabled = true;
 }
 function playSelectedWorld(){ if(selectedWorldIdx >= 0) enterWorld(selectedWorldIdx); }
 function enterWorld(i){
-  var w = worlds[i]; w.lastPlayed = new Date().toLocaleDateString(); localStorage.setItem('mc_worlds_v15', JSON.stringify(worlds)); launchGame(w.name, w.seed, false);
+  var w = worlds[i]; w.lastPlayed = new Date().toLocaleDateString(); localStorage.setItem('mc_worlds_v17', JSON.stringify(worlds)); launchGame(w.name, w.seed, false);
 }
 
 // ================= 局域网与联机 =================
@@ -586,7 +598,7 @@ function openAddServer(){ document.getElementById('addServerName').value = ''; d
 function doAddServer(){
   var name = document.getElementById('addServerName').value.trim() || '兄弟的服'; var addr = document.getElementById('addServerAddr').value.trim();
   if(!addr){ toast('端口不能空着'); return; }
-  servers.push({ name, addr }); localStorage.setItem('mc_servers_v15', JSON.stringify(servers)); closeModal('modalAddServer');
+  servers.push({ name, addr }); localStorage.setItem('mc_servers_v17', JSON.stringify(servers)); closeModal('modalAddServer');
   selectedServerIdx = servers.length - 1; renderServers(); toast('服务器加好了');
 }
 function joinSelectedServer(){ if(selectedServerIdx >= 0) joinServer(selectedServerIdx); }
@@ -606,7 +618,7 @@ async function connectToRoom(addr, host){
   if(currentRoom){ try { currentRoom.leave(); } catch(e){} }
 
   try {
-    currentRoom = joinRoomFn({ appId: 'mc-web-final-v15', rtcConfig: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } }, addr);
+    currentRoom = joinRoomFn({ appId: 'mc-web-final-v17', rtcConfig: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } }, addr);
   } catch(e){ toast('端口格式有误，无法建立连接'); return; }
 
   myPeerId = currentRoom.selfId || 'local';
@@ -664,7 +676,7 @@ function executeCommand(cmd) {
   addGameChatMessage('系统', '😀', result);
 }
 
-// ================= 游戏引擎与真实物理 =================
+// ================= 游戏引擎与 AABB 物理 =================
 function launchGame(worldName, seed, isMultiplayer){
   if(!renderer) initEngine();
   document.getElementById('gameView').classList.add('show'); gameActive = true;
@@ -678,11 +690,11 @@ function launchGame(worldName, seed, isMultiplayer){
           yaw = state.yaw;
           pitch = state.pitch;
       } catch(e) {
-          playerPos.set(0, 30, 0); // 没存档的话从高空出生
+          playerPos.set(8, 25, 8); 
           yaw = 0; pitch = 0;
       }
   } else {
-      playerPos.set(0, 30, 0); 
+      playerPos.set(8, 25, 8); 
       yaw = 0; pitch = 0;
   }
   
@@ -703,7 +715,7 @@ function initEngine(){
   
   // 方块高亮线框
   var geo = new THREE.EdgesGeometry(new THREE.BoxGeometry(1.002, 1.002, 1.002)); 
-  var mat = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 }); // MC是黑框
+  var mat = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 }); 
   highlightBox = new THREE.LineSegments(geo, mat); highlightBox.visible = false; scene.add(highlightBox);
 
   document.addEventListener('keydown', onKeyDown); document.addEventListener('keyup', onKeyUp); document.addEventListener('mousemove', onMouseMove);
@@ -722,11 +734,8 @@ function initEngine(){
 }
 
 function generateWorld() {
-  // 清理旧数据
-  blocks.forEach(b => scene.remove(b)); blocks = []; blockMeshes = [];
-  
+  blocks.forEach(b => scene.remove(b)); blocks = [];
   var half = Math.floor(renderDistance / 2);
-  // 生成多区块
   for(var cx = -half; cx <= half; cx++) {
     for(var cz = -half; cz <= half; cz++) {
       generateChunk(cx, cz);
@@ -738,16 +747,12 @@ function generateChunk(cx, cz) {
   var startX = cx * CHUNK_SIZE;
   var startZ = cz * CHUNK_SIZE;
   
-  // 高度图数组
-  var heightMap = {};
-  
   for(var x = 0; x < CHUNK_SIZE; x++) {
     for(var z = 0; z < CHUNK_SIZE; z++) {
       var wx = startX + x;
       var wz = startZ + z;
-      // 生成波浪地形
+      // 基于噪声的波浪地形
       var h = Math.floor(Math.sin(wx * 0.1) * 4 + Math.cos(wz * 0.1) * 4 + 12);
-      heightMap[x + ',' + z] = h;
       
       // 最底层基岩
       addBlock(wx, 0, wz, 'bedrock');
@@ -786,10 +791,11 @@ function generateTree(x, groundY, z) {
 }
 
 function addBlock(x, y, z, type){
-  var geo = new THREE.BoxGeometry(1, 1, 1); var tex = getTexture(type); var mat = new THREE.MeshLambertMaterial({ map: tex });
+  var geo = new THREE.BoxGeometry(1, 1, 1); var tex = getTexture(type); 
+  var mat = new THREE.MeshLambertMaterial({ map: tex, color: 0xffffff }); // 强制基础色为白，防止红块
   var mesh = new THREE.Mesh(geo, mat); 
   mesh.position.set(x, y, z); 
-  mesh.userData = { type: type }; 
+  mesh.userData = { type: type, x: x, y: y, z: z }; 
   scene.add(mesh); 
   blocks.push(mesh);
 }
@@ -798,7 +804,7 @@ function createPlayerModelMesh(){
   var group = new THREE.Group(); 
   var tex = textureLoader.load(STEVE_SKIN_URL, undefined, undefined, function(){ tex.image = new Image(); tex.image.src = FALLBACK_TEXTURE; tex.needsUpdate = true; });
   tex.magFilter = THREE.NearestFilter; tex.minFilter = THREE.NearestFilter; 
-  var bodyMat = new THREE.MeshLambertMaterial({ map: tex });
+  var bodyMat = new THREE.MeshLambertMaterial({ map: tex, color: 0xffffff });
   
   var body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.75, 0.25), bodyMat); body.position.y = 0.375; group.add(body);
   var head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), bodyMat); head.position.y = 1.0; group.add(head);
@@ -860,14 +866,35 @@ function updateCameraModeText(){
   document.getElementById('gameMode').textContent = '模式: ' + text;
 }
 
-// 真正的重力与碰撞物理循环
+// 真实 AABB 包围盒物理引擎
 var lastFrameTime = performance.now();
+var justJumped = false; // 防止按一下空格连续跳跃
+
+function isColliding(nx, ny, nz) {
+    var playerMinX = nx - 0.3, playerMaxX = nx + 0.3;
+    var playerMinY = ny - 1.5, playerMaxY = ny - 0.5; // 脚底到头顶
+    var playerMinZ = nz - 0.3, playerMaxZ = nz + 0.3;
+    
+    for(var i = 0; i < blocks.length; i++) {
+        var b = blocks[i];
+        var bMinX = b.position.x - 0.5, bMaxX = b.position.x + 0.5;
+        var bMinY = b.position.y - 0.5, bMaxY = b.position.y + 0.5;
+        var bMinZ = b.position.z - 0.5, bMaxZ = b.position.z + 0.5;
+        
+        if (playerMaxX > bMinX && playerMinX < bMaxX &&
+            playerMaxY > bMinY && playerMinY < bMaxY &&
+            playerMaxZ > bMinZ && playerMinZ < bMaxZ) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function loop(){
   requestAnimationFrame(loop); if(!gameActive) return;
   var now = performance.now(); var dt = (now - lastFrameTime) / 1000; lastFrameTime = now;
   
-  // 防止切出页面导致巨大物理跳跃
-  if (dt > 0.1) dt = 0.1;
+  if (dt > 0.1) dt = 0.1; // 防卡顿穿模
   var tickDelta = dt * 20; 
   if (tickDelta > 2) tickDelta = 2; 
   
@@ -875,39 +902,61 @@ function loop(){
   if (isSneaking) speed = SNEAK_SPEED; 
   else if (isSprinting) speed = SPRINT_SPEED;
   
-  // 水平移动
+  // 水平移动计算
   var forward = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw)); var right = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
-  if(keys['KeyW']) playerPos.addScaledVector(forward, speed * dt);
-  if(keys['KeyS']) playerPos.addScaledVector(forward, -speed * dt);
-  if(keys['KeyA']) playerPos.addScaledVector(right, -speed * dt);
-  if(keys['KeyD']) playerPos.addScaledVector(right, speed * dt);
-
-  // 重力下落
+  var moveVec = new THREE.Vector3(0,0,0);
+  if(keys['KeyW']) moveVec.add(forward);
+  if(keys['KeyS']) moveVec.sub(forward);
+  if(keys['KeyA']) moveVec.sub(right);
+  if(keys['KeyD']) moveVec.add(right);
+  
+  if (moveVec.lengthSq() > 0) {
+      moveVec.normalize().multiplyScalar(speed * dt);
+      // 分轴碰撞检测
+      var nextX = playerPos.x + moveVec.x;
+      if (!isColliding(nextX, playerPos.y, playerPos.z)) playerPos.x = nextX;
+      
+      var nextZ = playerPos.z + moveVec.z;
+      if (!isColliding(playerPos.x, playerPos.y, nextZ)) playerPos.z = nextZ;
+  }
+  
+  // 垂直移动 (重力)
   velocityY -= GRAVITY * tickDelta;
-  if(velocityY < -50) velocityY = -50; // 终端速度限制
+  if(velocityY < -50) velocityY = -50; 
   
   var nextY = playerPos.y + velocityY * tickDelta;
   
-  // 射线检测地面碰撞
-  var onGround = false;
-  var rayStart = new THREE.Vector3(playerPos.x, nextY - 1.5 + 0.1, playerPos.z); // 从脚部往下打
-  var rayDir = new THREE.Vector3(0, -1, 0);
-  raycaster.set(rayStart, rayDir);
-  var hits = raycaster.intersectObjects(blocks);
-  
-  if (hits.length > 0 && hits[0].distance < Math.abs(velocityY * tickDelta) + 0.1) {
-      // 如果脚下有方块，并且距离小于下落距离，说明撞到地面了
-      onGround = true;
-      playerPos.y = hits[0].point.y + 1.5 - 0.1; // 校准高度 (模型原点在中心)
-      velocityY = 0;
+  if (isColliding(playerPos.x, nextY, playerPos.z)) {
+      if (velocityY < 0) {
+          // 落地：将玩家吸附到方块表面
+          playerPos.y = Math.floor(nextY + 1.5) + 1.5 - 0.01; 
+          velocityY = 0;
+          isGrounded = true;
+      } else if (velocityY > 0) {
+          // 撞头
+          velocityY = 0;
+      }
   } else {
       playerPos.y = nextY;
+      isGrounded = false;
   }
   
   // 跳跃
-  if(keys['Space'] && onGround){
-    velocityY = JUMP_VELOCITY;
-    onGround = false;
+  if(keys['Space']) {
+      if (isGrounded && !justJumped) {
+          velocityY = JUMP_VELOCITY;
+          isGrounded = false;
+          justJumped = true; // 防止长按连跳
+      }
+  } else {
+      justJumped = false; // 松开空格重置
+  }
+
+  // 掉入虚空重置
+  if (playerPos.y < -20) {
+      playerPos.set(8, 25, 8);
+      velocityY = 0;
+      addGameChatMessage('系统', '😀', '你掉入了虚空！');
   }
 
   // 更新模型位置
@@ -920,7 +969,7 @@ function loop(){
   else { var offset = new THREE.Vector3(-Math.sin(yaw) * 4, 2, -Math.cos(yaw) * 4); camera.position.copy(playerPos).add(offset); camera.lookAt(playerPos); playerModel.visible = true; }
   camera.rotation.order = 'YXZ'; camera.rotation.y = yaw; camera.rotation.x = pitch;
 
-  // 方块高亮 (黑框)
+  // 方块高亮
   raycaster.setFromCamera(new THREE.Vector2(0, 0), camera); var targetHits = raycaster.intersectObjects(blocks);
   if(targetHits.length > 0 && targetHits[0].distance < 8){ highlightBox.position.copy(targetHits[0].object.position); highlightBox.visible = true; } else { highlightBox.visible = false; }
 
