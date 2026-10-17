@@ -19,24 +19,11 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden}
 #mobileBlockLayer .block-code{font-size:12px;color:#666;background:#1a1a1a;padding:10px 22px;border-radius:8px;border:1px solid #333;letter-spacing:2px;margin-bottom:30px}
 #mobileBlockLayer .block-hint{font-size:12px;color:#555;line-height:1.8;max-width:480px}
 
-/* 加载页 */
-#loadingScreen{position:fixed;inset:0;background:#0a0a12;z-index:3000000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;transition:opacity .6s}
-#loadingScreen.hide{opacity:0;pointer-events:none}
-#loadingScreen .brand{font-size:38px;font-weight:900;letter-spacing:8px;background:linear-gradient(135deg,#4a6cf7,#a855f7,#ec4899);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 40px rgba(74,108,247,.5));animation:floatUp 2.5s ease-in-out infinite}
-@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-#loadingScreen .progress-wrap{width:min(520px,80vw);position:relative}
-#loadingScreen .progress-bar{width:100%;height:6px;background:rgba(74,108,247,.15);border-radius:3px;overflow:hidden;position:relative}
-#loadingScreen .progress-fill{height:100%;width:0%;background:linear-gradient(90deg,#3a5cdf,#4a6cf7,#a855f7);border-radius:3px;transition:width .25s ease;box-shadow:0 0 24px rgba(74,108,247,.7);position:relative}
-#loadingScreen .progress-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);animation:shimmer 1.5s infinite}
-@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
-#loadingScreen .percent{font-size:56px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:2px;background:linear-gradient(135deg,#4a6cf7,#a855f7);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
-#loadingScreen .status{font-size:13px;color:#6a7080;letter-spacing:2px;min-height:20px;text-align:center;padding:0 20px}
-#loadingScreen .detail{font-size:11px;color:#4a5060;letter-spacing:1px;margin-top:8px}
-
 /* 点击开始播放遮罩 */
 #startOverlay{position:fixed;inset:0;background:#000;z-index:2000000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:30px;transition:opacity .5s}
 #startOverlay.hide{opacity:0;pointer-events:none}
 #startOverlay .title{font-size:42px;font-weight:900;letter-spacing:8px;background:linear-gradient(135deg,#4a6cf7,#a855f7,#ec4899);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 60px rgba(74,108,247,.5);animation:floatUp 2s ease-in-out infinite}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 #startOverlay .sub{font-size:14px;color:#8890a0;letter-spacing:3px}
 #startOverlay .startBtn{padding:18px 60px;background:linear-gradient(135deg,#3a5cdf,#4a6cf7);color:#fff;border:none;border-radius:50px;font-size:18px;font-weight:700;cursor:pointer;letter-spacing:4px;box-shadow:0 8px 32px rgba(74,108,247,.6),0 0 80px rgba(74,108,247,.4);transition:all .3s;font-family:inherit;animation:pulseBtn 2s ease-in-out infinite}
 @keyframes pulseBtn{0%,100%{transform:scale(1);box-shadow:0 8px 32px rgba(74,108,247,.6),0 0 80px rgba(74,108,247,.4)}50%{transform:scale(1.05);box-shadow:0 12px 48px rgba(74,108,247,.8),0 0 120px rgba(74,108,247,.6)}}
@@ -233,17 +220,6 @@ body.ui-hidden #soundToggleBtn:hover{opacity:1}
     你已被踢出，请用电脑访问本网站。<br>
     如有疑问请联系作者。
   </div>
-</div>
-
-<!-- 加载页 -->
-<div id="loadingScreen">
-  <div class="brand">说 话 大 厅</div>
-  <div class="percent" id="loadPercent">0%</div>
-  <div class="progress-wrap">
-    <div class="progress-bar"><div class="progress-fill" id="loadFill"></div></div>
-  </div>
-  <div class="status" id="loadStatus">正在准备资源...</div>
-  <div class="detail" id="loadDetail">首次加载会缓存所有资源，之后打开无需重新下载</div>
 </div>
 
 <!-- 点击开始播放 -->
@@ -540,7 +516,7 @@ body.ui-hidden #soundToggleBtn:hover{opacity:1}
     window.__BLOCKED_DEVICE__ = true;
     var blockLayer = document.getElementById('mobileBlockLayer');
     if(blockLayer){ blockLayer.classList.add('show'); blockLayer.style.display = 'flex'; }
-    var ids = ['loadingScreen','startOverlay','introLayer'];
+    var ids = ['startOverlay','introLayer'];
     for(var i=0;i<ids.length;i++){ var el = document.getElementById(ids[i]); if(el) el.style.display = 'none'; }
     document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
@@ -593,58 +569,13 @@ try { currentAvatar = localStorage.getItem('speaking-avatar') || '😀'; } catch
 
 var historyStack = ['screenHome'];
 
-// 3. 资源缓存
-var CACHE_NAME = 'speaking-hall-assets-v2';
+// 3. 资源路径（直接引用，不做缓存）
 var ASSETS = ['进入主界面后的背景视频.mp4', '背景视频.mp4', '背景音乐.mp3'];
-
-async function preloadAll(onProgress){
-  var cache; try { cache = await caches.open(CACHE_NAME); } catch(e){ onProgress(100, '缓存不受支持，跳过'); return false; }
-  var totalBytes = 0; var loadedBytes = 0; var fileSizes = {}; var allCached = true;
-  for(var i=0;i<ASSETS.length;i++){
-    var f = ASSETS[i]; var cached = await cache.match(f);
-    if(cached){ var blob = await cached.blob(); fileSizes[f] = blob.size || 0; loadedBytes += fileSizes[f]; }
-    else { allCached = false; try { var head = await fetch(f, { method: 'HEAD' }); var cl = parseInt(head.headers.get('Content-Length') || '0', 10); fileSizes[f] = cl > 0 ? cl : (5 * 1024 * 1024); } catch(e){ fileSizes[f] = 5 * 1024 * 1024; } }
-    totalBytes += fileSizes[f];
-  }
-  if(totalBytes === 0) totalBytes = 15 * 1024 * 1024;
-  if(allCached){ onProgress(100, '已从缓存加载'); return true; }
-  onProgress(Math.round(loadedBytes / totalBytes * 100), '检查缓存...');
-  for(var j=0;j<ASSETS.length;j++){
-    var file = ASSETS[j]; var existing = await cache.match(file); if(existing) continue;
-    try {
-      var res = await fetch(file); if(!res.ok) throw new Error('HTTP ' + res.status);
-      var resForCache = res.clone(); var cachePromise = cache.put(file, resForCache);
-      if(res.body && res.body.getReader){
-        var reader = res.body.getReader();
-        while(true){ var chunk = await reader.read(); if(chunk.done) break; loadedBytes += chunk.value.length; var pct = Math.min(99, Math.round(loadedBytes / totalBytes * 100)); onProgress(pct, '正在下载：' + file); }
-      } else { await res.blob(); loadedBytes += fileSizes[file] || 0; }
-      await cachePromise;
-    } catch(err){ loadedBytes += fileSizes[file] || 0; }
-  }
-  onProgress(100, '全部缓存完成'); return true;
-}
-
-async function setSrcFromCache(el, filename){
-  if(!el) return;
-  try {
-    var cache = await caches.open(CACHE_NAME); var res = await cache.match(filename);
-    if(res){ var blob = await res.blob(); if(el.dataset.blobUrl){ try{ URL.revokeObjectURL(el.dataset.blobUrl); }catch(e){} } var url = URL.createObjectURL(blob); el.dataset.blobUrl = url; el.src = url; return true; }
-  } catch(e){}
-  el.src = filename; return false;
-}
-
-function updateLoadUI(pct, text){
-  var p = document.getElementById('loadPercent'); var f = document.getElementById('loadFill'); var s = document.getElementById('loadStatus');
-  if(p) p.textContent = pct + '%'; if(f) f.style.width = pct + '%'; if(s && text) s.textContent = text;
-}
 
 var INTRO_DONE_KEY = 'speaking-intro-done-session-v2';
 var introStarted = false; var introFinished = false;
 
-window.addEventListener('load', async function(){
-  try { await preloadAll(updateLoadUI); } catch(e){}
-  await new Promise(function(r){ setTimeout(r, 400); });
-  var ls = document.getElementById('loadingScreen'); ls.classList.add('hide'); setTimeout(function(){ ls.style.display = 'none'; }, 700);
+window.addEventListener('load', function(){
   var isFirstOpen = !sessionStorage.getItem(INTRO_DONE_KEY);
   if(!isFirstOpen){ introFinished = true; afterIntro(); return; }
   var so = document.getElementById('startOverlay'); so.style.display = 'flex'; updateSoundBtn();
@@ -655,7 +586,7 @@ async function startPlayback(){
   var introVideo = document.getElementById('introVideo'); var bgVideo = document.getElementById('bgVideo'); var bgMusic = document.getElementById('bgMusic');
   try{ bgVideo.pause(); bgVideo.currentTime = 0; }catch(e){} try{ bgMusic.pause(); bgMusic.currentTime = 0; }catch(e){}
   var ov = document.getElementById('startOverlay'); ov.classList.add('hide'); setTimeout(function(){ ov.style.display = 'none'; }, 500);
-  await setSrcFromCache(introVideo, ASSETS[0]); await setSrcFromCache(bgVideo, ASSETS[1]); await setSrcFromCache(bgMusic, ASSETS[2]);
+  introVideo.src = ASSETS[0]; bgVideo.src = ASSETS[1]; bgMusic.src = ASSETS[2];
   var introLayer = document.getElementById('introLayer'); introLayer.classList.add('active'); introLayer.style.display = 'flex';
   introVideo.muted = false; introVideo.volume = 1.0; try{ introVideo.currentTime = 0; }catch(e){}
   if(introVideo.readyState < 2){ await new Promise(function(resolve){ var done = false; function onReady(){ if(!done){ done = true; resolve(); } } introVideo.addEventListener('loadeddata', onReady, { once: true }); introVideo.addEventListener('canplay', onReady, { once: true }); setTimeout(onReady, 2000); }); }
@@ -674,15 +605,12 @@ function skipIntro(){ finishIntro(); }
 
 function afterIntro(){
   var bgVideo = document.getElementById('bgVideo'); var bgMusic = document.getElementById('bgMusic');
-  setSrcFromCache(bgVideo, ASSETS[1]).then(function(){
-    setSrcFromCache(bgMusic, ASSETS[2]).then(function(){
-      bgVideo.muted = isMuted; bgVideo.volume = 0.75; bgMusic.muted = isMuted; bgMusic.volume = 0.8;
-      try{ bgVideo.currentTime = 0; }catch(e){} try{ bgMusic.currentTime = 0; }catch(e){}
-      var vp = bgVideo.play(); var mp = bgMusic.play();
-      if(vp && vp.catch){ vp.catch(function(){ bgVideo.muted = true; bgVideo.play().catch(function(){}); }); }
-      if(mp && mp.catch){ mp.catch(function(){}); }
-    });
-  });
+  bgVideo.src = ASSETS[1]; bgMusic.src = ASSETS[2];
+  bgVideo.muted = isMuted; bgVideo.volume = 0.75; bgMusic.muted = isMuted; bgMusic.volume = 0.8;
+  try{ bgVideo.currentTime = 0; }catch(e){} try{ bgMusic.currentTime = 0; }catch(e){}
+  var vp = bgVideo.play(); var mp = bgMusic.play();
+  if(vp && vp.catch){ vp.catch(function(){ bgVideo.muted = true; bgVideo.play().catch(function(){}); }); }
+  if(mp && mp.catch){ mp.catch(function(){}); }
   updateSoundBtn(); playHomeAnimations();
 }
 
