@@ -211,6 +211,14 @@ body.ui-hidden #soundToggleBtn:hover{opacity:1}
 .about-box b { color: #4a6cf7; }
 .about-box .highlight { color: #55ff55; font-weight: bold; }
 .about-box .warn { color: #ff8080; }
+
+/* MC 风格弹窗 */
+.mc-alert-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999999; display: none; align-items: center; justify-content: center; }
+.mc-alert-box { background: #3a3a3a; border: 4px solid #5a5a5a; padding: 24px; width: 480px; max-width: 90vw; box-shadow: 0 10px 40px rgba(0,0,0,0.8); font-family: "Minecraft", "Consolas", monospace; color: #fff; text-align: center; }
+.mc-alert-box .title { font-size: 18px; margin-bottom: 16px; color: #ff5555; font-weight: bold; }
+.mc-alert-box .desc { font-size: 14px; line-height: 1.6; margin-bottom: 24px; color: #ddd; }
+.mc-alert-box .btn-ok { padding: 10px 40px; background: #5a5a5a; border: 2px solid #8a8a8a; color: #fff; font-family: inherit; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+.mc-alert-box .btn-ok:hover { background: #7a7a7a; border-color: #aaa; }
 </style>
 </head>
 <body>
@@ -536,6 +544,15 @@ body.ui-hidden #soundToggleBtn:hover{opacity:1}
 <div class="toast" id="toast"></div>
 </div>
 
+<!-- MC 风格弹窗 -->
+<div class="mc-alert-overlay" id="mcAlertOverlay">
+  <div class="mc-alert-box">
+    <div class="title" id="mcAlertTitle">连接失败</div>
+    <div class="desc" id="mcAlertDesc">无法连接到服务器</div>
+    <button class="btn-ok" onclick="closeMcAlert()">返回</button>
+  </div>
+</div>
+
 <audio id="bgMusic" loop preload="auto"></audio>
 
 <script>
@@ -754,18 +771,44 @@ function copyPublicIP(){
 
 function doAddServer(){
   var name = document.getElementById('addName').value.trim(); var code = document.getElementById('addCode').value.trim().toUpperCase();
-  if(!name){ toast('请输入名称'); return; } if(!code || code.length < 4){ toast('房间码无效'); return; }
-  for(var i=0;i<servers.length;i++) if(servers[i].code===code){ toast('已存在'); return; }
-  servers.push({code:code, name:name, motd:'&7新添加的服务器', ping:-1}); localStorage.setItem('speaking-servers', JSON.stringify(servers)); toast('已添加'); renderServers(); goBack();
+  if(!name){ showMcAlert('连接失败', '服务器名称不能为空！'); return; }
+  if(!code || code.length < 4){ showMcAlert('连接失败', '无效的服务器地址！请检查房间码格式是否正确。'); return; }
+  // 检查房间码是否只包含合法字符
+  if(!/^[A-Z0-9]+$/.test(code)){ showMcAlert('连接失败', '无效的服务器地址！房间码只能包含大写字母和数字。'); return; }
+  
+  for(var i=0;i<servers.length;i++) if(servers[i].code===code){ showMcAlert('已存在', '该服务器已经在列表中了。'); return; }
+  
+  // 模拟 MC 的添加过程
+  servers.push({code:code, name:name, motd:'&7正在检测服务器状态...', ping:-1}); 
+  localStorage.setItem('speaking-servers', JSON.stringify(servers)); 
+  renderServers(); 
+  goBack();
+  // 过一会儿模拟检测失败
+  setTimeout(function(){
+    if(!currentRoom || currentCode !== code) {
+       showMcAlert('无法连接至服务器', 'Connection refused: connect\n\n没有在该地址上发现正在运行的服务器，或者端口未开放。\n请检查房间码是否输入正确，或房主是否已经开启映射。');
+       // 移除那个假服务器或标记为离线
+       for(var j=0;j<servers.length;j++){
+         if(servers[j].code === code && servers[j].ping === -1){
+            servers[j].motd = '&7无法连接至服务器';
+         }
+       }
+       renderServers();
+    }
+  }, 2000);
 }
 function doJoinRoom(){
   var code = document.getElementById('joinCode').value.trim().toUpperCase(); var nick = document.getElementById('joinNick').value.trim();
-  if(!code || code.length < 4){ toast('无该房间码（格式不对）'); return; } if(!nick){ toast('请输入昵称'); return; }
+  if(!code || code.length < 4){ showMcAlert('连接失败', '无效的房间码！'); return; }
+  if(!/^[A-Z0-9]+$/.test(code)){ showMcAlert('连接失败', '无效的房间码！只能包含大写字母和数字。'); return; }
+  if(!nick){ toast('请输入昵称'); return; }
   currentNick = nick; localStorage.setItem('speaking-nick', nick); connectToRoom(code, nick, '', false);
 }
 function doDirectConnect(){
   var code = document.getElementById('directCode').value.trim().toUpperCase(); var nick = document.getElementById('directNick').value.trim();
-  if(!code || code.length < 4){ toast('无该房间码（格式不对）'); return; } if(!nick){ toast('请输入昵称'); return; }
+  if(!code || code.length < 4){ showMcAlert('连接失败', '无效的房间码！'); return; }
+  if(!/^[A-Z0-9]+$/.test(code)){ showMcAlert('连接失败', '无效的房间码！只能包含大写字母和数字。'); return; }
+  if(!nick){ toast('请输入昵称'); return; }
   currentNick = nick; localStorage.setItem('speaking-nick', nick); connectToRoom(code, nick, '', false);
 }
 function doCreateRoom(){
@@ -833,16 +876,29 @@ function checkAndMute(text){ var word = containsBannedWord(text); if(word){ mute
 function updateMuteBanner(){ var banner = document.getElementById('muteBanner'); if(!banner) return; if(Date.now() < mutedUntil){ var remain = Math.ceil((mutedUntil - Date.now()) / 60000); banner.textContent = '你已被禁言 ' + remain + ' 分钟'; banner.classList.add('show'); setTimeout(updateMuteBanner, 1000); } else { banner.classList.remove('show'); } }
 function isBlacklisted(peerId){ var entry = blacklist[peerId]; if(!entry) return false; if(entry.expire && entry.expire > 0 && entry.expire < Date.now()){ delete blacklist[peerId]; localStorage.setItem('speaking-blacklist', JSON.stringify(blacklist)); return false; } return true; }
 
+// MC 风格弹窗
+function showMcAlert(title, desc) {
+    document.getElementById('mcAlertTitle').textContent = title;
+    document.getElementById('mcAlertDesc').innerHTML = desc.replace(/\n/g, '<br>');
+    document.getElementById('mcAlertOverlay').style.display = 'flex';
+}
+function closeMcAlert() {
+    document.getElementById('mcAlertOverlay').style.display = 'none';
+}
+
 // 【关键】WebRTC 与消息可靠传输
 async function connectToRoom(code, nick, name, host, motd){
-  if(!trysteroReady){ toast('正在加载联机组件...'); var ok = await loadTrystero(); if(!ok){ toast('联机组件加载失败，请刷新页面'); return; } }
-  if(!joinRoomFn){ toast('未就绪'); return; }
+  if(!trysteroReady){ toast('正在加载联机组件...'); var ok = await loadTrystero(); if(!ok){ showMcAlert('连接失败', '联机组件加载失败，请刷新页面重试。'); return; } }
+  if(!joinRoomFn){ showMcAlert('连接失败', '内部错误：联机模块未就绪。'); return; }
+  
+  // 如果之前有房间，先清理
   if(currentRoom){ try{ currentRoom.leave(); }catch(e){} currentRoom = null; }
   if(pingTimer){ clearInterval(pingTimer); pingTimer = null; }
   if(connectionTimeout){ clearTimeout(connectionTimeout); connectionTimeout = null; }
-  currentCode = code; currentNick = nick; currentName = name || code; currentMotd = motd || ''; isHost = !!host;
-  toast('正在连接 ' + code + ' ...');
   
+  currentCode = code; currentNick = nick; currentName = name || code; currentMotd = motd || ''; isHost = !!host;
+  
+  // 尝试连接
   try {
     currentRoom = joinRoomFn({ 
       appId: 'speaking-hall-p2p-v2',
@@ -857,29 +913,43 @@ async function connectToRoom(code, nick, name, host, motd){
         ]
       }
     }, code);
-  } catch(e){ toast('连接失败：' + (e && e.message || e)); return; }
+  } catch(e){ 
+    showMcAlert('连接失败', '无法初始化连接：' + (e && e.message || e)); 
+    return; 
+  }
 
   myPeerId = currentRoom.selfId || Math.random().toString(36).substring(2);
 
-  // 超时检测：5 秒内没有任何 peer，视为房间不存在或无人
+  // 超时检测：8 秒内没有任何 peer，视为什么都没连上
   connectionTimeout = setTimeout(function(){
     if(!currentRoom || Object.keys(peerAvatars).length === 0){
-      // 如果仍然没有 peer，提示并断开
       if(currentRoom){
         try{ currentRoom.leave(); }catch(e){}
         currentRoom = null;
       }
-      addSystemMsg('⚠️ 无该房间码或房间无人，已取消连接');
-      toast('无该房间码 / 房间无人');
+      // 强制打断，弹窗提示
+      showMcAlert('无法连接至服务器', 'Connection timed out: connect\n\n服务器可能未启动、网络不可达，或房间码对应的映射已经失效。\n请检查房间码是否正确，或房主是否已经开启 NatGo 映射。');
+      
+      // 返回服务器列表，并把那个服务器标记为离线
       historyStack = ['screenHome','screenMultiplayer'];
       showScreen('screenMultiplayer');
+      
+      // 更新服务器状态
+      for(var i=0;i<servers.length;i++) {
+        if(servers[i].code === code) {
+          servers[i].ping = -1;
+          servers[i].motd = '&7无法连接至服务器';
+        }
+      }
       renderServers();
     }
     connectionTimeout = null;
-  }, 5000);
+  }, 8000); // 8 秒超时，给足打洞时间
 
   currentRoom.onPeerJoin(function(peerId){
+    // 有人进来了，清除超时
     if(connectionTimeout){ clearTimeout(connectionTimeout); connectionTimeout = null; }
+    
     if(isBlacklisted(peerId)) return;
     if(window._sendJoin) window._sendJoin({ name: currentNick });
     if(sendPing) sendPing({ ts: Date.now() });
