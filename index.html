@@ -8,11 +8,9 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
 body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:none}
 
-/* 移动端拦截 */
 #mobileBlock{position:fixed;inset:0;z-index:9999999;background:#0a0a12;display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;color:#fff;font-family:monospace}
 #mobileBlock.show{display:flex}
 
-/* 开场动画与视频 */
 #startOverlay{position:fixed;inset:0;background:#000;z-index:2000000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:30px;transition:opacity .5s}
 #startOverlay.hide{opacity:0;pointer-events:none}
 #startOverlay .title{font-size:48px;font-weight:900;letter-spacing:8px;background:linear-gradient(135deg,#4a6cf7,#a855f7,#ec4899);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 60px rgba(74,108,247,.5);animation:floatUp 2s ease-in-out infinite}
@@ -27,18 +25,15 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
 #introSkip{position:absolute;right:24px;bottom:24px;padding:8px 18px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.3);border-radius:20px;color:#fff;font-size:12px;cursor:pointer;backdrop-filter:blur(8px);transition:all .2s;z-index:3;opacity:.7}
 #introSkip:hover{background:rgba(0,0,0,.8);opacity:1}
 
-/* 背景视频 */
 #bgVideo{position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:0;pointer-events:none;background:#000}
 #bgMask{position:fixed;inset:0;z-index:1;background:linear-gradient(180deg,rgba(10,10,20,.08) 0%,rgba(10,10,20,.35) 100%);pointer-events:none}
 
-/* 右上角头像 */
 #topAvatarBtn { position: fixed; right: 20px; top: 20px; z-index: 5000; display: flex; align-items: center; gap: 10px; padding: 6px 14px; background: rgba(30,32,48,.85); border: 1px solid rgba(74,108,247,.3); border-radius: 30px; cursor: pointer; backdrop-filter: blur(12px); transition: all .2s; }
 #topAvatarBtn:hover { border-color: #4a6cf7; box-shadow: 0 0 16px rgba(74,108,247,.3); }
 #topAvatarBtn .avatar-img { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#4a6cf7,#a855f7); display: flex; align-items: center; justify-content: center; font-size: 18px; overflow: hidden; }
 #topAvatarBtn .avatar-img img { width: 100%; height: 100%; object-fit: cover; }
 #topAvatarBtn .nick-text { font-size: 13px; font-weight: 600; color: #e8e8f0; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-/* 个人资料面板 */
 .panel { position: fixed; z-index: 5000; background: rgba(21,22,30,.95); backdrop-filter: blur(20px); border: 1px solid rgba(74,108,247,.3); border-radius: 14px; padding: 20px; width: 320px; display: none; box-shadow: 0 10px 40px rgba(0,0,0,.6); }
 .panel.show { display: block; animation: popIn .2s cubic-bezier(.16,1,.3,1); }
 @keyframes popIn { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: scale(1); } }
@@ -52,7 +47,6 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
 .avatar-option.selected { border-color: #4a6cf7; box-shadow: 0 0 0 3px rgba(74,108,247,.3); }
 .avatar-option img { width: 100%; height: 100%; object-fit: cover; }
 
-/* 通用布局 */
 .app{width:100vw;height:100vh;position:relative;z-index:2;display:flex;flex-direction:column}
 .screen{display:none;flex-direction:column;flex:1;padding:30px 40px;overflow-y:auto}
 .screen.active{display:flex}
@@ -63,7 +57,6 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
 .mc-btn.primary{background:linear-gradient(135deg,rgba(59,130,246,.9),rgba(110,231,183,.8));border-color:transparent;color:#fff}
 .mc-btn.danger{background:rgba(58,28,28,.9);border-color:rgba(255,128,128,.3);color:#ff8080}
 
-/* 列表与卡片 */
 .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-shrink:0}
 .topbar h1{font-size:22px;font-weight:800;letter-spacing:1px;color:#fff}
 .btn-icon{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#ccc;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s}
@@ -82,23 +75,22 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
 .btn-sm:disabled{opacity:.4;cursor:not-allowed}
 .btn-sm.green{background:rgba(110,231,183,.1);border-color:rgba(110,231,183,.3);color:#6ee7b7}
 
-/* 游戏视图 */
 #gameView{position:fixed;inset:0;z-index:9999998;background:#000;display:none;cursor:none}
 #gameView.show{display:block}
 #gameCanvas{width:100%;height:100%;display:block}
 
-/* 准心 */
 #crosshair{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:20px;height:20px;pointer-events:none;z-index:10}
 #crosshair::before,#crosshair::after{content:'';position:absolute;background:rgba(255,255,255,.8)}
 #crosshair::before{left:50%;top:0;width:2px;height:100%;transform:translateX(-50%)}
 #crosshair::after{top:50%;left:0;height:2px;width:100%;transform:translateY(-50%)}
 
-/* HUD */
 #gameHud{position:absolute;top:20px;left:20px;z-index:11;color:#fff;font-family:monospace;font-size:13px;line-height:1.8;text-shadow:0 2px 6px #000;pointer-events:none}
 #gamePing{color:#6ee7b7;font-weight:700;margin-top:6px;display:none}
 #gameMode{color:#ffaa00;font-weight:700}
 
-/* 游戏内聊天框 */
+#debugScreen { position: absolute; top: 20px; left: 20px; z-index: 12; color: #fff; font-family: monospace; font-size: 13px; line-height: 1.5; text-shadow: 1px 1px 2px #000; display: none; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 4px; }
+#debugScreen.show { display: block; }
+
 #gameChatBox { position: absolute; left: 20px; bottom: 80px; width: 400px; height: 250px; z-index: 11; display: flex; flex-direction: column; justify-content: flex-end; pointer-events: none; }
 #gameChatHistory { display: flex; flex-direction: column; gap: 4px; overflow-y: hidden; margin-bottom: 8px; }
 .chat-msg { background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 4px; color: #fff; font-size: 14px; display: flex; align-items: center; gap: 8px; animation: fadeInOut 10s forwards; text-shadow: 1px 1px 0 #000; }
@@ -109,14 +101,12 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
 #gameChatInputWrap.show { display: block; }
 #gameChatInput { width: 100%; padding: 10px; background: rgba(0,0,0,0.7); border: 2px solid #555; color: #fff; font-size: 14px; outline: none; }
 
-/* 暂停菜单 */
 #pauseMenu{position:absolute;inset:0;z-index:20;background:rgba(11,12,16,.85);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;cursor:default}
 #pauseMenu.show{display:flex}
 #pauseMenu h2{color:#fff;font-size:32px;margin-bottom:20px;letter-spacing:4px;font-weight:900}
 #pauseMenu button{width:320px;padding:14px;background:rgba(255,255,255,.06);color:#e8e8f0;border:1px solid rgba(255,255,255,.1);border-radius:10px;font-size:15px;cursor:pointer;transition:all .2s;font-weight:600}
 #pauseMenu button:hover{background:rgba(59,130,246,.2);border-color:#3b82f6;color:#fff}
 
-/* 背包界面 */
 #inventoryScreen{position:absolute;inset:0;z-index:15;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;cursor:default}
 #inventoryScreen.show{display:flex}
 .inv-panel{background:rgba(30,30,30,.95);border:4px solid #555;border-radius:8px;padding:20px;width:500px}
@@ -127,14 +117,12 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
 .inv-slot.selected{border-color:#fff;box-shadow:0 0 0 2px #fff}
 .inv-slot img{width:80%;height:80%;object-fit:contain;image-rendering:pixelated}
 
-/* 快捷栏 */
 #hotbar{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:11;display:flex;gap:4px;padding:4px;background:rgba(0,0,0,.5);border-radius:8px;border:2px solid rgba(255,255,255,.15)}
 .hotbar-slot{width:42px;height:42px;background:rgba(30,30,30,.7);border:2px solid rgba(255,255,255,.2);border-radius:4px;display:flex;align-items:center;justify-content:center;position:relative}
 .hotbar-slot.selected{border-color:#fff;box-shadow:0 0 8px rgba(255,255,255,.4)}
 .hotbar-slot img{width:32px;height:32px;object-fit:contain;image-rendering:pixelated}
 .hotbar-slot .slot-num{position:absolute;top:1px;left:3px;font-size:10px;color:#aaa}
 
-/* 弹窗 */
 .modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:600}
 .modal-mask.show{display:flex}
 .modal{background:rgba(21,22,30,.98);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:28px;width:460px;max-width:92vw;box-shadow:0 20px 60px rgba(0,0,0,.8)}
@@ -148,48 +136,16 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
 .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(60px);background:rgba(30,32,48,.95);backdrop-filter:blur(12px);border:1px solid rgba(59,130,246,.3);border-radius:10px;padding:12px 24px;font-size:13px;color:#e8e8f0;opacity:0;transition:all .3s;pointer-events:none;z-index:999999;box-shadow:0 8px 32px rgba(0,0,0,.5)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* 游戏模式悬浮切换器 */
-#gamemodeSwitcher {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 30;
-  background: rgba(0,0,0,.6);
-  border: 2px solid rgba(255,255,255,.2);
-  padding: 20px;
-  display: none;
-  flex-direction: column;
-  gap: 10px;
-  border-radius: 8px;
-  pointer-events: auto;
-  cursor: default;
-}
-#gamemodeSwitcher.show {
-  display: flex;
-}
-.gm-option {
-  padding: 10px 20px;
-  background: rgba(255,255,255,.1);
-  color: #fff;
-  font-size: 16px;
-  text-align: center;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all .1s;
-}
-.gm-option.selected {
-  background: rgba(255,255,255,.4);
-  font-weight: bold;
-  border: 1px solid #fff;
-}
+#gamemodeSwitcher { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 30; background: rgba(0,0,0,.6); border: 2px solid rgba(255,255,255,.2); padding: 20px; display: none; flex-direction: column; gap: 10px; border-radius: 8px; pointer-events: auto; cursor: default; }
+#gamemodeSwitcher.show { display: flex; }
+.gm-option { padding: 10px 20px; background: rgba(255,255,255,.1); color: #fff; font-size: 16px; text-align: center; border-radius: 4px; cursor: pointer; transition: all .1s; }
+.gm-option.selected { background: rgba(255,255,255,.4); font-weight: bold; border: 1px solid #fff; }
 </style>
 </head>
 <body>
 
 <div id="mobileBlock"><div style="font-size:60px;margin-bottom:20px;">🚫</div><div style="font-size:20px;font-weight:bold;">手机端玩不了这个</div><div style="margin-top:10px;color:#888;">换电脑来吧，兄弟</div></div>
 
-<!-- 开场视频 -->
 <div id="startOverlay">
   <div class="title">我的世界 · 网页版</div>
   <button class="startBtn" onclick="startPlayback()">开始游戏</button>
@@ -199,11 +155,9 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
   <div id="introSkip" onclick="finishIntro()">跳过 ▶</div>
 </div>
 
-<!-- 背景视频 -->
 <video id="bgVideo" loop playsinline preload="auto"></video>
 <div id="bgMask"></div>
 
-<!-- 头像与资料 -->
 <div id="topAvatarBtn" onclick="toggleProfile()">
   <div class="avatar-img" id="topAvatarImg">😀</div>
   <div class="nick-text" id="topNickText">史蒂夫</div>
@@ -266,7 +220,6 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
   </div>
 </div>
 
-<!-- 游戏视图 -->
 <div id="gameView">
   <canvas id="gameCanvas"></canvas>
   <div id="crosshair"></div>
@@ -277,6 +230,9 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
     <div id="gamePing">延迟: ---</div>
   </div>
 
+  <!-- F3 调试界面 -->
+  <div id="debugScreen"></div>
+
   <div id="gameChatBox">
     <div id="gameChatHistory"></div>
     <div id="gameChatInputWrap">
@@ -284,7 +240,6 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
     </div>
   </div>
 
-  <!-- 游戏模式悬浮切换器 -->
   <div id="gamemodeSwitcher">
     <div class="gm-option" data-mode="0">生存模式</div>
     <div class="gm-option" data-mode="1">创造模式</div>
@@ -309,7 +264,6 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
   <div id="hotbar"></div>
 </div>
 
-<!-- 弹窗 -->
 <div class="modal-mask" id="modalCreateWorld">
   <div class="modal">
     <h3>新建世界</h3>
@@ -324,7 +278,6 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
   </div>
 </div>
 
-<!-- 极简版对局域网开放，只填端口 -->
 <div class="modal-mask" id="modalLan">
   <div class="modal">
     <h3>对局域网开放</h3>
@@ -370,8 +323,8 @@ if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|HarmonyOS|Mobi
   throw new Error('Mobile Blocked');
 }
 
-var worlds = JSON.parse(localStorage.getItem('mc_worlds_v13') || '[]');
-var servers = JSON.parse(localStorage.getItem('mc_servers_v13') || '[]');
+var worlds = JSON.parse(localStorage.getItem('mc_worlds_v14') || '[]');
+var servers = JSON.parse(localStorage.getItem('mc_servers_v14') || '[]');
 var selectedWorldIdx = -1, selectedServerIdx = -1;
 var currentRoom = null, currentAddress = '';
 var currentNick = localStorage.getItem('mc_nick') || '史蒂夫';
@@ -387,7 +340,7 @@ var isIntroFinished = false;
 var gameActive = false;
 var scene, camera, renderer, raycaster;
 var yaw = 0, pitch = 0, keys = {};
-var playerPos = new THREE.Vector3(0, 5, 15);
+var playerPos = new THREE.Vector3(0, 20, 0); // 初始高度调整
 var velocityY = 0, isGrounded = false, isSneaking = false, isSprinting = false;
 var cameraMode = 0; 
 var playerModel, highlightBox;
@@ -396,14 +349,28 @@ var selectedHotbarSlot = 0;
 var inventoryOpen = false;
 var isChatting = false;
 var lastPosSendTime = 0;
-var gameMode = 0; // 0: 生存, 1: 创造, 2: 冒险, 3: 旁观
+var gameMode = 0;
 
-// F3+F4 状态
+// F3 状态
 var isF3Held = false;
 var isGMSwitcherOpen = false;
 var selectedGMOption = 0;
+var isDebugOpen = false;
 
-// 纹理加载器
+// 物理常量 (基于 MC 1.20.1)
+var GRAVITY = 0.08;
+var JUMP_VELOCITY = 0.42;
+var AIR_RESISTANCE = 0.98;
+var WALK_SPEED = 4.317;
+var SPRINT_SPEED = 5.612;
+var SNEAK_SPEED = 1.295;
+
+// 区块与渲染距离设置
+var renderDistance = 6; // 渲染距离（区块数）
+var simulationDistance = 4; // 模拟距离（区块数）
+var CHUNK_SIZE = 16;
+
+// 纹理加载器 (使用 jsDelivr CDN 的 PrismarineJS 1.20.2 纹理)
 var textureLoader = new THREE.TextureLoader();
 var textureCache = {};
 var FALLBACK_TEXTURE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
@@ -442,115 +409,73 @@ var blockTextures = {
   'iron_ore': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/iron_ore.png',
   'gold_ore': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/gold_ore.png',
   'diamond_ore': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/diamond_ore.png',
-  'gravel': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/gravel.png',
-  'obsidian': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/obsidian.png'
+  'oak_leaves': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/oak_leaves.png'
 };
 
-var STEVE_SKIN_URL = 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.1/assets/minecraft/textures/entity/steve.png';
+var STEVE_SKIN_URL = 'https://cdn.jsdelivr.net/gh/InventivetalexDev/minecraft-assets@1.20.1/assets/minecraft/textures/entity/steve.png';
 var VIDEO_INTRO = '进入主界面后的背景视频.mp4'; 
 var VIDEO_BG = '背景视频.mp4';
 
-// ================= 快捷键拦截防线（含 F3+F4 逻辑） =================
+// ================= 快捷键与拦截 =================
 window.addEventListener('keydown', function(e) {
-    // 拦截 Ctrl+W / Cmd+W
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'w') {
-        e.preventDefault(); e.stopPropagation(); toast('已拦截浏览器关闭'); return false;
-    }
-    // 拦截 Ctrl+R / Cmd+R
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'r') {
-        e.preventDefault(); e.stopPropagation(); toast('已拦截浏览器刷新'); return false;
-    }
-    // 拦截 F5
-    if (e.key === 'F5' || e.keyCode === 116) {
-        e.preventDefault(); e.stopPropagation(); return false;
-    }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'w') { e.preventDefault(); e.stopPropagation(); toast('已拦截浏览器关闭'); return false; }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'r') { e.preventDefault(); e.stopPropagation(); toast('已拦截浏览器刷新'); return false; }
+    if (e.key === 'F5' || e.keyCode === 116) { e.preventDefault(); e.stopPropagation(); return false; }
     
-    // F3 按下
     if (e.key === 'F3' || e.keyCode === 114) {
-        e.preventDefault(); e.stopPropagation();
-        isF3Held = true;
-        return false;
+        e.preventDefault(); e.stopPropagation(); isF3Held = true; return false;
     }
-
-    // F4 按下（如果 F3 是按住的）
     if ((e.key === 'F4' || e.keyCode === 115) && isF3Held) {
         e.preventDefault(); e.stopPropagation();
-        
         if (!isGMSwitcherOpen) {
-            // 第一次打开切换器
-            isGMSwitcherOpen = true;
-            selectedGMOption = gameMode; // 默认选中当前模式
-            updateGMSwitcherUI();
+            isGMSwitcherOpen = true; selectedGMOption = gameMode; updateGMSwitcherUI();
             document.getElementById('gamemodeSwitcher').classList.add('show');
             if (document.pointerLockElement) document.exitPointerLock();
         } else {
-            // 如果已经打开，继续按 F4 循环切换
-            selectedGMOption = (selectedGMOption + 1) % 4;
-            updateGMSwitcherUI();
+            selectedGMOption = (selectedGMOption + 1) % 4; updateGMSwitcherUI();
         }
         return false;
     }
 }, true);
 
 window.addEventListener('keyup', function(e) {
-    // F3 松开
     if (e.key === 'F3' || e.keyCode === 114) {
         isF3Held = false;
-        
         if (isGMSwitcherOpen) {
-            // 应用选中的模式并关闭
             gameMode = selectedGMOption;
             var modes = ['生存', '创造', '冒险', '旁观'];
             document.getElementById('gameMode').textContent = '模式: ' + modes[gameMode];
             toast('已切换至: ' + modes[gameMode] + ' 模式');
-            
             isGMSwitcherOpen = false;
             document.getElementById('gamemodeSwitcher').classList.remove('show');
-            
-            if (gameActive && !inventoryOpen && !isChatting) {
-                document.getElementById('gameCanvas').requestPointerLock();
-            }
+            if (gameActive && !inventoryOpen && !isChatting) document.getElementById('gameCanvas').requestPointerLock();
         }
     }
 });
 
 function updateGMSwitcherUI() {
-    var opts = document.querySelectorAll('.gm-option');
-    opts.forEach((opt, idx) => {
-        opt.classList.toggle('selected', idx === selectedGMOption);
-    });
+    document.querySelectorAll('.gm-option').forEach((opt, idx) => { opt.classList.toggle('selected', idx === selectedGMOption); });
 }
 
-// 点击切换器选项
 document.getElementById('gamemodeSwitcher').addEventListener('click', function(e) {
     if (e.target.classList.contains('gm-option')) {
-        var mode = parseInt(e.target.getAttribute('data-mode'));
-        selectedGMOption = mode;
-        gameMode = selectedGMOption;
-        
+        selectedGMOption = parseInt(e.target.getAttribute('data-mode')); gameMode = selectedGMOption;
         var modes = ['生存', '创造', '冒险', '旁观'];
         document.getElementById('gameMode').textContent = '模式: ' + modes[gameMode];
         toast('已切换至: ' + modes[gameMode] + ' 模式');
-        
-        isGMSwitcherOpen = false;
-        this.classList.remove('show');
-        
-        if (gameActive && !inventoryOpen && !isChatting) {
-            document.getElementById('gameCanvas').requestPointerLock();
-        }
+        isGMSwitcherOpen = false; this.classList.remove('show');
+        if (gameActive && !inventoryOpen && !isChatting) document.getElementById('gameCanvas').requestPointerLock();
     }
 });
 
 window.addEventListener('beforeunload', function (e) {
-    if (gameActive) {
-        e.preventDefault(); e.returnValue = '游戏正在运行中，确定要离开吗？'; return e.returnValue;
-    }
+    if (gameActive) { e.preventDefault(); e.returnValue = '游戏正在运行中，确定要离开吗？'; return e.returnValue; }
 });
 
 // ================= 视频与资料 =================
 window.addEventListener('load', function() {
   updateMyMini(); renderWorlds(); renderServers(); initHotbarUI();
-  var isFirst = !sessionStorage.getItem('mc_intro_done_v13');
+  var isFirst = !sessionStorage.getItem('mc_intro_done_v14');
   if(!isFirst){ isIntroFinished = true; afterIntro(); return; }
   document.getElementById('startOverlay').style.display = 'flex'; 
 });
@@ -562,7 +487,7 @@ async function startPlayback(){
   var il = document.getElementById('introLayer'); il.classList.add('active'); il.style.display = 'flex';
   iv.muted = false; iv.volume = 1.0;
   try { await iv.play(); } catch(e) { iv.muted = true; iv.play().catch(()=> finishIntro()); }
-  sessionStorage.setItem('mc_intro_done_v13', '1');
+  sessionStorage.setItem('mc_intro_done_v14', '1');
   iv.onended = finishIntro; setTimeout(() => { if(il.classList.contains('active')) finishIntro(); }, 25000);
 }
 
@@ -621,20 +546,20 @@ function selectWorld(i){ selectedWorldIdx = i; renderWorlds(); document.getEleme
 function openCreateWorld(){ document.getElementById('worldNameInput').value = ''; document.getElementById('worldSeedInput').value = ''; document.getElementById('modalCreateWorld').classList.add('show'); }
 function doCreateWorld(){
   var name = document.getElementById('worldNameInput').value.trim() || '新的世界'; var seed = document.getElementById('worldSeedInput').value.trim() || Math.random().toString(36).substring(2, 8);
-  worlds.push({ name, seed, lastPlayed: new Date().toLocaleDateString() }); localStorage.setItem('mc_worlds_v13', JSON.stringify(worlds)); closeModal('modalCreateWorld');
+  worlds.push({ name, seed, lastPlayed: new Date().toLocaleDateString() }); localStorage.setItem('mc_worlds_v14', JSON.stringify(worlds)); closeModal('modalCreateWorld');
   selectedWorldIdx = worlds.length - 1; renderWorlds(); toast('世界建好了，进吧');
 }
 function deleteSelectedWorld(){
   if(selectedWorldIdx < 0) return; if(!confirm('删了可就找不回来了，确定？')) return;
-  worlds.splice(selectedWorldIdx, 1); localStorage.setItem('mc_worlds_v13', JSON.stringify(worlds)); selectedWorldIdx = -1; renderWorlds();
+  worlds.splice(selectedWorldIdx, 1); localStorage.setItem('mc_worlds_v14', JSON.stringify(worlds)); selectedWorldIdx = -1; renderWorlds();
   document.getElementById('btnPlayWorld').disabled = true; document.getElementById('btnOpenLan').disabled = true; document.getElementById('btnDeleteWorld').disabled = true;
 }
 function playSelectedWorld(){ if(selectedWorldIdx >= 0) enterWorld(selectedWorldIdx); }
 function enterWorld(i){
-  var w = worlds[i]; w.lastPlayed = new Date().toLocaleDateString(); localStorage.setItem('mc_worlds_v13', JSON.stringify(worlds)); launchGame(w.name, w.seed, false);
+  var w = worlds[i]; w.lastPlayed = new Date().toLocaleDateString(); localStorage.setItem('mc_worlds_v14', JSON.stringify(worlds)); launchGame(w.name, w.seed, false);
 }
 
-// ================= 局域网开放 =================
+// ================= 局域网与联机 =================
 function openLanSettings(){
   if(selectedWorldIdx < 0) return;
   document.getElementById('lanPortInput').value = Math.floor(Math.random() * 10000) + 25565;
@@ -645,23 +570,11 @@ function randomLanPort(){ document.getElementById('lanPortInput').value = Math.f
 async function doOpenLan(){
   var port = document.getElementById('lanPortInput').value.trim();
   if(!port || isNaN(port)){ toast('请输入有效的数字端口号'); return; }
-  
-  currentAddress = port;
-  isHost = true;
-  
-  closeModal('modalLan');
-  toast('正在启动联机...');
-  
-  var w = worlds[selectedWorldIdx];
-  launchGame(w.name, w.seed, true);
-  
-  setTimeout(() => {
-    connectToRoom(currentAddress, true);
-    document.getElementById('gamePing').style.display = 'block';
-  }, 1200);
+  currentAddress = port; isHost = true; closeModal('modalLan'); toast('正在启动联机...');
+  var w = worlds[selectedWorldIdx]; launchGame(w.name, w.seed, true);
+  setTimeout(() => { connectToRoom(currentAddress, true); document.getElementById('gamePing').style.display = 'block'; }, 1200);
 }
 
-// ================= 多人联机 =================
 function renderServers(){
   var box = document.getElementById('serverList');
   if(servers.length === 0){ box.innerHTML = '<div style="text-align:center;padding:60px;color:#666;">还没添加过服务器，把朋友发的端口粘进来就行</div>'; return; }
@@ -674,7 +587,7 @@ function openAddServer(){ document.getElementById('addServerName').value = ''; d
 function doAddServer(){
   var name = document.getElementById('addServerName').value.trim() || '兄弟的服'; var addr = document.getElementById('addServerAddr').value.trim();
   if(!addr){ toast('端口不能空着'); return; }
-  servers.push({ name, addr }); localStorage.setItem('mc_servers_v13', JSON.stringify(servers)); closeModal('modalAddServer');
+  servers.push({ name, addr }); localStorage.setItem('mc_servers_v14', JSON.stringify(servers)); closeModal('modalAddServer');
   selectedServerIdx = servers.length - 1; renderServers(); toast('服务器加好了');
 }
 function joinSelectedServer(){ if(selectedServerIdx >= 0) joinServer(selectedServerIdx); }
@@ -694,7 +607,7 @@ async function connectToRoom(addr, host){
   if(currentRoom){ try { currentRoom.leave(); } catch(e){} }
 
   try {
-    currentRoom = joinRoomFn({ appId: 'mc-web-final-v13', rtcConfig: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } }, addr);
+    currentRoom = joinRoomFn({ appId: 'mc-web-final-v14', rtcConfig: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } }, addr);
   } catch(e){ toast('端口格式有误，无法建立连接'); return; }
 
   myPeerId = currentRoom.selfId || 'local';
@@ -752,23 +665,24 @@ function executeCommand(cmd) {
   addGameChatMessage('系统', '😀', result);
 }
 
-// ================= 游戏引擎 =================
+// ================= 游戏引擎与物理 =================
 function launchGame(worldName, seed, isMultiplayer){
   if(!renderer) initEngine();
   document.getElementById('gameView').classList.add('show'); gameActive = true;
-  playerPos.set(0, 5, 15); velocityY = 0; yaw = 0; pitch = 0; cameraMode = 0;
+  playerPos.set(0, 20, 0); velocityY = 0; isGrounded = false; yaw = 0; pitch = 0; cameraMode = 0;
   document.getElementById('gameCanvas').requestPointerLock(); updateCameraModeText();
 }
 
 function initEngine(){
   var canvas = document.getElementById('gameCanvas');
-  scene = new THREE.Scene(); scene.background = new THREE.Color(0x87CEEB); scene.fog = new THREE.Fog(0x87CEEB, 30, 80);
+  scene = new THREE.Scene(); scene.background = new THREE.Color(0x87CEEB); scene.fog = new THREE.Fog(0x87CEEB, renderDistance * 16 - 16, renderDistance * 16);
   camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 1000);
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true }); renderer.setSize(innerWidth, innerHeight); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   raycaster = new THREE.Raycaster(); scene.add(new THREE.AmbientLight(0xffffff, 0.65));
   var dir = new THREE.DirectionalLight(0xffffff, 0.75); dir.position.set(50, 100, 50); scene.add(dir);
 
-  generateTerrain(); playerModel = createPlayerModelMesh(); scene.add(playerModel);
+  generateWorld(); // 生成带有树木的多区块地形
+  playerModel = createPlayerModelMesh(); scene.add(playerModel);
   var geo = new THREE.EdgesGeometry(new THREE.BoxGeometry(1.002, 1.002, 1.002)); var mat = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
   highlightBox = new THREE.LineSegments(geo, mat); highlightBox.visible = false; scene.add(highlightBox);
 
@@ -783,18 +697,72 @@ function initEngine(){
       e.target.value = ''; toggleChat(false);
     }
   });
+
+  // 启动 F3 调试界面刷新
+  setInterval(updateDebugScreen, 100);
+  
   loop();
 }
 
-function generateTerrain(){
-  var size = 16;
-  for(var x = -size; x < size; x++){ for(var z = -size; z < size; z++){
-      var h = Math.floor(Math.sin(x * 0.3) * 2 + Math.cos(z * 0.3) * 2 + 4);
-      for(var y = 0; y < h; y++){ var type = y === h - 1 ? 'grass_block' : (y > h - 3 ? 'dirt' : 'stone'); addBlock(x, y, z, type); }
-  } }
+function generateWorld() {
+  // 生成一个 3x3 的区块区域 (48x48 格)
+  var halfChunks = Math.floor(renderDistance / 2);
+  for(var cx = -halfChunks; cx <= halfChunks; cx++) {
+    for(var cz = -halfChunks; cz <= halfChunks; cz++) {
+      generateChunk(cx, cz);
+    }
+  }
+}
+
+function generateChunk(cx, cz) {
+  var startX = cx * CHUNK_SIZE;
+  var startZ = cz * CHUNK_SIZE;
+  
+  // 生成地表 (简易噪声高度)
+  for(var x = 0; x < CHUNK_SIZE; x++) {
+    for(var z = 0; z < CHUNK_SIZE; z++) {
+      var wx = startX + x;
+      var wz = startZ + z;
+      var h = Math.floor(Math.sin(wx * 0.1) * 3 + Math.cos(wz * 0.1) * 3 + 10);
+      
+      for(var y = 0; y < h; y++) {
+        var type = y === h - 1 ? 'grass_block' : (y > h - 4 ? 'dirt' : 'stone');
+        addBlock(wx, y, wz, type);
+      }
+      
+      // 概率生成树木
+      if (Math.random() < 0.02) { // 2% 概率生成树木
+        generateTree(wx, h, wz);
+      }
+    }
+  }
+}
+
+function generateTree(x, groundY, z) {
+  var trunkHeight = 4 + Math.floor(Math.random() * 2); // 4-5 高
+  for (var i = 0; i < trunkHeight; i++) {
+    addBlock(x, groundY + i, z, 'oak_log');
+  }
+  
+  // 生成树叶 (简单球形)
+  for (var dx = -2; dx <= 2; dx++) {
+    for (var dz = -2; dz <= 2; dz++) {
+      for (var dy = 0; dy <= 2; dy++) {
+        // 剔除四个角使其更圆润
+        if (Math.abs(dx) === 2 && Math.abs(dz) === 2) continue; 
+        if (dy === 2 && (Math.abs(dx) > 1 || Math.abs(dz) > 1)) continue;
+        
+        // 避免覆盖树干顶部
+        if (dx === 0 && dz === 0 && dy < 2) continue; 
+        
+        addBlock(x + dx, groundY + trunkHeight - 1 + dy, z + dz, 'oak_leaves');
+      }
+    }
+  }
 }
 
 function addBlock(x, y, z, type){
+  // 简易优化：如果是相同位置则跳过
   var geo = new THREE.BoxGeometry(1, 1, 1); var tex = getTexture(type); var mat = new THREE.MeshLambertMaterial({ map: tex });
   var mesh = new THREE.Mesh(geo, mat); mesh.position.set(x, y, z); mesh.userData = { type: type }; scene.add(mesh); blocks.push(mesh);
 }
@@ -816,6 +784,9 @@ function onKeyDown(e){
   if(!gameActive) return;
   if(isChatting){ if(e.code === 'Escape') toggleChat(false); return; }
   keys[e.code] = true;
+  
+  if(e.code === 'F3') { e.preventDefault(); isDebugOpen = !isDebugOpen; document.getElementById('debugScreen').classList.toggle('show', isDebugOpen); }
+  
   if(e.code === 'Escape'){ if(document.pointerLockElement){ document.exitPointerLock(); document.getElementById('pauseMenu').classList.add('show'); } }
   if(e.code === 'F5'){ e.preventDefault(); cameraMode = (cameraMode + 1) % 3; updateCameraModeText(); }
   if(e.code === 'KeyE'){ e.preventDefault(); inventoryOpen = !inventoryOpen; document.getElementById('inventoryScreen').classList.toggle('show', inventoryOpen); if(inventoryOpen && document.pointerLockElement) document.exitPointerLock(); if(!inventoryOpen) document.getElementById('gameCanvas').requestPointerLock(); }
@@ -857,38 +828,112 @@ function onCanvasMouseDown(e){
 function onResize(){ if(renderer){ renderer.setSize(innerWidth, innerHeight); camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix(); } }
 function updateCameraModeText(){
   var text = '第一人称'; if(cameraMode === 1) text = '第三人称 (背面)'; if(cameraMode === 2) text = '第三人称 (正面)';
-  document.getElementById('gameMode').textContent = '视角: ' + text;
+  document.getElementById('gameMode').textContent = '模式: ' + text;
 }
 
+function updateDebugScreen() {
+  if (!isDebugOpen || !gameActive) return;
+  var debug = document.getElementById('debugScreen');
+  var cX = Math.floor(playerPos.x / 16);
+  var cZ = Math.floor(playerPos.z / 16);
+  
+  var facing = '南 (Z+)';
+  if (Math.abs(yaw) < Math.PI/4) facing = '南 (Z+)';
+  else if (Math.abs(yaw - Math.PI) < Math.PI/4) facing = '北 (Z-)';
+  else if (Math.abs(yaw - Math.PI/2) < Math.PI/4) facing = '东 (X+)';
+  else if (Math.abs(yaw + Math.PI/2) < Math.PI/4) facing = '西 (X-)';
+  
+  debug.innerHTML = `Minecraft 1.20.1 (Web)<br>
+  X: ${playerPos.x.toFixed(2)} Y: ${playerPos.y.toFixed(2)} Z: ${playerPos.z.toFixed(2)}<br>
+  Chunk: ${cX}, ${cZ}<br>
+  Facing: ${facing}<br>
+  Render Distance: ${renderDistance} chunks<br>
+  Simulation Distance: ${simulationDistance} chunks<br>
+  FPS: ${renderer.info.render.fps || 'N/A'}`;
+}
+
+// 物理循环 (严格遵循 MC 1.20.1)
 var lastFrameTime = performance.now();
+var lastGroundY = 20; // 记录上一次站在地面上的 Y 坐标
 function loop(){
   requestAnimationFrame(loop); if(!gameActive) return;
   var now = performance.now(); var dt = (now - lastFrameTime) / 1000; lastFrameTime = now;
-  var tickDelta = dt * 20; if (tickDelta > 2) tickDelta = 2;
-  var speed = 4.317; if (isSneaking) speed = 1.295; else if (isSprinting) speed = 5.612;
   
+  // 限制单帧时间，防止卡顿导致穿模
+  if (dt > 0.1) dt = 0.1;
+  
+  var tickDelta = dt * 20; 
+  if (tickDelta > 2) tickDelta = 2; // 防止切出页面卡顿
+  
+  // 速度计算
+  var speed = WALK_SPEED; 
+  if (isSneaking) speed = SNEAK_SPEED; 
+  else if (isSprinting) speed = SPRINT_SPEED;
+  
+  // 水平移动
   var forward = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw)); var right = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
   if(keys['KeyW']) playerPos.addScaledVector(forward, speed * dt);
   if(keys['KeyS']) playerPos.addScaledVector(forward, -speed * dt);
   if(keys['KeyA']) playerPos.addScaledVector(right, -speed * dt);
   if(keys['KeyD']) playerPos.addScaledVector(right, speed * dt);
 
-  if (!isGrounded) { velocityY = (velocityY - 0.08 * tickDelta) * Math.pow(0.98, tickDelta); playerPos.y += velocityY * tickDelta; }
-  if(playerPos.y <= 5){ playerPos.y = 5; velocityY = 0; isGrounded = true; } else { isGrounded = false; }
-  if(keys['Space'] && isGrounded){ velocityY = 0.42; isGrounded = false; }
+  // 垂直物理 (跳跃与重力)
+  if (!isGrounded) { 
+    // 垂直速度衰减：先减重力，再乘空气阻力
+    velocityY = (velocityY - GRAVITY * tickDelta) * Math.pow(AIR_RESISTANCE, tickDelta); 
+    playerPos.y += velocityY * tickDelta; 
+  }
+  
+  // 地面碰撞检测
+  // 计算脚底所在的方块 Y 坐标
+  var footY = Math.floor(playerPos.y);
+  
+  // 简易碰撞检测：如果玩家在某个方块上方，则停止下坠
+  var onGround = false;
+  for (var i = 0; i < blocks.length; i++) {
+     var b = blocks[i];
+     // 检查水平方向是否重叠，且玩家脚部刚好在方块顶部附近
+     if (Math.abs(b.position.x - playerPos.x) < 0.5 && 
+         Math.abs(b.position.z - playerPos.z) < 0.5 &&
+         playerPos.y >= b.position.y + 1 - 0.1 && 
+         playerPos.y <= b.position.y + 1 + 0.1) {
+         onGround = true;
+         lastGroundY = b.position.y + 1;
+         break;
+     }
+  }
+  
+  if (onGround) {
+     playerPos.y = lastGroundY;
+     velocityY = 0;
+     isGrounded = true;
+  } else {
+     isGrounded = false;
+  }
 
+  // 跳跃
+  if(keys['Space'] && isGrounded){
+    velocityY = JUMP_VELOCITY;
+    isGrounded = false;
+  }
+
+  // 更新模型位置
   playerModel.position.copy(playerPos); playerModel.position.y -= 1.5; playerModel.rotation.y = yaw;
   if(sendPos && Date.now() - lastPosSendTime > 100) { lastPosSendTime = Date.now(); sendPos({ pos: playerPos, yaw: yaw }); }
 
+  // 相机视角
   if(cameraMode === 0){ camera.position.copy(playerPos); camera.position.y += 0.6; playerModel.visible = false; } 
   else if(cameraMode === 1){ var offset = new THREE.Vector3(Math.sin(yaw) * 4, 2, Math.cos(yaw) * 4); camera.position.copy(playerPos).add(offset); camera.lookAt(playerPos); playerModel.visible = true; } 
   else { var offset = new THREE.Vector3(-Math.sin(yaw) * 4, 2, -Math.cos(yaw) * 4); camera.position.copy(playerPos).add(offset); camera.lookAt(playerPos); playerModel.visible = true; }
   camera.rotation.order = 'YXZ'; camera.rotation.y = yaw; camera.rotation.x = pitch;
 
+  // 方块高亮
   raycaster.setFromCamera(new THREE.Vector2(0, 0), camera); var hits = raycaster.intersectObjects(blocks);
   if(hits.length > 0 && hits[0].distance < 8){ highlightBox.position.copy(hits[0].object.position); highlightBox.visible = true; } else { highlightBox.visible = false; }
 
+  // 更新 HUD 坐标
   document.getElementById('gameCoord').textContent = `X: ${playerPos.x.toFixed(1)} Y: ${playerPos.y.toFixed(1)} Z: ${playerPos.z.toFixed(1)}`;
+  
   renderer.render(scene, camera);
 }
 
@@ -903,7 +948,7 @@ function initHotbarUI(){
 function updateHotbarUI(){ document.querySelectorAll('.hotbar-slot').forEach((slot, i) => { slot.classList.toggle('selected', i === selectedHotbarSlot); }); }
 function resumeGame(){ document.getElementById('pauseMenu').classList.remove('show'); document.getElementById('gameCanvas').requestPointerLock(); }
 function saveAndQuit(){ gameActive = false; document.getElementById('gameView').classList.remove('show'); document.getElementById('pauseMenu').classList.remove('show'); document.getElementById('gamePing').style.display = 'none'; if(document.pointerLockElement) document.exitPointerLock(); if(currentRoom){ try { currentRoom.leave(); } catch(e){} currentRoom = null; } goHome(); }
-function showAbout(){ alert('咋联机？\n\n房主：单人世界 -> 选中一个 -> 对局域网开放。\n\n只需要填一个端口号，朋友在多人联机里输入同样的端口就行。\n\n游戏内快捷键：\nWASD: 移动\n空格: 跳跃\nShift: 潜行\nCtrl: 疾跑\nT: 聊天/指令\nE: 背包\nF5: 切换视角\nF3+F4: 切换游戏模式\n左键: 破坏\n右键: 放置'); }
+function showAbout(){ alert('咋联机？\n\n房主：单人世界 -> 选中一个 -> 对局域网开放。\n\n只需要填一个端口号，朋友在多人联机里输入同样的端口就行。\n\n游戏内快捷键：\nWASD: 移动\n空格: 跳跃\nShift: 潜行\nCtrl: 疾跑\nT: 聊天/指令\nE: 背包\nF5: 切换视角\nF3: 调试界面\nF3+F4: 切换游戏模式\n左键: 破坏\n右键: 放置'); }
 </script>
 </body>
 </html>
