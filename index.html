@@ -8,7 +8,7 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
 body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden}
 
-/* ============ 手机端拦截层 ============ */
+/* 手机端拦截层 */
 #mobileBlockLayer{position:fixed;inset:0;z-index:9999999;background:#0a0a12;display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;color:#fff;font-family:"Consolas","Courier New",monospace}
 #mobileBlockLayer.show{display:flex}
 #mobileBlockLayer .block-icon{font-size:100px;line-height:1;color:#ff3b30;margin-bottom:30px;filter:drop-shadow(0 0 40px rgba(255,59,48,.7));animation:blink 1.5s ease-in-out infinite}
@@ -19,7 +19,7 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden}
 #mobileBlockLayer .block-code{font-size:12px;color:#666;background:#1a1a1a;padding:10px 22px;border-radius:8px;border:1px solid #333;letter-spacing:2px;margin-bottom:30px}
 #mobileBlockLayer .block-hint{font-size:12px;color:#555;line-height:1.8;max-width:480px}
 
-/* ============ 加载页 ============ */
+/* 加载页 */
 #loadingScreen{position:fixed;inset:0;background:#0a0a12;z-index:3000000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;transition:opacity .6s}
 #loadingScreen.hide{opacity:0;pointer-events:none}
 #loadingScreen .brand{font-size:38px;font-weight:900;letter-spacing:8px;background:linear-gradient(135deg,#4a6cf7,#a855f7,#ec4899);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 40px rgba(74,108,247,.5));animation:floatUp 2.5s ease-in-out infinite}
@@ -33,7 +33,7 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden}
 #loadingScreen .status{font-size:13px;color:#6a7080;letter-spacing:2px;min-height:20px;text-align:center;padding:0 20px}
 #loadingScreen .detail{font-size:11px;color:#4a5060;letter-spacing:1px;margin-top:8px}
 
-/* ============ 点击开始播放遮罩 ============ */
+/* 点击开始播放遮罩 */
 #startOverlay{position:fixed;inset:0;background:#000;z-index:2000000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:30px;transition:opacity .5s}
 #startOverlay.hide{opacity:0;pointer-events:none}
 #startOverlay .title{font-size:42px;font-weight:900;letter-spacing:8px;background:linear-gradient(135deg,#4a6cf7,#a855f7,#ec4899);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 60px rgba(74,108,247,.5);animation:floatUp 2s ease-in-out infinite}
@@ -43,7 +43,7 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden}
 #startOverlay .startBtn:hover{transform:scale(1.1) !important}
 #startOverlay .hint{font-size:12px;color:#6a7080;letter-spacing:2px;margin-top:8px}
 
-/* ============ 开场视频 ============ */
+/* 开场视频 */
 #introLayer{position:fixed;inset:0;background:#000;z-index:999999;display:none;align-items:center;justify-content:center;opacity:1;transition:opacity .8s ease}
 #introLayer.active{display:flex}
 #introLayer.fade-out{opacity:0;pointer-events:none}
@@ -51,11 +51,11 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden}
 #introSkip{position:absolute;right:24px;bottom:24px;padding:8px 18px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.3);border-radius:20px;color:#fff;font-size:12px;cursor:pointer;backdrop-filter:blur(8px);transition:all .2s;z-index:3;opacity:.7}
 #introSkip:hover{background:rgba(0,0,0,.8);opacity:1}
 
-/* ============ 主界面背景视频 ============ */
+/* 主界面背景视频 */
 #bgVideo{position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:0;pointer-events:none;background:#000}
 #bgMask{position:fixed;inset:0;z-index:1;background:linear-gradient(180deg,rgba(10,10,20,.08) 0%,rgba(10,10,20,.35) 100%);pointer-events:none}
 
-/* ============ 左下角按钮 ============ */
+/* 左下角按钮 */
 #uiToggleBtn{position:fixed;left:20px;bottom:20px;z-index:5000;width:46px;height:46px;border-radius:50%;background:rgba(30,32,48,.85);border:1px solid rgba(74,108,247,.5);color:#e8e8f0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;backdrop-filter:blur(12px);transition:all .3s;box-shadow:0 4px 16px rgba(0,0,0,.4);user-select:none}
 #uiToggleBtn:hover{background:rgba(74,108,247,.5);transform:scale(1.08)}
 #uiToggleBtn.hidden-mode{background:rgba(30,32,48,.4);border-color:rgba(74,108,247,.3);opacity:.5}
@@ -69,7 +69,7 @@ body.ui-hidden #uiToggleBtn:hover{opacity:1}
 body.ui-hidden #soundToggleBtn{opacity:.5}
 body.ui-hidden #soundToggleBtn:hover{opacity:1}
 
-/* ============ 通用 ============ */
+/* 通用 */
 .app{width:100vw;height:100vh;position:relative;overflow:hidden;z-index:2}
 .screen{position:absolute;inset:0;display:none;flex-direction:column;padding:40px;overflow-y:auto}
 .screen.active{display:flex}
@@ -209,11 +209,17 @@ body.ui-hidden #soundToggleBtn:hover{opacity:1}
 .custom-ctx-item.danger{color:#ff8080}
 .custom-ctx-item.danger:hover{background:rgba(58,28,28,.9)}
 .custom-ctx-sep{height:1px;background:rgba(74,108,247,.25);margin:4px 0}
+
+/* 玩家列表特定样式 */
+.player-item{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(26,28,40,.9);border:1px solid rgba(74,108,247,.2);border-radius:8px;margin-bottom:6px}
+.player-name{font-size:14px;font-weight:600;color:#e8e8f0}
+.player-ban-btn{padding:4px 10px;background:rgba(255,59,48,.15);color:#ff3b30;border:1px solid rgba(255,59,48,.3);border-radius:6px;font-size:12px;cursor:pointer;transition:all .2s}
+.player-ban-btn:hover{background:#ff3b30;color:#fff}
 </style>
 </head>
 <body>
 
-<!-- ============ 手机端拦截层 ============ -->
+<!-- 手机端拦截层 -->
 <div id="mobileBlockLayer">
   <div class="block-icon">⛔</div>
   <div class="block-title">设备不兼容</div>
@@ -229,7 +235,7 @@ body.ui-hidden #soundToggleBtn:hover{opacity:1}
   </div>
 </div>
 
-<!-- ============ 加载页 ============ -->
+<!-- 加载页 -->
 <div id="loadingScreen">
   <div class="brand">说 话 大 厅</div>
   <div class="percent" id="loadPercent">0%</div>
@@ -240,7 +246,7 @@ body.ui-hidden #soundToggleBtn:hover{opacity:1}
   <div class="detail" id="loadDetail">首次加载会缓存所有资源，之后打开无需重新下载</div>
 </div>
 
-<!-- ============ 点击开始 ============ -->
+<!-- 点击开始播放 -->
 <div id="startOverlay">
   <div class="title">说 话 大 厅</div>
   <div class="sub">VOICE HALL · P2P CHAT</div>
@@ -389,7 +395,7 @@ body.ui-hidden #soundToggleBtn:hover{opacity:1}
     <div style="width:80px"></div>
   </div>
   <div style="padding:40px;max-width:600px;margin:0 auto;line-height:2;color:#a0a8b8;font-size:14px">
-    <p>说话大厅 v1.9</p>
+    <p>说话大厅 v2.0</p>
     <p>基于 WebRTC 的 P2P 聊天工具。</p>
     <p>消息点对点直传，不经过任何中转服务器。</p>
     <p>房间码为 8 位随机字符，约 1.1 万亿种组合。</p>
@@ -416,6 +422,7 @@ body.ui-hidden #soundToggleBtn:hover{opacity:1}
     </div>
   </div>
   <div id="ownerMenu" class="owner-menu">
+    <div class="owner-menu-item" onclick="openPlayerListModal()">👥 在线玩家列表</div>
     <div class="owner-menu-item" onclick="openWordManage()">🚫 违禁词管理</div>
     <div class="owner-menu-item" onclick="openEditRoom()">✏️ 修改房间信息</div>
     <div class="owner-menu-item" onclick="viewBannedList()">📋 黑名单管理</div>
@@ -428,6 +435,19 @@ body.ui-hidden #soundToggleBtn:hover{opacity:1}
     <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="sendImage(this)">
     <textarea id="msgInput" placeholder="输入消息，Enter发送，Shift+Enter换行"></textarea>
     <button onclick="sendMsg()">发送</button>
+  </div>
+</div>
+
+<!-- 玩家列表弹窗 -->
+<div class="modal-mask" id="playerListModal">
+  <div class="modal">
+    <h3>👥 在线玩家列表</h3>
+    <div id="playerListContainer" style="max-height: 300px; overflow-y: auto;">
+      <!-- JS 动态渲染 -->
+    </div>
+    <div class="btn-row">
+      <button class="mc-btn small" onclick="closePlayerListModal()">关闭</button>
+    </div>
   </div>
 </div>
 
@@ -505,42 +525,25 @@ body.ui-hidden #soundToggleBtn:hover{opacity:1}
 <audio id="bgMusic" loop preload="auto"></audio>
 
 <script>
-// ============================================================
-// 【最优先】设备检测：手机/平板直接拦截，不执行任何后续逻辑
-// ============================================================
+// 1. 设备拦截检测（最优先执行）
 (function(){
   var mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|HarmonyOS|Mobile|Windows Phone|MicroMessenger|QQ\/|UCBrowser|Quark|MiuiBrowser|VivoBrowser|OppoBrowser|HuaweiBrowser|SamsungBrowser|HeyTapBrowser|baidubrowser/i;
   var ua = navigator.userAgent || '';
   var uaHit = mobileRegex.test(ua);
-
-  // 触摸设备 + 小屏，辅助判断
   var maxTouch = navigator.maxTouchPoints || 0;
   var touchHit = ('ontouchstart' in window) && (maxTouch > 1);
   var sw = Math.min(window.screen.width || 9999, window.screen.height || 9999);
   var iw = Math.min(window.innerWidth || 9999, window.innerHeight || 9999);
   var smallScreen = (sw < 768) || (iw < 768);
 
-  // 综合判定：UA 命中，或者触摸+小屏
-  var isMobileDevice = uaHit || (touchHit && smallScreen);
-
-  if(isMobileDevice){
+  if(uaHit || (touchHit && smallScreen)){
     window.__BLOCKED_DEVICE__ = true;
-    // 立即显示拦截层
     var blockLayer = document.getElementById('mobileBlockLayer');
-    if(blockLayer){
-      blockLayer.classList.add('show');
-      blockLayer.style.display = 'flex';
-    }
-    // 隐藏其他所有可能弹出的层
+    if(blockLayer){ blockLayer.classList.add('show'); blockLayer.style.display = 'flex'; }
     var ids = ['loadingScreen','startOverlay','introLayer'];
-    for(var i=0;i<ids.length;i++){
-      var el = document.getElementById(ids[i]);
-      if(el){ el.style.display = 'none'; }
-    }
-    // 冻结 body
+    for(var i=0;i<ids.length;i++){ var el = document.getElementById(ids[i]); if(el) el.style.display = 'none'; }
     document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
-    // 移除 app 内容（不渲染）
     var app = document.querySelector('.app');
     if(app) app.style.display = 'none';
     var bg = document.getElementById('bgVideo');
@@ -551,21 +554,13 @@ body.ui-hidden #soundToggleBtn:hover{opacity:1}
     if(ui1) ui1.style.display = 'none';
     var ui2 = document.getElementById('soundToggleBtn');
     if(ui2) ui2.style.display = 'none';
-    // 直接返回，后面所有代码都不执行
     return;
   }
 })();
 
-// 如果被拦截，直接结束整个 script 执行
-if(window.__BLOCKED_DEVICE__){
-  // 用一个空的执行体，阻止后续代码运行
-  // 由于脚本是顺序执行的，这里用 throw 中断最干净
-  throw new Error('BLOCKED_DEVICE');
-}
+if(window.__BLOCKED_DEVICE__){ throw new Error('BLOCKED_DEVICE'); }
 
-// ============================================================
-// 以下代码仅在电脑端执行
-// ============================================================
+// 2. 全局变量
 var currentRoom = null;
 var currentCode = '';
 var currentNick = '';
@@ -576,6 +571,7 @@ var servers = [];
 var sendChat = null;
 var sendPing = null;
 var sendPong = null;
+var sendAck = null;
 var pingTimer = null;
 var joinRoomFn = null;
 var trysteroLoading = false;
@@ -587,6 +583,8 @@ var mutedUntil = 0;
 var peerAvatars = {};
 var uiHidden = false;
 var isMuted = false;
+var pendingMessages = {}; // 消息重传队列
+var myPeerId = '';
 
 try { servers = JSON.parse(localStorage.getItem('speaking-servers') || '[]'); } catch(e) { servers = []; }
 try { blacklist = JSON.parse(localStorage.getItem('speaking-blacklist') || '{}'); } catch(e) { blacklist = {}; }
@@ -595,314 +593,126 @@ try { currentAvatar = localStorage.getItem('speaking-avatar') || '😀'; } catch
 
 var historyStack = ['screenHome'];
 
-// ============================================================
-// 资源缓存配置
-// ============================================================
-var CACHE_NAME = 'speaking-hall-assets-v1';
-var ASSETS = [
-  '进入主界面后的背景视频.mp4',
-  '背景视频.mp4',
-  '背景音乐.mp3'
-];
+// 3. 资源缓存
+var CACHE_NAME = 'speaking-hall-assets-v2';
+var ASSETS = ['进入主界面后的背景视频.mp4', '背景视频.mp4', '背景音乐.mp3'];
 
-// ============================================================
-// 预加载
-// ============================================================
 async function preloadAll(onProgress){
-  var cache;
-  try {
-    cache = await caches.open(CACHE_NAME);
-  } catch(e){
-    onProgress(100, '缓存不受支持，跳过');
-    return false;
-  }
-
-  var totalBytes = 0;
-  var loadedBytes = 0;
-  var fileSizes = {};
-  var allCached = true;
-
+  var cache; try { cache = await caches.open(CACHE_NAME); } catch(e){ onProgress(100, '缓存不受支持，跳过'); return false; }
+  var totalBytes = 0; var loadedBytes = 0; var fileSizes = {}; var allCached = true;
   for(var i=0;i<ASSETS.length;i++){
-    var f = ASSETS[i];
-    var cached = await cache.match(f);
-    if(cached){
-      var blob = await cached.blob();
-      fileSizes[f] = blob.size || 0;
-      loadedBytes += fileSizes[f];
-    } else {
-      allCached = false;
-      try {
-        var head = await fetch(f, { method: 'HEAD' });
-        var cl = parseInt(head.headers.get('Content-Length') || '0', 10);
-        fileSizes[f] = cl > 0 ? cl : (5 * 1024 * 1024);
-      } catch(e){
-        fileSizes[f] = 5 * 1024 * 1024;
-      }
-    }
+    var f = ASSETS[i]; var cached = await cache.match(f);
+    if(cached){ var blob = await cached.blob(); fileSizes[f] = blob.size || 0; loadedBytes += fileSizes[f]; }
+    else { allCached = false; try { var head = await fetch(f, { method: 'HEAD' }); var cl = parseInt(head.headers.get('Content-Length') || '0', 10); fileSizes[f] = cl > 0 ? cl : (5 * 1024 * 1024); } catch(e){ fileSizes[f] = 5 * 1024 * 1024; } }
     totalBytes += fileSizes[f];
   }
-
   if(totalBytes === 0) totalBytes = 15 * 1024 * 1024;
-
-  if(allCached){
-    onProgress(100, '已从缓存加载');
-    return true;
-  }
-
+  if(allCached){ onProgress(100, '已从缓存加载'); return true; }
   onProgress(Math.round(loadedBytes / totalBytes * 100), '检查缓存...');
-
   for(var j=0;j<ASSETS.length;j++){
-    var file = ASSETS[j];
-    var existing = await cache.match(file);
-    if(existing) continue;
-
+    var file = ASSETS[j]; var existing = await cache.match(file); if(existing) continue;
     try {
-      var res = await fetch(file);
-      if(!res.ok) throw new Error('HTTP ' + res.status);
-      var resForCache = res.clone();
-      var cachePromise = cache.put(file, resForCache);
-
+      var res = await fetch(file); if(!res.ok) throw new Error('HTTP ' + res.status);
+      var resForCache = res.clone(); var cachePromise = cache.put(file, resForCache);
       if(res.body && res.body.getReader){
         var reader = res.body.getReader();
-        while(true){
-          var chunk = await reader.read();
-          if(chunk.done) break;
-          loadedBytes += chunk.value.length;
-          var pct = Math.min(99, Math.round(loadedBytes / totalBytes * 100));
-          onProgress(pct, '正在下载：' + file);
-        }
-      } else {
-        await res.blob();
-        loadedBytes += fileSizes[file] || 0;
-      }
+        while(true){ var chunk = await reader.read(); if(chunk.done) break; loadedBytes += chunk.value.length; var pct = Math.min(99, Math.round(loadedBytes / totalBytes * 100)); onProgress(pct, '正在下载：' + file); }
+      } else { await res.blob(); loadedBytes += fileSizes[file] || 0; }
       await cachePromise;
-    } catch(err){
-      console.warn('下载失败:', file, err);
-      loadedBytes += fileSizes[file] || 0;
-    }
+    } catch(err){ loadedBytes += fileSizes[file] || 0; }
   }
-
-  onProgress(100, '全部缓存完成');
-  return true;
+  onProgress(100, '全部缓存完成'); return true;
 }
 
 async function setSrcFromCache(el, filename){
   if(!el) return;
   try {
-    var cache = await caches.open(CACHE_NAME);
-    var res = await cache.match(filename);
-    if(res){
-      var blob = await res.blob();
-      if(el.dataset.blobUrl){
-        try{ URL.revokeObjectURL(el.dataset.blobUrl); }catch(e){}
-      }
-      var url = URL.createObjectURL(blob);
-      el.dataset.blobUrl = url;
-      el.src = url;
-      return true;
-    }
-  } catch(e){
-    console.warn('读缓存失败:', filename, e);
-  }
-  el.src = filename;
-  return false;
+    var cache = await caches.open(CACHE_NAME); var res = await cache.match(filename);
+    if(res){ var blob = await res.blob(); if(el.dataset.blobUrl){ try{ URL.revokeObjectURL(el.dataset.blobUrl); }catch(e){} } var url = URL.createObjectURL(blob); el.dataset.blobUrl = url; el.src = url; return true; }
+  } catch(e){}
+  el.src = filename; return false;
 }
 
 function updateLoadUI(pct, text){
-  var p = document.getElementById('loadPercent');
-  var f = document.getElementById('loadFill');
-  var s = document.getElementById('loadStatus');
-  if(p) p.textContent = pct + '%';
-  if(f) f.style.width = pct + '%';
-  if(s && text) s.textContent = text;
+  var p = document.getElementById('loadPercent'); var f = document.getElementById('loadFill'); var s = document.getElementById('loadStatus');
+  if(p) p.textContent = pct + '%'; if(f) f.style.width = pct + '%'; if(s && text) s.textContent = text;
 }
 
-var INTRO_DONE_KEY = 'speaking-intro-done-session';
-var introStarted = false;
-var introFinished = false;
+var INTRO_DONE_KEY = 'speaking-intro-done-session-v2';
+var introStarted = false; var introFinished = false;
 
 window.addEventListener('load', async function(){
-  var ok = true;
-  try {
-    await preloadAll(updateLoadUI);
-  } catch(e){
-    console.warn('预加载异常:', e);
-    ok = false;
-  }
-
+  try { await preloadAll(updateLoadUI); } catch(e){}
   await new Promise(function(r){ setTimeout(r, 400); });
-
-  var ls = document.getElementById('loadingScreen');
-  ls.classList.add('hide');
-  setTimeout(function(){ ls.style.display = 'none'; }, 700);
-
+  var ls = document.getElementById('loadingScreen'); ls.classList.add('hide'); setTimeout(function(){ ls.style.display = 'none'; }, 700);
   var isFirstOpen = !sessionStorage.getItem(INTRO_DONE_KEY);
-  if(!isFirstOpen){
-    introFinished = true;
-    afterIntro();
-    return;
-  }
-
-  var so = document.getElementById('startOverlay');
-  so.style.display = 'flex';
-
-  updateSoundBtn();
+  if(!isFirstOpen){ introFinished = true; afterIntro(); return; }
+  var so = document.getElementById('startOverlay'); so.style.display = 'flex'; updateSoundBtn();
 });
 
 async function startPlayback(){
-  if(introStarted) return;
-  introStarted = true;
-
-  var introVideo = document.getElementById('introVideo');
-  var bgVideo = document.getElementById('bgVideo');
-  var bgMusic = document.getElementById('bgMusic');
-
-  try{ bgVideo.pause(); bgVideo.currentTime = 0; }catch(e){}
-  try{ bgMusic.pause(); bgMusic.currentTime = 0; }catch(e){}
-
-  var ov = document.getElementById('startOverlay');
-  ov.classList.add('hide');
-  setTimeout(function(){ ov.style.display = 'none'; }, 500);
-
-  await setSrcFromCache(introVideo, ASSETS[0]);
-  await setSrcFromCache(bgVideo, ASSETS[1]);
-  await setSrcFromCache(bgMusic, ASSETS[2]);
-
-  var introLayer = document.getElementById('introLayer');
-  introLayer.classList.add('active');
-  introLayer.style.display = 'flex';
-
-  introVideo.muted = false;
-  introVideo.volume = 1.0;
-  try{ introVideo.currentTime = 0; }catch(e){}
-
-  if(introVideo.readyState < 2){
-    await new Promise(function(resolve){
-      var done = false;
-      function onReady(){ if(!done){ done = true; resolve(); } }
-      introVideo.addEventListener('loadeddata', onReady, { once: true });
-      introVideo.addEventListener('canplay', onReady, { once: true });
-      setTimeout(onReady, 2000);
-    });
-  }
-
-  var playPromise = introVideo.play();
-  if(playPromise && playPromise.catch){
-    playPromise.catch(function(){
-      introVideo.muted = true;
-      introVideo.play().catch(function(){ finishIntro(); });
-    });
-  }
-
-  sessionStorage.setItem(INTRO_DONE_KEY, '1');
-
-  introVideo.onended = function(){ finishIntro(); };
-
-  setTimeout(function(){
-    if(introLayer.classList.contains('active')) finishIntro();
-  }, 30000);
+  if(introStarted) return; introStarted = true;
+  var introVideo = document.getElementById('introVideo'); var bgVideo = document.getElementById('bgVideo'); var bgMusic = document.getElementById('bgMusic');
+  try{ bgVideo.pause(); bgVideo.currentTime = 0; }catch(e){} try{ bgMusic.pause(); bgMusic.currentTime = 0; }catch(e){}
+  var ov = document.getElementById('startOverlay'); ov.classList.add('hide'); setTimeout(function(){ ov.style.display = 'none'; }, 500);
+  await setSrcFromCache(introVideo, ASSETS[0]); await setSrcFromCache(bgVideo, ASSETS[1]); await setSrcFromCache(bgMusic, ASSETS[2]);
+  var introLayer = document.getElementById('introLayer'); introLayer.classList.add('active'); introLayer.style.display = 'flex';
+  introVideo.muted = false; introVideo.volume = 1.0; try{ introVideo.currentTime = 0; }catch(e){}
+  if(introVideo.readyState < 2){ await new Promise(function(resolve){ var done = false; function onReady(){ if(!done){ done = true; resolve(); } } introVideo.addEventListener('loadeddata', onReady, { once: true }); introVideo.addEventListener('canplay', onReady, { once: true }); setTimeout(onReady, 2000); }); }
+  var playPromise = introVideo.play(); if(playPromise && playPromise.catch){ playPromise.catch(function(){ introVideo.muted = true; introVideo.play().catch(function(){ finishIntro(); }); }); }
+  sessionStorage.setItem(INTRO_DONE_KEY, '1'); introVideo.onended = function(){ finishIntro(); };
+  setTimeout(function(){ if(introLayer.classList.contains('active')) finishIntro(); }, 30000);
 }
 
 function finishIntro(){
-  if(introFinished) return;
-  introFinished = true;
-
-  var introLayer = document.getElementById('introLayer');
-  var introVideo = document.getElementById('introVideo');
-  try{ introVideo.pause(); }catch(e){}
-
-  introLayer.classList.add('fade-out');
-  setTimeout(function(){
-    introLayer.classList.remove('active');
-    introLayer.style.display = 'none';
-    afterIntro();
-  }, 800);
+  if(introFinished) return; introFinished = true;
+  var introLayer = document.getElementById('introLayer'); var introVideo = document.getElementById('introVideo'); try{ introVideo.pause(); }catch(e){}
+  introLayer.classList.add('fade-out'); setTimeout(function(){ introLayer.classList.remove('active'); introLayer.style.display = 'none'; afterIntro(); }, 800);
 }
 
-function skipIntro(){
-  finishIntro();
-}
+function skipIntro(){ finishIntro(); }
 
 function afterIntro(){
-  var bgVideo = document.getElementById('bgVideo');
-  var bgMusic = document.getElementById('bgMusic');
-
+  var bgVideo = document.getElementById('bgVideo'); var bgMusic = document.getElementById('bgMusic');
   setSrcFromCache(bgVideo, ASSETS[1]).then(function(){
     setSrcFromCache(bgMusic, ASSETS[2]).then(function(){
-      bgVideo.muted = isMuted;
-      bgVideo.volume = 0.75;
-      bgMusic.muted = isMuted;
-      bgMusic.volume = 0.8;
-      try{ bgVideo.currentTime = 0; }catch(e){}
-      try{ bgMusic.currentTime = 0; }catch(e){}
-
-      var vp = bgVideo.play();
-      var mp = bgMusic.play();
-
-      if(vp && vp.catch){
-        vp.catch(function(){
-          bgVideo.muted = true;
-          bgVideo.play().catch(function(){});
-        });
-      }
-      if(mp && mp.catch){
-        mp.catch(function(){});
-      }
+      bgVideo.muted = isMuted; bgVideo.volume = 0.75; bgMusic.muted = isMuted; bgMusic.volume = 0.8;
+      try{ bgVideo.currentTime = 0; }catch(e){} try{ bgMusic.currentTime = 0; }catch(e){}
+      var vp = bgVideo.play(); var mp = bgMusic.play();
+      if(vp && vp.catch){ vp.catch(function(){ bgVideo.muted = true; bgVideo.play().catch(function(){}); }); }
+      if(mp && mp.catch){ mp.catch(function(){}); }
     });
   });
-
-  updateSoundBtn();
-  playHomeAnimations();
+  updateSoundBtn(); playHomeAnimations();
 }
 
 var homeAnimDone = false;
 function playHomeAnimations(){
-  if(homeAnimDone) return;
-  homeAnimDone = true;
-  var title = document.getElementById('homeTitle');
-  var buttons = document.querySelectorAll('.slide-btn');
+  if(homeAnimDone) return; homeAnimDone = true;
+  var title = document.getElementById('homeTitle'); var buttons = document.querySelectorAll('.slide-btn');
   setTimeout(function(){ title.classList.add('anim-in'); }, 200);
-  buttons.forEach(function(btn, idx){
-    setTimeout(function(){ btn.classList.add('slide-done'); }, 500 + idx * 220);
-  });
+  buttons.forEach(function(btn, idx){ setTimeout(function(){ btn.classList.add('slide-done'); }, 500 + idx * 220); });
 }
 
 function toggleSound(){
-  var introVideo = document.getElementById('introVideo');
-  var bgVideo = document.getElementById('bgVideo');
-  var bgMusic = document.getElementById('bgMusic');
+  var introVideo = document.getElementById('introVideo'); var bgVideo = document.getElementById('bgVideo'); var bgMusic = document.getElementById('bgMusic');
   isMuted = !isMuted;
-  if(introVideo) introVideo.muted = isMuted;
-  if(bgVideo) bgVideo.muted = isMuted;
-  if(bgMusic) bgMusic.muted = isMuted;
-  if(!isMuted){
-    if(bgVideo && bgVideo.paused && introFinished) bgVideo.play().catch(function(){});
-    if(bgMusic && bgMusic.paused && introFinished) bgMusic.play().catch(function(){});
-    toast('🔊 声音已开启');
-  } else {
-    toast('🔇 声音已关闭');
-  }
+  if(introVideo) introVideo.muted = isMuted; if(bgVideo) bgVideo.muted = isMuted; if(bgMusic) bgMusic.muted = isMuted;
+  if(!isMuted){ if(bgVideo && bgVideo.paused && introFinished) bgVideo.play().catch(function(){}); if(bgMusic && bgMusic.paused && introFinished) bgMusic.play().catch(function(){}); toast('🔊 声音已开启'); }
+  else { toast('🔇 声音已关闭'); }
   updateSoundBtn();
 }
+
 function updateSoundBtn(){
-  var btn = document.getElementById('soundToggleBtn');
-  if(!btn) return;
-  if(isMuted){ btn.textContent = '🔇'; btn.classList.add('muted'); }
-  else { btn.textContent = '🔊'; btn.classList.remove('muted'); }
+  var btn = document.getElementById('soundToggleBtn'); if(!btn) return;
+  if(isMuted){ btn.textContent = '🔇'; btn.classList.add('muted'); } else { btn.textContent = '🔊'; btn.classList.remove('muted'); }
 }
 
 function toast(msg){
-  var t = document.getElementById('toast');
-  if(!t) return;
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(t._timer);
-  t._timer = setTimeout(function(){ t.classList.remove('show'); }, 2400);
+  var t = document.getElementById('toast'); if(!t) return; t.textContent = msg; t.classList.add('show'); clearTimeout(t._timer); t._timer = setTimeout(function(){ t.classList.remove('show'); }, 2400);
 }
 function showScreen(id){
-  var screens = document.querySelectorAll('.screen');
-  for(var i = 0; i < screens.length; i++) screens[i].classList.remove('active');
-  var t = document.getElementById(id); if(t) t.classList.add('active');
+  var screens = document.querySelectorAll('.screen'); for(var i = 0; i < screens.length; i++) screens[i].classList.remove('active'); var t = document.getElementById(id); if(t) t.classList.add('active');
 }
 function goHome(id){ historyStack = ['screenHome']; if(id !== 'screenHome') historyStack.push(id); showScreen(id); }
 function goScreen(id){ if(historyStack[historyStack.length-1] !== id) historyStack.push(id); showScreen(id); }
@@ -925,19 +735,13 @@ document.addEventListener('contextmenu', function(e){
 }, true);
 document.addEventListener('keydown', function(e){
   if(e.key === 'F12'){ e.preventDefault(); e.stopPropagation(); return false; }
-  if(e.ctrlKey && e.shiftKey){
-    var k=(e.key||'').toUpperCase();
-    if(['I','J','C','K','E'].indexOf(k)!==-1){ e.preventDefault(); e.stopPropagation(); return false; }
-  }
+  if(e.ctrlKey && e.shiftKey){ var k=(e.key||'').toUpperCase(); if(['I','J','C','K','E'].indexOf(k)!==-1){ e.preventDefault(); e.stopPropagation(); return false; } }
   if(e.ctrlKey && (e.key||'').toUpperCase()==='U'){ e.preventDefault(); e.stopPropagation(); return false; }
 }, true);
 
 function toggleUI(){
-  uiHidden = !uiHidden;
-  document.body.classList.toggle('ui-hidden', uiHidden);
-  var btn = document.getElementById('uiToggleBtn');
-  if(uiHidden){ btn.classList.add('hidden-mode'); btn.title = '显示界面'; }
-  else { btn.classList.remove('hidden-mode'); btn.title = '隐藏界面'; }
+  uiHidden = !uiHidden; document.body.classList.toggle('ui-hidden', uiHidden); var btn = document.getElementById('uiToggleBtn');
+  if(uiHidden){ btn.classList.add('hidden-mode'); btn.title = '显示界面'; } else { btn.classList.remove('hidden-mode'); btn.title = '隐藏界面'; }
 }
 
 var COLOR_CODES = [
@@ -948,30 +752,20 @@ var COLOR_CODES = [
 ];
 function buildColorPanel(panelId, inputId){
   var p = document.getElementById(panelId); if(!p) return;
-  var h=''; for(var i=0;i<COLOR_CODES.length;i++){
-    var c=COLOR_CODES[i];
-    h += '<div class="color-swatch" style="color:'+c.color+'" onclick="insertColorCode(\''+inputId+'\',\''+c.code+'\')">'+c.code+'<span class="code">'+c.name+'</span></div>';
-  } p.innerHTML=h;
+  var h=''; for(var i=0;i<COLOR_CODES.length;i++){ var c=COLOR_CODES[i]; h += '<div class="color-swatch" style="color:'+c.color+'" onclick="insertColorCode(\''+inputId+'\',\''+c.code+'\')">'+c.code+'<span class="code">'+c.name+'</span></div>'; } p.innerHTML=h;
 }
 function toggleColorPanel(panelId){ var p=document.getElementById(panelId); if(p) p.classList.toggle('show'); }
 function insertColorCode(inputId, code){
   var input = document.getElementById(inputId); if(!input) return;
-  var start = input.selectionStart || input.value.length;
-  var end = input.selectionEnd || input.value.length;
-  input.value = input.value.substring(0,start) + code + input.value.substring(end);
-  var np = start + code.length;
-  input.setSelectionRange(np, np); input.focus();
+  var start = input.selectionStart || input.value.length; var end = input.selectionEnd || input.value.length;
+  input.value = input.value.substring(0,start) + code + input.value.substring(end); var np = start + code.length; input.setSelectionRange(np, np); input.focus();
 }
 
 function goMultiplayer(){ renderServers(); goHome('screenMultiplayer'); }
 function openCreateRoom(){
-  document.getElementById('createName').value = '';
-  document.getElementById('createMotd').value = '&7欢迎来到 &a说话大厅';
-  document.getElementById('createNick').value = currentNick;
-  document.getElementById('createCode').value = generateRoomCode();
-  buildColorPanel('createNamePanel','createName');
-  buildColorPanel('createMotdPanel','createMotd');
-  goHome('screenCreate');
+  document.getElementById('createName').value = ''; document.getElementById('createMotd').value = '&7欢迎来到 &a说话大厅';
+  document.getElementById('createNick').value = currentNick; document.getElementById('createCode').value = generateRoomCode();
+  buildColorPanel('createNamePanel','createName'); buildColorPanel('createMotdPanel','createMotd'); goHome('screenCreate');
 }
 function openAddServer(){ document.getElementById('addName').value=''; document.getElementById('addCode').value=''; goScreen('screenAdd'); }
 function openJoinRoom(){ document.getElementById('joinCode').value=''; document.getElementById('joinNick').value=currentNick; goScreen('screenJoin'); }
@@ -980,68 +774,38 @@ function copyCreateCode(){ var c=document.getElementById('createCode').value; if
 function regenCreateCode(){ var c=generateRoomCode(); document.getElementById('createCode').value=c; toast('新房间码：'+c); }
 
 function doAddServer(){
-  var name = document.getElementById('addName').value.trim();
-  var code = document.getElementById('addCode').value.trim().toUpperCase();
-  if(!name){ toast('请输入名称'); return; }
-  if(!code || code.length < 4){ toast('房间码无效'); return; }
+  var name = document.getElementById('addName').value.trim(); var code = document.getElementById('addCode').value.trim().toUpperCase();
+  if(!name){ toast('请输入名称'); return; } if(!code || code.length < 4){ toast('房间码无效'); return; }
   for(var i=0;i<servers.length;i++) if(servers[i].code===code){ toast('已存在'); return; }
-  servers.push({code:code, name:name, motd:'&7新添加的服务器', ping:-1});
-  localStorage.setItem('speaking-servers', JSON.stringify(servers));
-  toast('已添加'); renderServers(); goBack();
+  servers.push({code:code, name:name, motd:'&7新添加的服务器', ping:-1}); localStorage.setItem('speaking-servers', JSON.stringify(servers)); toast('已添加'); renderServers(); goBack();
 }
 function doJoinRoom(){
-  var code = document.getElementById('joinCode').value.trim().toUpperCase();
-  var nick = document.getElementById('joinNick').value.trim();
-  if(!code || code.length < 4){ toast('房间码无效'); return; }
-  if(!nick){ toast('请输入昵称'); return; }
-  currentNick = nick; localStorage.setItem('speaking-nick', nick);
-  connectToRoom(code, nick, '', false);
+  var code = document.getElementById('joinCode').value.trim().toUpperCase(); var nick = document.getElementById('joinNick').value.trim();
+  if(!code || code.length < 4){ toast('房间码无效'); return; } if(!nick){ toast('请输入昵称'); return; }
+  currentNick = nick; localStorage.setItem('speaking-nick', nick); connectToRoom(code, nick, '', false);
 }
 function doDirectConnect(){
-  var code = document.getElementById('directCode').value.trim().toUpperCase();
-  var nick = document.getElementById('directNick').value.trim();
-  if(!code || code.length < 4){ toast('房间码无效'); return; }
-  if(!nick){ toast('请输入昵称'); return; }
-  currentNick = nick; localStorage.setItem('speaking-nick', nick);
-  connectToRoom(code, nick, '', false);
+  var code = document.getElementById('directCode').value.trim().toUpperCase(); var nick = document.getElementById('directNick').value.trim();
+  if(!code || code.length < 4){ toast('房间码无效'); return; } if(!nick){ toast('请输入昵称'); return; }
+  currentNick = nick; localStorage.setItem('speaking-nick', nick); connectToRoom(code, nick, '', false);
 }
 function doCreateRoom(){
-  var name = document.getElementById('createName').value.trim();
-  var motd = document.getElementById('createMotd').value.trim() || '&7欢迎来到 &a说话大厅';
-  var nick = document.getElementById('createNick').value.trim();
-  var code = document.getElementById('createCode').value.trim().toUpperCase();
-  if(!name){ toast('请输入房间名'); return; }
-  if(!nick){ toast('请输入昵称'); return; }
-  if(!code){ toast('房间码为空'); return; }
-  currentNick = nick; localStorage.setItem('speaking-nick', nick);
-  servers.push({code:code, name:name, motd:motd, ping:-1, host:true});
-  localStorage.setItem('speaking-servers', JSON.stringify(servers));
-  connectToRoom(code, nick, name, true, motd);
+  var name = document.getElementById('createName').value.trim(); var motd = document.getElementById('createMotd').value.trim() || '&7欢迎来到 &a说话大厅'; var nick = document.getElementById('createNick').value.trim(); var code = document.getElementById('createCode').value.trim().toUpperCase();
+  if(!name){ toast('请输入房间名'); return; } if(!nick){ toast('请输入昵称'); return; } if(!code){ toast('房间码为空'); return; }
+  currentNick = nick; localStorage.setItem('speaking-nick', nick); servers.push({code:code, name:name, motd:motd, ping:-1, host:true}); localStorage.setItem('speaking-servers', JSON.stringify(servers)); connectToRoom(code, nick, name, true, motd);
 }
 
 function renderServers(){
   var list = document.getElementById('serverList'); if(!list) return;
-  if(servers.length === 0){
-    list.innerHTML = '<div class="empty">还没有服务器<br>点下面「添加服务器」或「加入房间」</div>';
-    return;
-  }
+  if(servers.length === 0){ list.innerHTML = '<div class="empty">还没有服务器<br>点下面「添加服务器」或「加入房间」</div>'; return; }
   var html='';
   for(var idx=0; idx<servers.length; idx++){
-    var s=servers[idx];
-    var ping=s.ping;
-    var barsHtml='';
+    var s=servers[idx]; var ping=s.ping; var barsHtml='';
     for(var i=1;i<=5;i++){
-      var cls='';
-      if(ping<0) cls='';
-      else if(ping<60 && i<=5) cls='on';
-      else if(ping<150 && i<=4) cls='mid';
-      else if(ping<300 && i<=3) cls='high';
-      else if(i<=2) cls='high';
+      var cls=''; if(ping<0) cls=''; else if(ping<60 && i<=5) cls='on'; else if(ping<150 && i<=4) cls='mid'; else if(ping<300 && i<=3) cls='high'; else if(i<=2) cls='high';
       barsHtml += '<div class="ping-bar '+cls+'" style="height:'+(i*3+3)+'px"></div>';
     }
-    var pingTxt = ping<0 ? '---' : ping+'ms';
-    var activeCls = (s.code===currentCode) ? ' active' : '';
-    var icon = s.host ? '👑' : '💬';
+    var pingTxt = ping<0 ? '---' : ping+'ms'; var activeCls = (s.code===currentCode) ? ' active' : ''; var icon = s.host ? '👑' : '💬';
     html += '<div class="server-item'+activeCls+'" data-idx="'+idx+'" onclick="joinServer('+idx+')">'+
       '<div class="server-icon">'+icon+'</div>'+
       '<div class="server-info">'+
@@ -1055,165 +819,68 @@ function renderServers(){
   }
   list.innerHTML = html;
   var menuBtns = list.querySelectorAll('.server-menu-btn');
-  for(var i=0;i<menuBtns.length;i++){
-    (function(btn){
-      btn.addEventListener('click', function(ev){
-        ev.preventDefault(); ev.stopPropagation();
-        var idx = parseInt(btn.getAttribute('data-menu'));
-        var r = btn.getBoundingClientRect();
-        openServerCtxMenu({ clientX: r.left, clientY: r.bottom + 4 }, idx);
-        return false;
-      });
-    })(menuBtns[i]);
-  }
+  for(var i=0;i<menuBtns.length;i++){ (function(btn){ btn.addEventListener('click', function(ev){ ev.preventDefault(); ev.stopPropagation(); var idx = parseInt(btn.getAttribute('data-menu')); var r = btn.getBoundingClientRect(); openServerCtxMenu({ clientX: r.left, clientY: r.bottom + 4 }, idx); return false; }); })(menuBtns[i]); }
   var items = list.querySelectorAll('.server-item');
-  for(var j=0;j<items.length;j++){
-    (function(el){
-      el.addEventListener('contextmenu', function(ev){
-        ev.preventDefault(); ev.stopPropagation();
-        var idx = parseInt(el.getAttribute('data-idx'));
-        openServerCtxMenu(ev, idx);
-        return false;
-      }, false);
-    })(items[j]);
-  }
+  for(var j=0;j<items.length;j++){ (function(el){ el.addEventListener('contextmenu', function(ev){ ev.preventDefault(); ev.stopPropagation(); var idx = parseInt(el.getAttribute('data-idx')); openServerCtxMenu(ev, idx); return false; }, false); })(items[j]); }
 }
 
 var ctxMenu = document.getElementById('customCtxMenu');
 function openServerCtxMenu(ev, idx){
-  closeCtxMenu();
-  var s = servers[idx]; if(!s) return;
-  var items = [
-    { label: '✏️ 重命名', action: function(){ renameServer(idx); } },
-    { label: '📋 复制房间码', action: function(){ navigator.clipboard.writeText(s.code).then(function(){ toast('已复制：'+s.code); }); } },
-    { sep: true },
-    { label: '🗑️ 从列表中删除', action: function(){ deleteServer(idx); }, danger: true }
-  ];
+  closeCtxMenu(); var s = servers[idx]; if(!s) return;
+  var items = [ { label: '✏️ 重命名', action: function(){ renameServer(idx); } }, { label: '📋 复制房间码', action: function(){ navigator.clipboard.writeText(s.code).then(function(){ toast('已复制：'+s.code); }); } }, { sep: true }, { label: '🗑️ 从列表中删除', action: function(){ deleteServer(idx); }, danger: true } ];
   var html = '';
-  for(var i=0;i<items.length;i++){
-    if(items[i].sep){ html += '<div class="custom-ctx-sep"></div>'; continue; }
-    html += '<div class="custom-ctx-item'+(items[i].danger?' danger':'')+'" data-idx="'+i+'">'+items[i].label+'</div>';
-  }
+  for(var i=0;i<items.length;i++){ if(items[i].sep){ html += '<div class="custom-ctx-sep"></div>'; continue; } html += '<div class="custom-ctx-item'+(items[i].danger?' danger':'')+'" data-idx="'+i+'">'+items[i].label+'</div>'; }
   ctxMenu.innerHTML = html;
   var nodes = ctxMenu.querySelectorAll('.custom-ctx-item');
-  for(var j=0;j<nodes.length;j++){
-    (function(node, item){
-      node.onclick = function(e){ e.stopPropagation(); closeCtxMenu(); item.action(); };
-    })(nodes[j], items[parseInt(nodes[j].getAttribute('data-idx'))]);
-  }
-  var x = Math.min(ev.clientX, window.innerWidth - 200);
-  var y = Math.min(ev.clientY, window.innerHeight - 200);
-  ctxMenu.style.left = x+'px'; ctxMenu.style.top = y+'px';
-  ctxMenu.classList.add('show');
-  setTimeout(function(){ document.addEventListener('click', closeCtxMenu, { once: true }); }, 10);
+  for(var j=0;j<nodes.length;j++){ (function(node, item){ node.onclick = function(e){ e.stopPropagation(); closeCtxMenu(); item.action(); }; })(nodes[j], items[parseInt(nodes[j].getAttribute('data-idx'))]); }
+  var x = Math.min(ev.clientX, window.innerWidth - 200); var y = Math.min(ev.clientY, window.innerHeight - 200);
+  ctxMenu.style.left = x+'px'; ctxMenu.style.top = y+'px'; ctxMenu.classList.add('show'); setTimeout(function(){ document.addEventListener('click', closeCtxMenu, { once: true }); }, 10);
 }
 function closeCtxMenu(){ if(ctxMenu) ctxMenu.classList.remove('show'); }
-function deleteServer(idx){
-  var s = servers[idx]; if(!s) return;
-  if(s.code === currentCode){
-    if(!confirm('这是当前连接的服务器，删除会先断开连接，确定吗？')) return;
-    leaveRoom();
-  }
-  servers.splice(idx, 1);
-  localStorage.setItem('speaking-servers', JSON.stringify(servers));
-  renderServers();
-  toast('已删除：' + s.name);
-}
-function renameServer(idx){
-  var s = servers[idx]; if(!s) return;
-  var newName = prompt('新名称：', s.name);
-  if(!newName || newName === s.name) return;
-  servers[idx].name = newName;
-  localStorage.setItem('speaking-servers', JSON.stringify(servers));
-  renderServers();
-  toast('已重命名：' + newName);
-}
-function joinServer(idx){
-  var s = servers[idx]; if(!s) return;
-  if(s.code === currentCode){ showChatScreen(); return; }
-  var nick = currentNick || prompt('你的昵称：') || '';
-  if(!nick){ toast('取消'); return; }
-  currentNick = nick; localStorage.setItem('speaking-nick', nick);
-  connectToRoom(s.code, nick, s.name, false, s.motd);
-}
-function refreshAllPings(){
-  for(var i=0;i<servers.length;i++) servers[i].ping = -1;
-  renderServers();
-  toast('已刷新');
-  if(sendPing) sendPing({ ts: Date.now() });
-}
+function deleteServer(idx){ var s = servers[idx]; if(!s) return; if(s.code === currentCode){ if(!confirm('这是当前连接的服务器，删除会先断开连接，确定吗？')) return; leaveRoom(); } servers.splice(idx, 1); localStorage.setItem('speaking-servers', JSON.stringify(servers)); renderServers(); toast('已删除：' + s.name); }
+function renameServer(idx){ var s = servers[idx]; if(!s) return; var newName = prompt('新名称：', s.name); if(!newName || newName === s.name) return; servers[idx].name = newName; localStorage.setItem('speaking-servers', JSON.stringify(servers)); renderServers(); toast('已重命名：' + newName); }
+function joinServer(idx){ var s = servers[idx]; if(!s) return; if(s.code === currentCode){ showChatScreen(); return; } var nick = currentNick || prompt('你的昵称：') || ''; if(!nick){ toast('取消'); return; } currentNick = nick; localStorage.setItem('speaking-nick', nick); connectToRoom(s.code, nick, s.name, false, s.motd); }
+function refreshAllPings(){ for(var i=0;i<servers.length;i++) servers[i].ping = -1; renderServers(); toast('已刷新'); if(sendPing) sendPing({ ts: Date.now() }); }
 
 async function loadTrystero(){
-  if(trysteroReady) return true;
-  if(trysteroLoading) return false;
-  trysteroLoading = true;
-  var cdns = [
-    'https://cdn.jsdelivr.net/npm/trystero@0.21.5/+esm',
-    'https://esm.sh/trystero@0.21.5',
-    'https://esm.run/trystero',
-    'https://unpkg.com/trystero@0.21.5?module'
-  ];
-  for(var i=0;i<cdns.length;i++){
-    try{
-      var mod = await import(cdns[i]);
-      if(mod && mod.joinRoom){ joinRoomFn = mod.joinRoom; trysteroReady = true; trysteroLoading = false; return true; }
-    }catch(e){ console.warn('CDN fail:', cdns[i]); }
-  }
-  trysteroLoading = false;
-  return false;
+  if(trysteroReady) return true; if(trysteroLoading) return false; trysteroLoading = true;
+  var cdns = [ 'https://cdn.jsdelivr.net/npm/trystero@0.21.5/+esm', 'https://esm.sh/trystero@0.21.5', 'https://esm.run/trystero', 'https://unpkg.com/trystero@0.21.5?module' ];
+  for(var i=0;i<cdns.length;i++){ try{ var mod = await import(cdns[i]); if(mod && mod.joinRoom){ joinRoomFn = mod.joinRoom; trysteroReady = true; trysteroLoading = false; return true; } }catch(e){} }
+  trysteroLoading = false; return false;
 }
 
-function containsBannedWord(text){
-  if(!bannedWords.length) return null;
-  for(var i=0;i<bannedWords.length;i++){
-    if(bannedWords[i] && text.indexOf(bannedWords[i]) !== -1) return bannedWords[i];
-  }
-  return null;
-}
-function checkAndMute(text){
-  var word = containsBannedWord(text);
-  if(word){
-    mutedUntil = Date.now() + 10*60*1000;
-    updateMuteBanner();
-    toast('触发违禁词「'+word+'」，禁言 10 分钟');
-    return true;
-  }
-  return false;
-}
-function updateMuteBanner(){
-  var banner = document.getElementById('muteBanner'); if(!banner) return;
-  if(Date.now() < mutedUntil){
-    var remain = Math.ceil((mutedUntil - Date.now()) / 60000);
-    banner.textContent = '你已被禁言 ' + remain + ' 分钟';
-    banner.classList.add('show');
-    setTimeout(updateMuteBanner, 1000);
-  } else { banner.classList.remove('show'); }
-}
-function isBlacklisted(peerId){
-  var entry = blacklist[peerId];
-  if(!entry) return false;
-  if(entry.expire && entry.expire > 0 && entry.expire < Date.now()){
-    delete blacklist[peerId];
-    localStorage.setItem('speaking-blacklist', JSON.stringify(blacklist));
-    return false;
-  }
-  return true;
-}
+function containsBannedWord(text){ if(!bannedWords.length) return null; for(var i=0;i<bannedWords.length;i++){ if(bannedWords[i] && text.indexOf(bannedWords[i]) !== -1) return bannedWords[i]; } return null; }
+function checkAndMute(text){ var word = containsBannedWord(text); if(word){ mutedUntil = Date.now() + 10*60*1000; updateMuteBanner(); toast('触发违禁词「'+word+'」，禁言 10 分钟'); return true; } return false; }
+function updateMuteBanner(){ var banner = document.getElementById('muteBanner'); if(!banner) return; if(Date.now() < mutedUntil){ var remain = Math.ceil((mutedUntil - Date.now()) / 60000); banner.textContent = '你已被禁言 ' + remain + ' 分钟'; banner.classList.add('show'); setTimeout(updateMuteBanner, 1000); } else { banner.classList.remove('show'); } }
+function isBlacklisted(peerId){ var entry = blacklist[peerId]; if(!entry) return false; if(entry.expire && entry.expire > 0 && entry.expire < Date.now()){ delete blacklist[peerId]; localStorage.setItem('speaking-blacklist', JSON.stringify(blacklist)); return false; } return true; }
 
+// 【关键】WebRTC 与消息可靠传输
 async function connectToRoom(code, nick, name, host, motd){
-  if(!trysteroReady){
-    toast('正在加载联机组件...');
-    var ok = await loadTrystero();
-    if(!ok){ toast('联机组件加载失败，请刷新页面'); return; }
-  }
+  if(!trysteroReady){ toast('正在加载联机组件...'); var ok = await loadTrystero(); if(!ok){ toast('联机组件加载失败，请刷新页面'); return; } }
   if(!joinRoomFn){ toast('未就绪'); return; }
   if(currentRoom){ try{ currentRoom.leave(); }catch(e){} currentRoom = null; }
   if(pingTimer){ clearInterval(pingTimer); pingTimer = null; }
   currentCode = code; currentNick = nick; currentName = name || code; currentMotd = motd || ''; isHost = !!host;
   toast('正在连接 ' + code + ' ...');
-  try{
-    currentRoom = joinRoomFn({ appId: 'speaking-hall-p2p-v1' }, code);
-  }catch(e){ toast('连接失败：' + (e && e.message || e)); return; }
+  
+  try {
+    currentRoom = joinRoomFn({ 
+      appId: 'speaking-hall-p2p-v2',
+      // 塞入最全的公共 STUN 服务器提高打洞成功率
+      rtcConfig: {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' },
+          { urls: 'stun:stun2.l.google.com:19302' },
+          { urls: 'stun:stun3.l.google.com:19302' },
+          { urls: 'stun:stun4.l.google.com:19302' },
+          { urls: 'stun:stun.cloudflare.com:3478' }
+        ]
+      }
+    }, code);
+  } catch(e){ toast('连接失败：' + (e && e.message || e)); return; }
+
+  myPeerId = currentRoom.selfId || Math.random().toString(36).substring(2);
 
   currentRoom.onPeerJoin(function(peerId){
     if(isBlacklisted(peerId)) return;
@@ -1224,11 +891,12 @@ async function connectToRoom(code, nick, name, host, motd){
     if(isHost && window._sendBlack) window._sendBlack({ list: blacklist });
     if(isHost && window._sendRoom) window._sendRoom({ name: currentName, motd: currentMotd });
   });
-  currentRoom.onPeerLeave(function(peerId){ delete peerAvatars[peerId]; });
+  currentRoom.onPeerLeave(function(peerId){ delete peerAvatars[peerId]; renderPlayerList(); });
 
   var msgAction = currentRoom.makeAction('msg');
   var pingAction = currentRoom.makeAction('ping');
   var pongAction = currentRoom.makeAction('pong');
+  var ackAction = currentRoom.makeAction('ack');
   var metaAction = currentRoom.makeAction('meta');
   var banAction = currentRoom.makeAction('ban');
   var wordAction = currentRoom.makeAction('word');
@@ -1238,53 +906,55 @@ async function connectToRoom(code, nick, name, host, motd){
   var joinAction = currentRoom.makeAction('join');
   var leaveAction = currentRoom.makeAction('leave');
 
-  sendChat = msgAction[0]; sendPing = pingAction[0]; sendPong = pongAction[0];
+  sendChat = msgAction[0]; sendPing = pingAction[0]; sendPong = pongAction[0]; sendAck = ackAction[0];
   window._sendMeta = metaAction[0]; window._sendBan = banAction[0]; window._sendWord = wordAction[0];
   window._sendKick = kickAction[0]; window._sendBlack = blackAction[0]; window._sendRoom = roomAction[0];
   window._sendJoin = joinAction[0]; window._sendLeave = leaveAction[0];
 
+  // 【接收消息并回执 ACK】
   msgAction[1](function(data, peerId){
     if(isBlacklisted(peerId)) return;
     if(!peerAvatars[peerId]) peerAvatars[peerId] = { name: data.sender, avatar: data.avatar || '👤' };
     addMessage(data.text, data.sender, false, data.images, peerId, data.avatar);
+    if(window._sendAck && data.id) window._sendAck({ id: data.id }, peerId); // 可靠传输
     if(('Notification' in window) && Notification.permission === 'granted'){
       if(data.text && data.text.indexOf('@' + currentNick) !== -1){
         new Notification('有人 @了你', { body: data.sender + '：' + data.text });
       }
     }
+    renderPlayerList();
   });
+
+  // 【发送方收到 ACK，清理等待队列】
+  ackAction[1](function(data, peerId){
+    if(pendingMessages[data.id]){
+      clearTimeout(pendingMessages[data.id].timer);
+      delete pendingMessages[data.id];
+    }
+  });
+
+  // 【真实的延迟测试】
   pingAction[1](function(data, peerId){ sendPong({ ts: data.ts }, peerId); });
   pongAction[1](function(data, peerId){
     var rtt = Date.now() - data.ts;
     for(var i=0;i<servers.length;i++) if(servers[i].code === currentCode){ servers[i].ping = rtt; break; }
     renderServers(); updateChatInfo();
   });
-  metaAction[1](function(data, peerId){ peerAvatars[peerId] = { name: data.name, avatar: data.avatar }; });
+
+  metaAction[1](function(data, peerId){ peerAvatars[peerId] = { name: data.name, avatar: data.avatar }; renderPlayerList(); });
   banAction[1](function(data, peerId){ if(isHost){ addSystemMsg('🚫 ' + data.name + ' 被举报'); } });
   wordAction[1](function(data, peerId){ bannedWords = data.words || []; renderWordList(); toast('违禁词更新（' + bannedWords.length + ' 条）'); });
   kickAction[1](function(data, peerId){
     if(data.targetPeer === myPeerId){
-      addSystemMsg('🚫 你已被房主踢出房间');
-      toast('你已被踢出');
-      setTimeout(function(){
-        if(currentRoom){ try{ currentRoom.leave(); }catch(e){} }
-        currentRoom = null; currentCode = '';
-        historyStack = ['screenHome','screenMultiplayer'];
-        showScreen('screenMultiplayer');
-      }, 1500);
-    } else {
-      addSystemMsg('🚫 ' + (data.name||data.targetPeer.slice(0,6)) + ' 被踢出');
-    }
+      addSystemMsg('🚫 你已被房主踢出房间'); toast('你已被踢出');
+      setTimeout(function(){ if(currentRoom){ try{ currentRoom.leave(); }catch(e){} } currentRoom = null; currentCode = ''; historyStack = ['screenHome','screenMultiplayer']; showScreen('screenMultiplayer'); }, 1500);
+    } else { addSystemMsg('🚫 ' + (data.name||data.targetPeer.slice(0,6)) + ' 被踢出'); }
   });
   blackAction[1](function(data, peerId){
-    blacklist = data.list || {};
-    localStorage.setItem('speaking-blacklist', JSON.stringify(blacklist));
+    blacklist = data.list || {}; localStorage.setItem('speaking-blacklist', JSON.stringify(blacklist));
     var rows = document.querySelectorAll('.msg-row[data-peer-id]');
-    for(var i=0;i<rows.length;i++){
-      var pid = rows[i].getAttribute('data-peer-id');
-      if(pid && blacklist[pid]) rows[i].remove();
-    }
-    renderBannedList();
+    for(var i=0;i<rows.length;i++){ var pid = rows[i].getAttribute('data-peer-id'); if(pid && blacklist[pid]) rows[i].remove(); }
+    renderBannedList(); renderPlayerList();
   });
   roomAction[1](function(data, peerId){
     if(data.name){ currentName = data.name; document.getElementById('chatName').innerHTML = parseMcColors(currentName); }
@@ -1292,15 +962,8 @@ async function connectToRoom(code, nick, name, host, motd){
     for(var i=0;i<servers.length;i++) if(servers[i].code === currentCode){ servers[i].name = currentName; servers[i].motd = currentMotd; break; }
     renderServers();
   });
-  joinAction[1](function(data, peerId){
-    if(isBlacklisted(peerId)) return;
-    var name = data.name || peerId.slice(0,6);
-    addSystemMsg('「' + name + '」加入了该大厅');
-  });
-  leaveAction[1](function(data, peerId){
-    var name = data.name || peerId.slice(0,6);
-    addSystemMsg('「' + name + '」退出了该大厅');
-  });
+  joinAction[1](function(data, peerId){ if(isBlacklisted(peerId)) return; var name = data.name || peerId.slice(0,6); addSystemMsg('「' + name + '」加入了该大厅'); renderPlayerList(); });
+  leaveAction[1](function(data, peerId){ var name = data.name || peerId.slice(0,6); addSystemMsg('「' + name + '」退出了该大厅'); renderPlayerList(); });
 
   if(('Notification' in window) && Notification.permission === 'default') Notification.requestPermission();
   document.getElementById('messages').innerHTML = '';
@@ -1311,6 +974,8 @@ async function connectToRoom(code, nick, name, host, motd){
   showScreen('screenChat');
   addSystemMsg('已连接到房间 ' + code + (isHost ? '（你是房主）' : ''));
   if(window._sendJoin) window._sendJoin({ name: currentNick });
+  
+  // 只有真正建立连接后才开始发真实 ping
   pingTimer = setInterval(function(){ if(sendPing) sendPing({ ts: Date.now() }); }, 3000);
   mutedUntil = 0; updateMuteBanner();
 }
@@ -1332,225 +997,98 @@ function leaveRoom(){
   if(window._sendLeave) window._sendLeave({ name: currentNick });
   if(currentRoom){ try{ currentRoom.leave(); }catch(e){} currentRoom = null; }
   if(pingTimer){ clearInterval(pingTimer); pingTimer = null; }
-  currentCode = '';
-  historyStack = ['screenHome','screenMultiplayer'];
-  showScreen('screenMultiplayer');
-  renderServers();
+  currentCode = ''; historyStack = ['screenHome','screenMultiplayer']; showScreen('screenMultiplayer'); renderServers();
 }
-function copyRoomCode(){
-  if(!currentCode){ toast('无房间码'); return; }
-  navigator.clipboard.writeText(currentCode).then(function(){ toast('已复制：'+currentCode); });
-}
+function copyRoomCode(){ if(!currentCode){ toast('无房间码'); return; } navigator.clipboard.writeText(currentCode).then(function(){ toast('已复制：'+currentCode); }); }
 
 function addMessage(text, sender, isSelf, images, peerId, avatar){
   var box = document.getElementById('messages'); if(!box) return;
-  var row = document.createElement('div');
-  row.className = 'msg-row ' + (isSelf ? 'self' : 'other');
-  if(peerId) row.dataset.peerId = peerId;
+  var row = document.createElement('div'); row.className = 'msg-row ' + (isSelf ? 'self' : 'other'); if(peerId) row.dataset.peerId = peerId;
   var av = avatar || (isSelf ? currentAvatar : (peerId && peerAvatars[peerId] ? peerAvatars[peerId].avatar : '👤'));
   var avatarHtml = '<div class="msg-avatar">' + renderAvatar(av) + '</div>';
-  var contentHtml = '';
-  if(!isSelf) contentHtml += '<div class="msg-name">' + esc(sender) + '</div>';
-  contentHtml += '<div class="msg-bubble">';
-  var processed = esc(text);
-  processed = processed.replace(/@(\S+)/g, '\x00M\x00$1\x00');
-  contentHtml += parseMcColors(processed);
-  contentHtml = contentHtml.replace(/\x00M\x00(\S+?)\x00/g, '<span class="mention">@$1</span>');
-  if(images && images.length){
-    for(var i=0;i<images.length;i++) contentHtml += '<img src="'+images[i]+'" onclick="window.open(this.src)">';
-  }
+  var contentHtml = ''; if(!isSelf) contentHtml += '<div class="msg-name">' + esc(sender) + '</div>'; contentHtml += '<div class="msg-bubble">';
+  var processed = esc(text); processed = processed.replace(/@(\S+)/g, '\x00M\x00$1\x00'); contentHtml += parseMcColors(processed); contentHtml = contentHtml.replace(/\x00M\x00(\S+?)\x00/g, '<span class="mention">@$1</span>');
+  if(images && images.length){ for(var i=0;i<images.length;i++) contentHtml += '<img src="'+images[i]+'" onclick="window.open(this.src)">'; }
   contentHtml += '</div><div class="msg-time">' + now() + '</div>';
   row.innerHTML = avatarHtml + '<div class="msg-body">' + contentHtml + '</div>';
-  if(!isSelf && peerId){
-    row.addEventListener('contextmenu', function(ev){
-      ev.preventDefault(); ev.stopPropagation();
-      openMsgCtxMenu(ev, peerId, sender);
-      return false;
-    }, false);
-  }
+  if(!isSelf && peerId){ row.addEventListener('contextmenu', function(ev){ ev.preventDefault(); ev.stopPropagation(); openMsgCtxMenu(ev, peerId, sender); return false; }, false); }
   box.appendChild(row); box.scrollTop = box.scrollHeight;
 }
-function renderAvatar(av){
-  if(!av) return '👤';
-  if(av.indexOf('data:') === 0) return '<img src="' + av + '">';
-  return av;
-}
-function addSystemMsg(text){
-  var box = document.getElementById('messages'); if(!box) return;
-  var row = document.createElement('div');
-  row.className = 'msg-row system';
-  row.innerHTML = '<div class="msg-bubble">' + esc(text) + '</div>';
-  box.appendChild(row); box.scrollTop = box.scrollHeight;
-}
+function renderAvatar(av){ if(!av) return '👤'; if(av.indexOf('data:') === 0) return '<img src="' + av + '">'; return av; }
+function addSystemMsg(text){ var box = document.getElementById('messages'); if(!box) return; var row = document.createElement('div'); row.className = 'msg-row system'; row.innerHTML = '<div class="msg-bubble">' + esc(text) + '</div>'; box.appendChild(row); box.scrollTop = box.scrollHeight; }
 
 function openMsgCtxMenu(ev, peerId, senderName){
-  closeCtxMenu();
-  var items = [];
-  if(isHost){
-    items.push({ label: '🚫 临时封禁', action: function(){ pickDuration(peerId, senderName); } });
-    items.push({ label: '⛔ 永久拉黑', action: function(){ blacklistUser(peerId, senderName, 0); }, danger: true });
-    items.push({ label: '🥾 踢出房间', action: function(){ kickUser(peerId, senderName); }, danger: true });
-    items.push({ sep: true });
-  }
+  closeCtxMenu(); var items = [];
+  if(isHost){ items.push({ label: '🚫 临时封禁', action: function(){ pickDuration(peerId, senderName); } }); items.push({ label: '⛔ 永久拉黑', action: function(){ blacklistUser(peerId, senderName, 0); }, danger: true }); items.push({ label: '🥾 踢出房间', action: function(){ kickUser(peerId, senderName); }, danger: true }); items.push({ sep: true }); }
   items.push({ label: '⚠️ 举报此用户', action: function(){ reportUser(peerId, senderName); }, danger: true });
-  var html='';
-  for(var i=0;i<items.length;i++){
-    if(items[i].sep){ html += '<div class="custom-ctx-sep"></div>'; continue; }
-    html += '<div class="custom-ctx-item'+(items[i].danger?' danger':'')+'" data-idx="'+i+'">'+items[i].label+'</div>';
-  }
+  var html=''; for(var i=0;i<items.length;i++){ if(items[i].sep){ html += '<div class="custom-ctx-sep"></div>'; continue; } html += '<div class="custom-ctx-item'+(items[i].danger?' danger':'')+'" data-idx="'+i+'">'+items[i].label+'</div>'; }
   ctxMenu.innerHTML = html;
   var nodes = ctxMenu.querySelectorAll('.custom-ctx-item');
-  for(var j=0;j<nodes.length;j++){
-    (function(node, item){
-      node.onclick = function(e){ e.stopPropagation(); closeCtxMenu(); item.action(); };
-    })(nodes[j], items[parseInt(nodes[j].getAttribute('data-idx'))]);
-  }
-  var x = Math.min(ev.clientX, window.innerWidth - 200);
-  var y = Math.min(ev.clientY, window.innerHeight - 250);
-  ctxMenu.style.left = x+'px'; ctxMenu.style.top = y+'px';
-  ctxMenu.classList.add('show');
-  setTimeout(function(){ document.addEventListener('click', closeCtxMenu, { once: true }); }, 10);
+  for(var j=0;j<nodes.length;j++){ (function(node, item){ node.onclick = function(e){ e.stopPropagation(); closeCtxMenu(); item.action(); }; })(nodes[j], items[parseInt(nodes[j].getAttribute('data-idx'))]); }
+  var x = Math.min(ev.clientX, window.innerWidth - 200); var y = Math.min(ev.clientY, window.innerHeight - 250);
+  ctxMenu.style.left = x+'px'; ctxMenu.style.top = y+'px'; ctxMenu.classList.add('show'); setTimeout(function(){ document.addEventListener('click', closeCtxMenu, { once: true }); }, 10);
 }
 
-function pickDuration(peerId, senderName){
-  var c = prompt('封禁时长：\n1=5分钟\n2=30分钟\n3=1小时\n4=24小时\n输入数字：','1');
-  var d = { '1':5*60*1000, '2':30*60*1000, '3':60*60*1000, '4':24*60*60*1000 };
-  var ms = d[c||''];
-  if(!ms){ toast('取消'); return; }
-  blacklistUser(peerId, senderName, Date.now() + ms);
-}
+function pickDuration(peerId, senderName){ var c = prompt('封禁时长：\n1=5分钟\n2=30分钟\n3=1小时\n4=24小时\n输入数字：','1'); var d = { '1':5*60*1000, '2':30*60*1000, '3':60*60*1000, '4':24*60*60*1000 }; var ms = d[c||'']; if(!ms){ toast('取消'); return; } blacklistUser(peerId, senderName, Date.now() + ms); }
 function blacklistUser(peerId, senderName, expire){
-  blacklist[peerId] = { name: senderName, expire: expire };
-  localStorage.setItem('speaking-blacklist', JSON.stringify(blacklist));
-  var rows = document.querySelectorAll('.msg-row[data-peer-id="'+peerId+'"]');
-  for(var i=0;i<rows.length;i++) rows[i].remove();
-  addSystemMsg('🚫 已封禁 ' + senderName + (expire ? '（临时）' : '（永久）'));
-  if(window._sendBlack) window._sendBlack({ list: blacklist });
-  if(window._sendKick) window._sendKick({ targetPeer: peerId, name: senderName });
-  renderBannedList();
+  blacklist[peerId] = { name: senderName, expire: expire }; localStorage.setItem('speaking-blacklist', JSON.stringify(blacklist));
+  var rows = document.querySelectorAll('.msg-row[data-peer-id="'+peerId+'"]'); for(var i=0;i<rows.length;i++) rows[i].remove();
+  addSystemMsg('🚫 已封禁 ' + senderName + (expire ? '（临时）' : '（永久）')); if(window._sendBlack) window._sendBlack({ list: blacklist }); if(window._sendKick) window._sendKick({ targetPeer: peerId, name: senderName }); renderBannedList(); renderPlayerList();
 }
-function kickUser(peerId, senderName){
-  addSystemMsg('🥾 已踢出 ' + senderName);
-  if(window._sendKick) window._sendKick({ targetPeer: peerId, name: senderName });
-}
+function kickUser(peerId, senderName){ addSystemMsg('🥾 已踢出 ' + senderName); if(window._sendKick) window._sendKick({ targetPeer: peerId, name: senderName }); }
 function reportUser(peerId, senderName){
-  blacklist[peerId] = { name: senderName, expire: 0 };
-  localStorage.setItem('speaking-blacklist', JSON.stringify(blacklist));
-  var rows = document.querySelectorAll('.msg-row[data-peer-id="'+peerId+'"]');
-  for(var i=0;i<rows.length;i++) rows[i].remove();
-  addSystemMsg('🚫 你已举报 ' + senderName);
-  if(window._sendBlack) window._sendBlack({ list: blacklist });
-  renderBannedList();
+  blacklist[peerId] = { name: senderName, expire: 0 }; localStorage.setItem('speaking-blacklist', JSON.stringify(blacklist));
+  var rows = document.querySelectorAll('.msg-row[data-peer-id="'+peerId+'"]'); for(var i=0;i<rows.length;i++) rows[i].remove();
+  addSystemMsg('🚫 你已举报 ' + senderName); if(window._sendBlack) window._sendBlack({ list: blacklist }); renderBannedList(); renderPlayerList();
 }
 
 function toggleOwnerMenu(){ var m=document.getElementById('ownerMenu'); if(m) m.classList.toggle('show'); }
 function closeOwnerMenu(){ var m=document.getElementById('ownerMenu'); if(m) m.classList.remove('show'); }
 function openWordManage(){ closeOwnerMenu(); renderWordList(); document.getElementById('wordModal').classList.add('show'); }
 function closeWordManage(){ document.getElementById('wordModal').classList.remove('show'); }
-function renderWordList(){
-  var list = document.getElementById('wordList'); if(!list) return;
-  if(bannedWords.length === 0){ list.innerHTML = '<div style="color:#6a7080;font-size:12px;padding:8px;">还没有违禁词</div>'; return; }
-  var h=''; for(var i=0;i<bannedWords.length;i++) h += '<div class="word-tag">'+esc(bannedWords[i])+'<span class="remove" onclick="removeWord('+i+')">✕</span></div>';
-  list.innerHTML = h;
-}
-function addWord(){
-  var input = document.getElementById('newWord');
-  var w = input.value.trim(); if(!w){ toast('请输入'); return; }
-  for(var i=0;i<bannedWords.length;i++) if(bannedWords[i] === w){ toast('已存在'); return; }
-  bannedWords.push(w); input.value=''; renderWordList();
-}
+function renderWordList(){ var list = document.getElementById('wordList'); if(!list) return; if(bannedWords.length === 0){ list.innerHTML = '<div style="color:#6a7080;font-size:12px;padding:8px;">还没有违禁词</div>'; return; } var h=''; for(var i=0;i<bannedWords.length;i++) h += '<div class="word-tag">'+esc(bannedWords[i])+'<span class="remove" onclick="removeWord('+i+')">✕</span></div>'; list.innerHTML = h; }
+function addWord(){ var input = document.getElementById('newWord'); var w = input.value.trim(); if(!w){ toast('请输入'); return; } for(var i=0;i<bannedWords.length;i++) if(bannedWords[i] === w){ toast('已存在'); return; } bannedWords.push(w); input.value=''; renderWordList(); }
 function removeWord(idx){ bannedWords.splice(idx,1); renderWordList(); }
-function saveWords(){
-  closeWordManage();
-  if(window._sendWord){
-    window._sendWord({ words: bannedWords });
-    addSystemMsg('🚫 违禁词已更新（' + bannedWords.length + ' 条）');
-    toast('已保存并同步');
-  } else { toast('非房主'); }
-}
+function saveWords(){ closeWordManage(); if(window._sendWord){ window._sendWord({ words: bannedWords }); addSystemMsg('🚫 违禁词已更新（' + bannedWords.length + ' 条）'); toast('已保存并同步'); } else { toast('非房主'); } }
 function viewBannedList(){ closeOwnerMenu(); renderBannedList(); document.getElementById('bannedModal').classList.add('show'); }
 function closeBannedList(){ document.getElementById('bannedModal').classList.remove('show'); }
-function renderBannedList(){
-  var list = document.getElementById('bannedList'); if(!list) return;
-  var keys = Object.keys(blacklist);
-  if(keys.length === 0){ list.innerHTML = '<div style="color:#6a7080;font-size:12px;padding:8px;">还没有被封禁的用户</div>'; return; }
-  var h=''; for(var i=0;i<keys.length;i++){
-    var k=keys[i]; var p=blacklist[k];
-    var label = p.name || k.slice(0,8);
-    if(p.expire && p.expire > 0) label += '（临时）';
-    else if(p.expire === 0) label += '（永久）';
-    h += '<div class="word-tag">'+esc(label)+'<span class="remove" onclick="unbanPeer(\''+k+'\')">✕</span></div>';
-  }
-  list.innerHTML = h;
-}
-function unbanPeer(peerId){
-  delete blacklist[peerId];
-  localStorage.setItem('speaking-blacklist', JSON.stringify(blacklist));
-  renderBannedList();
-  if(window._sendBlack) window._sendBlack({ list: blacklist });
-  toast('已解除');
-}
-function openEditRoom(){
-  closeOwnerMenu();
-  document.getElementById('editRoomName').value = currentName;
-  document.getElementById('editRoomMotd').value = currentMotd;
-  buildColorPanel('editNamePanel','editRoomName');
-  buildColorPanel('editMotdPanel','editRoomMotd');
-  document.getElementById('editRoomModal').classList.add('show');
-}
+function renderBannedList(){ var list = document.getElementById('bannedList'); if(!list) return; var keys = Object.keys(blacklist); if(keys.length === 0){ list.innerHTML = '<div style="color:#6a7080;font-size:12px;padding:8px;">还没有被封禁的用户</div>'; return; } var h=''; for(var i=0;i<keys.length;i++){ var k=keys[i]; var p=blacklist[k]; var label = p.name || k.slice(0,8); if(p.expire && p.expire > 0) label += '（临时）'; else if(p.expire === 0) label += '（永久）'; h += '<div class="word-tag">'+esc(label)+'<span class="remove" onclick="unbanPeer(\''+k+'\')">✕</span></div>'; } list.innerHTML = h; }
+function unbanPeer(peerId){ delete blacklist[peerId]; localStorage.setItem('speaking-blacklist', JSON.stringify(blacklist)); renderBannedList(); if(window._sendBlack) window._sendBlack({ list: blacklist }); toast('已解除'); }
+function openEditRoom(){ closeOwnerMenu(); document.getElementById('editRoomName').value = currentName; document.getElementById('editRoomMotd').value = currentMotd; buildColorPanel('editNamePanel','editRoomName'); buildColorPanel('editMotdPanel','editRoomMotd'); document.getElementById('editRoomModal').classList.add('show'); }
 function closeEditRoom(){ document.getElementById('editRoomModal').classList.remove('show'); }
-function saveRoomInfo(){
-  var name = document.getElementById('editRoomName').value.trim();
-  var motd = document.getElementById('editRoomMotd').value.trim();
-  if(!name){ toast('房间名不能为空'); return; }
-  currentName = name; currentMotd = motd;
-  for(var i=0;i<servers.length;i++) if(servers[i].code === currentCode){ servers[i].name = name; servers[i].motd = motd; break; }
-  localStorage.setItem('speaking-servers', JSON.stringify(servers));
-  document.getElementById('chatName').innerHTML = parseMcColors(name);
-  renderServers();
-  if(window._sendRoom) window._sendRoom({ name: name, motd: motd });
-  closeEditRoom();
-  toast('房间信息已更新');
-  addSystemMsg('✏️ 房主更新了房间信息');
+function saveRoomInfo(){ var name = document.getElementById('editRoomName').value.trim(); var motd = document.getElementById('editRoomMotd').value.trim(); if(!name){ toast('房间名不能为空'); return; } currentName = name; currentMotd = motd; for(var i=0;i<servers.length;i++) if(servers[i].code === currentCode){ servers[i].name = name; servers[i].motd = motd; break; } localStorage.setItem('speaking-servers', JSON.stringify(servers)); document.getElementById('chatName').innerHTML = parseMcColors(name); renderServers(); if(window._sendRoom) window._sendRoom({ name: name, motd: motd }); closeEditRoom(); toast('房间信息已更新'); addSystemMsg('✏️ 房主更新了房间信息'); }
+
+// 玩家列表功能
+function openPlayerListModal(){ closeOwnerMenu(); renderPlayerList(); document.getElementById('playerListModal').classList.add('show'); }
+function closePlayerListModal(){ document.getElementById('playerListModal').classList.remove('show'); }
+function renderPlayerList(){
+  var container = document.getElementById('playerListContainer'); if(!container) return;
+  var keys = Object.keys(peerAvatars);
+  if(keys.length === 0){ container.innerHTML = '<div style="color:#6a7080;font-size:12px;padding:8px;">暂无其他在线玩家</div>'; return; }
+  var html = '';
+  for(var i=0;i<keys.length;i++){
+    var pid = keys[i]; var p = peerAvatars[pid];
+    var isBanned = blacklist[pid];
+    html += '<div class="player-item"><span class="player-name">' + esc(p.name || pid.slice(0,6)) + '</span>';
+    if(isBanned) html += '<span style="color:#ff3b30;font-size:12px;">已封禁</span>';
+    else html += '<button class="player-ban-btn" onclick="banPlayerFromList(\'' + pid + '\')">🚫 封禁</button>';
+    html += '</div>';
+  }
+  container.innerHTML = html;
+}
+function banPlayerFromList(peerId){
+  var p = peerAvatars[peerId]; if(!p) return;
+  blacklistUser(peerId, p.name, 0); // 永久封禁
+  toast('已封禁 ' + p.name);
 }
 
 var AVATAR_PRESETS = ['😀','😎','🐱','🐶','🦊','🐼','🐸','🦄','👻','🤖','🐧','🐨','🐯','🦁','🐵','🐙'];
-function openProfile(){
-  closeOwnerMenu();
-  document.getElementById('profileNick').value = currentNick || '';
-  var picker = document.getElementById('avatarPicker');
-  var h='';
-  for(var i=0;i<AVATAR_PRESETS.length;i++){
-    var av = AVATAR_PRESETS[i];
-    var cls = (av === currentAvatar) ? 'avatar-option selected' : 'avatar-option';
-    h += '<div class="'+cls+'" onclick="pickAvatar(\''+av+'\')">'+av+'</div>';
-  }
-  picker.innerHTML = h;
-  document.getElementById('profileModal').classList.add('show');
-}
+function openProfile(){ closeOwnerMenu(); document.getElementById('profileNick').value = currentNick || ''; var picker = document.getElementById('avatarPicker'); var h=''; for(var i=0;i<AVATAR_PRESETS.length;i++){ var av = AVATAR_PRESETS[i]; var cls = (av === currentAvatar) ? 'avatar-option selected' : 'avatar-option'; h += '<div class="'+cls+'" onclick="pickAvatar(\''+av+'\')">'+av+'</div>'; } picker.innerHTML = h; document.getElementById('profileModal').classList.add('show'); }
 function closeProfile(){ document.getElementById('profileModal').classList.remove('show'); }
-function pickAvatar(av){
-  currentAvatar = av;
-  var opts = document.querySelectorAll('.avatar-option');
-  for(var i=0;i<opts.length;i++) opts[i].classList.toggle('selected', opts[i].textContent === av);
-}
-function saveProfile(){
-  var nick = document.getElementById('profileNick').value.trim();
-  if(!nick){ toast('昵称不能为空'); return; }
-  currentNick = nick;
-  localStorage.setItem('speaking-nick', nick);
-  localStorage.setItem('speaking-avatar', currentAvatar);
-  updateMyMini();
-  closeProfile();
-  toast('已保存');
-  if(currentRoom && window._sendMeta) window._sendMeta({ name: currentNick, avatar: currentAvatar });
-}
-function updateMyMini(){
-  var mini = document.getElementById('myAvatarMini');
-  var nameEl = document.getElementById('myNameMini');
-  if(mini) mini.innerHTML = renderAvatar(currentAvatar);
-  if(nameEl) nameEl.textContent = currentNick || '我';
-}
+function pickAvatar(av){ currentAvatar = av; var opts = document.querySelectorAll('.avatar-option'); for(var i=0;i<opts.length;i++) opts[i].classList.toggle('selected', opts[i].textContent === av); }
+function saveProfile(){ var nick = document.getElementById('profileNick').value.trim(); if(!nick){ toast('昵称不能为空'); return; } currentNick = nick; localStorage.setItem('speaking-nick', nick); localStorage.setItem('speaking-avatar', currentAvatar); updateMyMini(); closeProfile(); toast('已保存'); if(currentRoom && window._sendMeta) window._sendMeta({ name: currentNick, avatar: currentAvatar }); }
+function updateMyMini(){ var mini = document.getElementById('myAvatarMini'); var nameEl = document.getElementById('myNameMini'); if(mini) mini.innerHTML = renderAvatar(currentAvatar); if(nameEl) nameEl.textContent = currentNick || '我'; }
+
 document.addEventListener('DOMContentLoaded', function(){
   var upload = document.getElementById('avatarUpload');
   if(upload){
@@ -1558,21 +1096,8 @@ document.addEventListener('DOMContentLoaded', function(){
       var file = e.target.files[0]; if(!file) return;
       var reader = new FileReader();
       reader.onload = function(ev){
-        var dataUrl = ev.target.result;
-        var img = new Image();
-        img.onload = function(){
-          var canvas = document.createElement('canvas');
-          canvas.width = 64; canvas.height = 64;
-          var ctx = canvas.getContext('2d');
-          var size = Math.min(img.width, img.height);
-          var sx = (img.width - size) / 2;
-          var sy = (img.height - size) / 2;
-          ctx.drawImage(img, sx, sy, size, size, 0, 0, 64, 64);
-          currentAvatar = canvas.toDataURL('image/jpeg', 0.7);
-          var picker = document.getElementById('avatarPicker');
-          if(picker) picker.innerHTML = '<div class="avatar-option selected"><img src="'+currentAvatar+'"></div>';
-          toast('头像已上传');
-        };
+        var dataUrl = ev.target.result; var img = new Image();
+        img.onload = function(){ var canvas = document.createElement('canvas'); canvas.width = 64; canvas.height = 64; var ctx = canvas.getContext('2d'); var size = Math.min(img.width, img.height); var sx = (img.width - size) / 2; var sy = (img.height - size) / 2; ctx.drawImage(img, sx, sy, size, size, 0, 0, 64, 64); currentAvatar = canvas.toDataURL('image/jpeg', 0.7); var picker = document.getElementById('avatarPicker'); if(picker) picker.innerHTML = '<div class="avatar-option selected"><img src="'+currentAvatar+'"></div>'; toast('头像已上传'); };
         img.src = dataUrl;
       };
       reader.readAsDataURL(file);
@@ -1580,18 +1105,32 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 });
 
+// 【可靠发送】重写 sendMsg
 function sendMsg(){
-  var input = document.getElementById('msgInput');
-  var text = input.value.trim(); if(!text) return;
+  var input = document.getElementById('msgInput'); var text = input.value.trim(); if(!text) return;
   if(!currentRoom || !sendChat){ toast('未连接'); return; }
   if(Date.now() < mutedUntil){ toast('你已被禁言'); return; }
   if(checkAndMute(text)) return;
+
+  var msgId = 'm_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+  var payload = { id: msgId, text: text, sender: currentNick, avatar: currentAvatar, images: [] };
+
   try{
-    sendChat({ text: text, sender: currentNick, avatar: currentAvatar, images: [] });
+    sendChat(payload);
+    // 将消息加入待确认队列，若对方没收到，3秒后重发
+    pendingMessages[msgId] = { payload: payload, count: 1 };
+    pendingMessages[msgId].timer = setTimeout(function(){
+      if(pendingMessages[msgId] && pendingMessages[msgId].count < 3){
+        sendChat(payload); // 重发
+        pendingMessages[msgId].count++;
+      }
+    }, 3000);
+
     addMessage(text, currentNick, true, null, null, currentAvatar);
     input.value = ''; input.style.height = '44px';
   }catch(e){ toast('发送失败'); }
 }
+
 function sendImage(input){
   var file = input.files[0]; if(!file) return;
   if(!currentRoom || !sendChat){ toast('未连接'); return; }
@@ -1599,37 +1138,34 @@ function sendImage(input){
   var reader = new FileReader();
   reader.onload = function(e){
     var dataUrl = e.target.result;
+    var msgId = 'img_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+    var payload = { id: msgId, text: '📷 图片', sender: currentNick, avatar: currentAvatar, images: [dataUrl] };
     try{
-      sendChat({ text: '📷 图片', sender: currentNick, avatar: currentAvatar, images: [dataUrl] });
+      sendChat(payload);
+      pendingMessages[msgId] = { payload: payload, count: 1 };
+      pendingMessages[msgId].timer = setTimeout(function(){
+        if(pendingMessages[msgId] && pendingMessages[msgId].count < 3){
+          sendChat(payload);
+          pendingMessages[msgId].count++;
+        }
+      }, 3000);
       addMessage('📷 图片', currentNick, true, [dataUrl], null, currentAvatar);
     }catch(err){ toast('发送失败'); }
   };
   reader.readAsDataURL(file);
   input.value = '';
 }
+
 var msgInput = document.getElementById('msgInput');
 if(msgInput){
-  msgInput.addEventListener('input', function(){
-    this.style.height = '44px';
-    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-  });
-  msgInput.addEventListener('keydown', function(e){
-    if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendMsg(); }
-  });
+  msgInput.addEventListener('input', function(){ this.style.height = '44px'; this.style.height = Math.min(this.scrollHeight, 120) + 'px'; });
+  msgInput.addEventListener('keydown', function(e){ if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendMsg(); } });
 }
-window.addEventListener('popstate', function(){
-  var active = document.querySelector('.screen.active');
-  if(active && active.id !== 'screenHome') goBack();
-});
+window.addEventListener('popstate', function(){ var active = document.querySelector('.screen.active'); if(active && active.id !== 'screenHome') goBack(); });
 
 renderServers();
 updateMyMini();
-console.log('说话大厅 UI 已就绪');
-
-loadTrystero().then(function(ok){
-  if(ok) console.log('联机组件就绪');
-  else console.warn('联机组件加载失败');
-});
+loadTrystero().then(function(ok){ if(ok) console.log('联机组件就绪'); else console.warn('联机组件加载失败'); });
 </script>
 </body>
 </html>
