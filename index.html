@@ -12,17 +12,24 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
 #mobileBlock{position:fixed;inset:0;z-index:9999999;background:#0a0a12;display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;color:#fff;font-family:monospace}
 #mobileBlock.show{display:flex}
 
-/* 开场动画 */
+/* 开场动画与视频 */
 #startOverlay{position:fixed;inset:0;background:#000;z-index:2000000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:30px;transition:opacity .5s}
 #startOverlay.hide{opacity:0;pointer-events:none}
 #startOverlay .title{font-size:48px;font-weight:900;letter-spacing:8px;background:linear-gradient(135deg,#4a6cf7,#a855f7,#ec4899);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 60px rgba(74,108,247,.5);animation:floatUp 2s ease-in-out infinite}
 @keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 #startOverlay .startBtn{padding:18px 60px;background:linear-gradient(135deg,#3a5cdf,#4a6cf7);color:#fff;border:none;border-radius:50px;font-size:18px;font-weight:700;cursor:pointer;letter-spacing:4px;box-shadow:0 8px 32px rgba(74,108,247,.6);transition:all .3s}
-#startOverlay .startBtn:hover{transform:scale(1.05)}
+#startOverlay .startBtn:hover{transform:scale(1.05);box-shadow:0 12px 48px rgba(74,108,247,.8)}
 
-/* 背景 */
-#bgVideo{position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:0;pointer-events:none;background:#000;opacity:.3}
-#bgMask{position:fixed;inset:0;z-index:1;background:radial-gradient(circle at center,rgba(11,12,16,.4),rgba(11,12,16,.85));pointer-events:none}
+#introLayer{position:fixed;inset:0;background:#000;z-index:999999;display:none;align-items:center;justify-content:center;opacity:1;transition:opacity .8s ease}
+#introLayer.active{display:flex}
+#introLayer.fade-out{opacity:0;pointer-events:none}
+#introVideo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+#introSkip{position:absolute;right:24px;bottom:24px;padding:8px 18px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.3);border-radius:20px;color:#fff;font-size:12px;cursor:pointer;backdrop-filter:blur(8px);transition:all .2s;z-index:3;opacity:.7}
+#introSkip:hover{background:rgba(0,0,0,.8);opacity:1}
+
+/* 背景视频 */
+#bgVideo{position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:0;pointer-events:none;background:#000}
+#bgMask{position:fixed;inset:0;z-index:1;background:linear-gradient(180deg,rgba(10,10,20,.08) 0%,rgba(10,10,20,.35) 100%);pointer-events:none}
 
 /* 右上角头像 */
 #topAvatarBtn { position: fixed; right: 20px; top: 20px; z-index: 5000; display: flex; align-items: center; gap: 10px; padding: 6px 14px; background: rgba(30,32,48,.85); border: 1px solid rgba(74,108,247,.3); border-radius: 30px; cursor: pointer; backdrop-filter: blur(12px); transition: all .2s; }
@@ -146,12 +153,18 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
 
 <div id="mobileBlock"><div style="font-size:60px;margin-bottom:20px;">🚫</div><div style="font-size:20px;font-weight:bold;">手机端玩不了这个</div><div style="margin-top:10px;color:#888;">换电脑来吧，兄弟</div></div>
 
+<!-- 开场视频逻辑（完全保留） -->
 <div id="startOverlay">
   <div class="title">我的世界 · 网页版</div>
   <button class="startBtn" onclick="startPlayback()">开始游戏</button>
 </div>
+<div id="introLayer">
+  <video id="introVideo" playsinline preload="auto"></video>
+  <div id="introSkip" onclick="finishIntro()">跳过 ▶</div>
+</div>
 
-<video id="bgVideo" loop muted playsinline></video>
+<!-- 背景视频 -->
+<video id="bgVideo" loop playsinline preload="auto"></video>
 <div id="bgMask"></div>
 
 <!-- 头像与资料 -->
@@ -309,18 +322,18 @@ if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|HarmonyOS|Mobi
   throw new Error('Mobile Blocked');
 }
 
-var worlds = JSON.parse(localStorage.getItem('mc_worlds_v8') || '[]');
-var servers = JSON.parse(localStorage.getItem('mc_servers_v8') || '[]');
+var worlds = JSON.parse(localStorage.getItem('mc_worlds_v9') || '[]');
+var servers = JSON.parse(localStorage.getItem('mc_servers_v9') || '[]');
 var selectedWorldIdx = -1, selectedServerIdx = -1;
 var currentRoom = null, currentAddress = '';
 var currentNick = localStorage.getItem('mc_nick') || '史蒂夫';
-// 默认头像是emoji，如果存了Base64就是本地图片
 var currentAvatar = localStorage.getItem('mc_avatar') || '😀'; 
 var isHost = false;
 var sendChat = null, sendPing = null, sendPong = null, sendMeta = null, sendPos = null;
 var joinRoomFn = null, trysteroReady = false;
 var myPeerId = '';
-var remotePlayers = {}; // 存储其他玩家: peerId -> { mesh, name, avatar, targetPos, targetYaw }
+var remotePlayers = {}; 
+var isIntroFinished = false;
 
 // 游戏引擎状态
 var gameActive = false;
@@ -354,8 +367,71 @@ var blockTextures = {
 };
 
 var STEVE_SKIN_URL = 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.1/assets/minecraft/textures/entity/steve.png';
+var VIDEO_INTRO = '进入主界面后的背景视频.mp4'; 
+var VIDEO_BG = '背景视频.mp4';
 
-// ================= 个人资料逻辑 =================
+// ================= 视频播放逻辑（核心保留） =================
+window.addEventListener('load', function() {
+  updateMyMini();
+  renderWorlds();
+  renderServers();
+  initHotbarUI();
+  
+  var isFirst = !sessionStorage.getItem('mc_intro_done_v9');
+  if(!isFirst){ 
+    isIntroFinished = true; 
+    afterIntro(); 
+    return; 
+  }
+  document.getElementById('startOverlay').style.display = 'flex'; 
+});
+
+async function startPlayback(){
+  var iv = document.getElementById('introVideo');
+  var bv = document.getElementById('bgVideo');
+  
+  var ov = document.getElementById('startOverlay'); 
+  ov.classList.add('hide'); 
+  setTimeout(() => ov.style.display = 'none', 500);
+  
+  iv.src = VIDEO_INTRO; 
+  bv.src = VIDEO_BG; 
+  
+  var il = document.getElementById('introLayer'); 
+  il.classList.add('active'); il.style.display = 'flex';
+  iv.muted = false; iv.volume = 1.0;
+  
+  try { 
+    await iv.play(); 
+  } catch(e) { 
+    iv.muted = true;
+    iv.play().catch(()=> finishIntro());
+  }
+  
+  sessionStorage.setItem('mc_intro_done_v9', '1');
+  iv.onended = finishIntro;
+  setTimeout(() => { if(il.classList.contains('active')) finishIntro(); }, 25000);
+}
+
+function finishIntro(){
+  if(isIntroFinished) return; 
+  isIntroFinished = true;
+  var il = document.getElementById('introLayer'), iv = document.getElementById('introVideo');
+  try { iv.pause(); } catch(e) {}
+  il.classList.add('fade-out');
+  setTimeout(() => {
+    il.classList.remove('active'); il.style.display = 'none'; 
+    afterIntro();
+  }, 800);
+}
+
+function afterIntro(){
+  var bv = document.getElementById('bgVideo');
+  bv.volume = 0.5;
+  bv.play().catch(()=>{});
+}
+
+// ================= 个人资料与头像 =================
 function updateMyMini(){
   var imgEl = document.getElementById('topAvatarImg');
   if(currentAvatar.startsWith('data:image')) {
@@ -398,7 +474,6 @@ function handleAvatarUpload(input){
   reader.onload = function(e){
     var img = new Image();
     img.onload = function(){
-      // 压缩到 64x64，避免 Base64 太长导致 WebRTC 传输卡顿
       var canvas = document.createElement('canvas');
       canvas.width = 64; canvas.height = 64;
       var ctx = canvas.getContext('2d');
@@ -424,20 +499,12 @@ function saveProfile(){
   closeProfile();
   toast('资料已保存');
   
-  // 如果在联机中，广播新头像和名字
   if(currentRoom && sendMeta) {
     sendMeta({ name: currentNick, avatar: currentAvatar });
   }
 }
 
-window.addEventListener('load', function() {
-  updateMyMini();
-  renderWorlds();
-  renderServers();
-  initHotbarUI();
-});
-
-// ================= UI 导航 =================
+// ================= 导航与UI逻辑 =================
 function goScreen(id){
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -492,7 +559,7 @@ function doCreateWorld(){
   var name = document.getElementById('worldNameInput').value.trim() || '新的世界';
   var seed = document.getElementById('worldSeedInput').value.trim() || Math.random().toString(36).substring(2, 8);
   worlds.push({ name, seed, lastPlayed: new Date().toLocaleDateString() });
-  localStorage.setItem('mc_worlds_v8', JSON.stringify(worlds));
+  localStorage.setItem('mc_worlds_v9', JSON.stringify(worlds));
   closeModal('modalCreateWorld');
   selectedWorldIdx = worlds.length - 1;
   renderWorlds();
@@ -502,7 +569,7 @@ function deleteSelectedWorld(){
   if(selectedWorldIdx < 0) return;
   if(!confirm('删了可就找不回来了，确定？')) return;
   worlds.splice(selectedWorldIdx, 1);
-  localStorage.setItem('mc_worlds_v8', JSON.stringify(worlds));
+  localStorage.setItem('mc_worlds_v9', JSON.stringify(worlds));
   selectedWorldIdx = -1;
   renderWorlds();
   document.getElementById('btnPlayWorld').disabled = true;
@@ -515,7 +582,7 @@ function playSelectedWorld(){
 function enterWorld(i){
   var w = worlds[i];
   w.lastPlayed = new Date().toLocaleDateString();
-  localStorage.setItem('mc_worlds_v8', JSON.stringify(worlds));
+  localStorage.setItem('mc_worlds_v9', JSON.stringify(worlds));
   launchGame(w.name, w.seed, false);
 }
 
@@ -575,7 +642,7 @@ function doAddServer(){
   var addr = document.getElementById('addServerAddr').value.trim();
   if(!addr){ toast('地址不能空着'); return; }
   servers.push({ name, addr });
-  localStorage.setItem('mc_servers_v8', JSON.stringify(servers));
+  localStorage.setItem('mc_servers_v9', JSON.stringify(servers));
   closeModal('modalAddServer');
   selectedServerIdx = servers.length - 1;
   renderServers();
@@ -608,14 +675,13 @@ async function connectToRoom(addr, host){
 
   try {
     currentRoom = joinRoomFn({
-      appId: 'mc-web-final-v8',
+      appId: 'mc-web-final-v9',
       rtcConfig: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }
     }, addr);
   } catch(e){ return; }
 
   myPeerId = currentRoom.selfId || 'local';
 
-  // 1. Ping 延迟
   var pingA = currentRoom.makeAction('ping');
   var pongA = currentRoom.makeAction('pong');
   sendPing = pingA[0]; sendPong = pongA[0];
@@ -626,14 +692,12 @@ async function connectToRoom(addr, host){
     document.getElementById('gamePing').style.color = '#6ee7b7';
   });
 
-  // 2. 聊天
   var chatA = currentRoom.makeAction('chat');
   sendChat = chatA[0];
   chatA[1]((d) => {
     addGameChatMessage(d.name, d.avatar, d.text);
   });
 
-  // 3. 头像与名字同步
   var metaA = currentRoom.makeAction('meta');
   sendMeta = metaA[0];
   metaA[1]((d, peerId) => {
@@ -641,13 +705,11 @@ async function connectToRoom(addr, host){
       remotePlayers[peerId].name = d.name;
       remotePlayers[peerId].avatar = d.avatar;
     }
-    // 更新本地记录
     if(!remotePlayers[peerId]) {
       spawnRemotePlayer(peerId, d.name, d.avatar);
     }
   });
 
-  // 4. 坐标位置同步
   var posA = currentRoom.makeAction('pos');
   sendPos = posA[0];
   posA[1]((d, peerId) => {
@@ -659,7 +721,6 @@ async function connectToRoom(addr, host){
   });
 
   currentRoom.onPeerJoin((id) => {
-    // 新玩家加入，主动发自己的元数据
     if(sendMeta) sendMeta({ name: currentNick, avatar: currentAvatar });
   });
 
@@ -684,22 +745,14 @@ function addGameChatMessage(name, avatar, text) {
   var box = document.getElementById('gameChatHistory');
   var div = document.createElement('div');
   div.className = 'chat-msg';
-  
   var avHtml = avatar.startsWith('data:image') ? `<img src="${avatar}">` : `<div style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;background:#333;border-radius:4px;">${avatar}</div>`;
-  
   div.innerHTML = `${avHtml} <span class="name">&lt;${name}&gt;</span> ${text}`;
   box.appendChild(div);
-  
-  // 维持最多 8 条记录
   if(box.children.length > 8) box.removeChild(box.firstChild);
-  
-  // 动画结束后移除
-  setTimeout(() => {
-    if(div.parentNode) div.parentNode.removeChild(div);
-  }, 10000);
+  setTimeout(() => { if(div.parentNode) div.parentNode.removeChild(div); }, 10000);
 }
 
-// ================= 游戏引擎核心 =================
+// ================= 游戏引擎 =================
 function launchGame(worldName, seed, isMultiplayer){
   if(!renderer) initEngine();
   document.getElementById('gameView').classList.add('show');
@@ -725,7 +778,6 @@ function initEngine(){
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
   raycaster = new THREE.Raycaster();
-
   scene.add(new THREE.AmbientLight(0xffffff, 0.65));
   var dir = new THREE.DirectionalLight(0xffffff, 0.75);
   dir.position.set(50, 100, 50);
@@ -749,7 +801,6 @@ function initEngine(){
   addEventListener('resize', onResize);
   window.addEventListener('keydown', e => { if(e.key === 'F5' || e.keyCode === 116) e.preventDefault(); });
 
-  // 聊天框回车事件
   document.getElementById('gameChatInput').addEventListener('keydown', e => {
     if(e.key === 'Enter'){
       var text = e.target.value.trim();
@@ -814,7 +865,6 @@ function createPlayerModelMesh(){
 function onKeyDown(e){
   if(!gameActive) return;
   
-  // 如果正在打字聊天，不触发游戏快捷键
   if(isChatting){
     if(e.code === 'Escape') toggleChat(false);
     return;
@@ -938,7 +988,6 @@ function loop(){
   requestAnimationFrame(loop);
   if(!gameActive) return;
 
-  // 移动
   var moveSpeed = isSneaking ? 4 : 8;
   var forward = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw));
   var right = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
@@ -948,7 +997,6 @@ function loop(){
   if(keys['KeyA']) playerPos.addScaledVector(right, -moveSpeed * 0.016);
   if(keys['KeyD']) playerPos.addScaledVector(right, moveSpeed * 0.016);
 
-  // 重力与跳跃
   velocityY -= 9.8 * 0.016;
   playerPos.y += velocityY * 0.016;
   
@@ -965,18 +1013,15 @@ function loop(){
     isGrounded = false;
   }
 
-  // 本地玩家模型隐藏与更新
   playerModel.position.copy(playerPos);
   playerModel.position.y -= 1.5;
   playerModel.rotation.y = yaw;
 
-  // 同步位置给别人（每100ms）
   if(sendPos && Date.now() - lastPosSendTime > 100) {
     lastPosSendTime = Date.now();
     sendPos({ pos: playerPos, yaw: yaw });
   }
 
-  // 相机
   if(cameraMode === 0){
     camera.position.copy(playerPos);
     camera.position.y += 0.6;
@@ -997,7 +1042,6 @@ function loop(){
   camera.rotation.y = yaw;
   camera.rotation.x = pitch;
 
-  // 高亮方块
   raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
   var hits = raycaster.intersectObjects(blocks);
   if(hits.length > 0 && hits[0].distance < 8){
@@ -1012,7 +1056,6 @@ function loop(){
   renderer.render(scene, camera);
 }
 
-// ================= 快捷栏 =================
 function initHotbarUI(){
   var hotbar = document.getElementById('hotbar');
   hotbar.innerHTML = '';
