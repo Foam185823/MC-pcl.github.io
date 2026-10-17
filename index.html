@@ -53,7 +53,7 @@ body.ui-hidden #soundToggleBtn{opacity:.5}
 .panel .toggle-row { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 13px; color: #e8e8f0; }
 .panel input[type=checkbox] { width: 18px; height: 18px; cursor: pointer; }
 
-/* 头像与昵称设置 */
+/* 头像与昵称 */
 #topAvatarBtn { position: fixed; right: 20px; top: 20px; z-index: 5000; display: flex; align-items: center; gap: 10px; padding: 6px 14px; background: rgba(30,32,48,.85); border: 1px solid rgba(74,108,247,.3); border-radius: 30px; cursor: pointer; backdrop-filter: blur(12px); transition: all .2s; }
 #topAvatarBtn:hover { border-color: #4a6cf7; box-shadow: 0 0 16px rgba(74,108,247,.3); }
 #topAvatarBtn .avatar-img { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#4a6cf7,#a855f7); display: flex; align-items: center; justify-content: center; font-size: 18px; overflow: hidden; }
@@ -152,7 +152,7 @@ body.ui-hidden #soundToggleBtn{opacity:.5}
 </div>
 <div id="introLayer">
   <video id="introVideo" playsinline preload="auto"></video>
-  <div id="introSkip" onclick="skipIntro()">跳过 ▶</div>
+  <div id="introSkip" onclick="finishIntro()">跳过 ▶</div>
 </div>
 
 <!-- 背景视频与音乐 -->
@@ -166,7 +166,7 @@ body.ui-hidden #soundToggleBtn{opacity:.5}
 
 <div id="settingsPanel" class="panel">
   <h3>⚙️ 游戏设置</h3>
-  <div class="toggle-row"><span>背景音乐</span><input type="checkbox" id="musicToggle" checked onchange="toggleMusic()"></div>
+  <div class="toggle-row"><span>背景音乐 (如果有)</span><input type="checkbox" id="musicToggle" checked onchange="toggleMusic()"></div>
   <label>音量大小</label>
   <input type="range" id="volumeSlider" min="0" max="100" value="50" oninput="changeVolume(this.value)">
   <div class="toggle-row"><span>隐藏所有UI</span><button class="btn-sm" onclick="toggleUI(); closeSettings();">切换</button></div>
@@ -334,18 +334,19 @@ var myPeerId = '';
 var isMuted = false, uiHidden = false;
 var isIntroFinished = false;
 
-// ================= 资源路径（可以自己换） =================
-var ASSETS = ['进入主界面后的背景视频.mp4', '背景视频.mp4', '背景音乐.mp3'];
+// ================= 视频路径 =================
+// 根据你的截图，视频文件叫这两个名字
+var VIDEO_INTRO = '进入主界面后的背景视频.mp4'; 
+var VIDEO_BG = '背景视频.mp4';
+var AUDIO_BG = '背景音乐.mp3'; // 如果你有加进来，没有就会静音
 
-// ================= 启动与动画 =================
 window.addEventListener('load', function() {
   updateMyMini();
   renderWorlds();
   renderServers();
   ensureTrystero();
   
-  // 检查是否已经开过场
-  var isFirst = !sessionStorage.getItem('mc_intro_done_v5');
+  var isFirst = !sessionStorage.getItem('mc_intro_done_v6');
   if(!isFirst){ 
     isIntroFinished = true; 
     afterIntro(); 
@@ -363,16 +364,25 @@ async function startPlayback(){
   ov.classList.add('hide'); 
   setTimeout(() => ov.style.display = 'none', 500);
   
-  iv.src = ASSETS[0]; bv.src = ASSETS[1]; bm.src = ASSETS[2];
+  iv.src = VIDEO_INTRO; 
+  bv.src = VIDEO_BG; 
+  bm.src = AUDIO_BG;
+  
   var il = document.getElementById('introLayer'); 
   il.classList.add('active'); il.style.display = 'flex';
   iv.muted = false; iv.volume = 1.0;
   
-  try { await iv.play(); } catch(e) { finishIntro(); }
+  try { 
+    await iv.play(); 
+  } catch(e) { 
+    // 如果浏览器阻止播放，静音播放或直接跳过
+    iv.muted = true;
+    iv.play().catch(()=> finishIntro());
+  }
   
-  sessionStorage.setItem('mc_intro_done_v5', '1');
+  sessionStorage.setItem('mc_intro_done_v6', '1');
   iv.onended = finishIntro;
-  setTimeout(() => { if(il.classList.contains('active')) finishIntro(); }, 30000);
+  setTimeout(() => { if(il.classList.contains('active')) finishIntro(); }, 25000);
 }
 
 function finishIntro(){
@@ -386,7 +396,6 @@ function finishIntro(){
     afterIntro();
   }, 800);
 }
-function skipIntro(){ finishIntro(); }
 
 function afterIntro(){
   var bv = document.getElementById('bgVideo');
@@ -396,7 +405,6 @@ function afterIntro(){
   bv.play().catch(()=>{});
   bm.play().catch(()=>{});
   
-  // 主界面动画
   var t = document.getElementById('homeTitle');
   var bs = document.querySelectorAll('.slide-btn');
   setTimeout(() => t.classList.add('anim-in'), 200);
@@ -436,7 +444,14 @@ function toggleSound(){
   var btn = document.getElementById('soundToggleBtn');
   if(isMuted){ btn.textContent = '🔇'; btn.classList.add('muted'); } else { btn.textContent = '🔊'; btn.classList.remove('muted'); }
 }
-
+function toggleMusic(){
+  var chk = document.getElementById('musicToggle').checked;
+  var bm = document.getElementById('bgMusic');
+  if(chk) bm.play().catch(()=>{}); else bm.pause();
+}
+function changeVolume(v){
+  document.getElementById('bgMusic').volume = v / 100;
+}
 function toggleSettings(){
   var p = document.getElementById('settingsPanel');
   p.classList.toggle('show');
@@ -618,7 +633,6 @@ function joinSelectedServer(){
 function joinServer(i){
   var s = servers[i];
   currentAddress = s.addr;
-  currentNick = currentNick; // 用保存的名字
   isHost = false;
   connectToRoom(s.addr, currentNick, false);
   launchGame(s.name, 'remote', true);
@@ -642,7 +656,7 @@ async function connectToRoom(addr, nick, host){
 
   try {
     currentRoom = joinRoomFn({
-      appId: 'mc-web-ip-direct-v5',
+      appId: 'mc-web-ip-direct-v6',
       rtcConfig: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }
     }, addr);
   } catch(e){
@@ -664,20 +678,17 @@ async function connectToRoom(addr, nick, host){
 
   var msgA = currentRoom.makeAction('msg');
   sendChat = msgA[0];
-  msgA[1]((d) => addMessage(d.text, d.sender, false));
+  msgA[1]((d) => console.log(`[${d.sender}]: ${d.text}`));
 
   currentRoom.onPeerJoin((id) => {
     toast('有人连进来了');
     document.getElementById('gamePing').textContent = '延迟: ---';
-    if(host) setInterval(() => { if(sendPing) sendPing({ ts: Date.now() }); }, 3000);
   });
 
   currentRoom.onPeerLeave(() => toast('人走了'));
 
   if(host) setInterval(() => { if(sendPing) sendPing({ ts: Date.now() }); }, 3000);
 }
-
-function addMessage(text, sender, isSelf){ console.log(`[${sender}]: ${text}`); }
 
 // ================= 游戏引擎 =================
 var gameActive = false;
@@ -693,7 +704,6 @@ function launchGame(worldName, seed, isMultiplayer){
   camera.position.set(0, 8, 16);
   yaw = 0; pitch = 0;
   document.getElementById('gameCanvas').requestPointerLock();
-  document.getElementById('gameHint').style.display = 'block';
 }
 
 function initEngine(){
@@ -774,7 +784,6 @@ function loop(){
   camera.position.y = Math.max(camera.position.y, 2);
 
   document.getElementById('gameCoord').textContent = `X: ${camera.position.x.toFixed(1)} Y: ${camera.position.y.toFixed(1)} Z: ${camera.position.z.toFixed(1)}`;
-
   renderer.render(scene, camera);
 }
 
