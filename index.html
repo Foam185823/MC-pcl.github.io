@@ -3,93 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>游戏大厅 · 单机联机版</title>
+<title>我的世界 · 网页联机大厅</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
-body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden}
-/* 手机端拦截 */
+body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:none}
+
+/* 移动端拦截 */
 #mobileBlock{position:fixed;inset:0;z-index:9999999;background:#0a0a12;display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;color:#fff;font-family:monospace}
 #mobileBlock.show{display:flex}
 
-/* 开场动画与视频 */
+/* 开场动画 */
 #startOverlay{position:fixed;inset:0;background:#000;z-index:2000000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:30px;transition:opacity .5s}
 #startOverlay.hide{opacity:0;pointer-events:none}
 #startOverlay .title{font-size:48px;font-weight:900;letter-spacing:8px;background:linear-gradient(135deg,#4a6cf7,#a855f7,#ec4899);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 60px rgba(74,108,247,.5);animation:floatUp 2s ease-in-out infinite}
 @keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 #startOverlay .startBtn{padding:18px 60px;background:linear-gradient(135deg,#3a5cdf,#4a6cf7);color:#fff;border:none;border-radius:50px;font-size:18px;font-weight:700;cursor:pointer;letter-spacing:4px;box-shadow:0 8px 32px rgba(74,108,247,.6);transition:all .3s}
-#startOverlay .startBtn:hover{transform:scale(1.05);box-shadow:0 12px 48px rgba(74,108,247,.8)}
+#startOverlay .startBtn:hover{transform:scale(1.05)}
 
-#introLayer{position:fixed;inset:0;background:#000;z-index:999999;display:none;align-items:center;justify-content:center;opacity:1;transition:opacity .8s ease}
-#introLayer.active{display:flex}
-#introLayer.fade-out{opacity:0;pointer-events:none}
-#introVideo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
-#introSkip{position:absolute;right:24px;bottom:24px;padding:8px 18px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.3);border-radius:20px;color:#fff;font-size:12px;cursor:pointer;backdrop-filter:blur(8px);transition:all .2s;z-index:3;opacity:.7}
-#introSkip:hover{background:rgba(0,0,0,.8);opacity:1}
-
-/* 背景视频与遮罩 */
-#bgVideo{position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:0;pointer-events:none;background:#000}
-#bgMask{position:fixed;inset:0;z-index:1;background:linear-gradient(180deg,rgba(10,10,20,.08) 0%,rgba(10,10,20,.35) 100%);pointer-events:none}
-
-/* 左下角按钮 */
-#uiToggleBtn{position:fixed;left:20px;bottom:20px;z-index:5000;width:46px;height:46px;border-radius:50%;background:rgba(30,32,48,.85);border:1px solid rgba(74,108,247,.5);color:#e8e8f0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;backdrop-filter:blur(12px);transition:all .3s;box-shadow:0 4px 16px rgba(0,0,0,.4);user-select:none}
-#uiToggleBtn:hover{background:rgba(74,108,247,.5);transform:scale(1.08)}
-#uiToggleBtn.hidden-mode{background:rgba(30,32,48,.4);border-color:rgba(74,108,247,.3);opacity:.5}
-#soundToggleBtn{position:fixed;left:80px;bottom:20px;z-index:5000;width:46px;height:46px;border-radius:50%;background:rgba(30,32,48,.85);border:1px solid rgba(74,108,247,.5);color:#e8e8f0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;backdrop-filter:blur(12px);transition:all .3s;box-shadow:0 4px 16px rgba(0,0,0,.4);user-select:none}
-#soundToggleBtn:hover{background:rgba(74,108,247,.5);transform:scale(1.08)}
-#soundToggleBtn.muted{background:rgba(58,28,28,.85);border-color:rgba(255,128,128,.5);color:#ff8080}
-body.ui-hidden .app .screen.active > *{opacity:0;pointer-events:none;transition:opacity .4s}
-body.ui-hidden #uiToggleBtn{opacity:.5}
-body.ui-hidden #soundToggleBtn{opacity:.5}
-
-/* 设置与头像面板 */
-.panel { position: fixed; z-index: 5000; background: rgba(21,22,30,.95); backdrop-filter: blur(20px); border: 1px solid rgba(74,108,247,.3); border-radius: 14px; padding: 20px; width: 300px; display: none; box-shadow: 0 10px 40px rgba(0,0,0,.6); }
-.panel.show { display: block; animation: popIn .2s cubic-bezier(.16,1,.3,1); }
-@keyframes popIn { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: scale(1); } }
-#settingsPanel { left: 20px; bottom: 80px; transform-origin: bottom left; }
-#profilePanel { right: 20px; top: 20px; transform-origin: top right; }
-.panel h3 { font-size: 15px; color: #fff; margin-bottom: 16px; text-align: center; letter-spacing: 1px; }
-.panel label { display: block; font-size: 12px; color: #8890a0; margin-bottom: 6px; margin-top: 12px; font-weight: 600; }
-.panel input[type=range] { width: 100%; margin-top: 4px; }
-.panel .toggle-row { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 13px; color: #e8e8f0; }
-.panel input[type=checkbox] { width: 18px; height: 18px; cursor: pointer; }
-
-/* 头像与昵称 */
-#topAvatarBtn { position: fixed; right: 20px; top: 20px; z-index: 5000; display: flex; align-items: center; gap: 10px; padding: 6px 14px; background: rgba(30,32,48,.85); border: 1px solid rgba(74,108,247,.3); border-radius: 30px; cursor: pointer; backdrop-filter: blur(12px); transition: all .2s; }
-#topAvatarBtn:hover { border-color: #4a6cf7; box-shadow: 0 0 16px rgba(74,108,247,.3); }
-#topAvatarBtn .avatar-img { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#4a6cf7,#a855f7); display: flex; align-items: center; justify-content: center; font-size: 18px; overflow: hidden; }
-#topAvatarBtn .avatar-img img { width: 100%; height: 100%; object-fit: cover; }
-#topAvatarBtn .nick-text { font-size: 13px; font-weight: 600; color: #e8e8f0; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.avatar-picker { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
-.avatar-option { width: 40px; height: 40px; border-radius: 50%; background: rgba(26,28,40,.9); border: 2px solid rgba(74,108,247,.25); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; transition: all .15s; overflow: hidden; }
-.avatar-option:hover { border-color: #4a6cf7; transform: scale(1.08); }
-.avatar-option.selected { border-color: #4a6cf7; box-shadow: 0 0 0 3px rgba(74,108,247,.3); }
+/* 背景 */
+#bgVideo{position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:0;pointer-events:none;background:#000;opacity:.3}
+#bgMask{position:fixed;inset:0;z-index:1;background:radial-gradient(circle at center,rgba(11,12,16,.4),rgba(11,12,16,.85));pointer-events:none}
 
 /* 通用布局 */
 .app{width:100vw;height:100vh;position:relative;z-index:2;display:flex;flex-direction:column}
-.screen{position:absolute;inset:0;display:none;flex-direction:column;padding:40px;overflow-y:auto}
+.screen{display:none;flex-direction:column;flex:1;padding:30px 40px;overflow-y:auto}
 .screen.active{display:flex}
-#screenHome{justify-content:center;align-items:center;padding:0}
-.home-content{width:100%;max-width:420px;display:flex;flex-direction:column;gap:14px}
-.mc-title{font-size:56px;font-weight:900;text-align:center;color:#fff;margin-bottom:50px;letter-spacing:6px;background:linear-gradient(135deg,#4a6cf7,#a855f7,#ec4899);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 4px 20px rgba(74,108,247,.5));opacity:0;transform:translateY(-30px);transition:all 1s cubic-bezier(.16,1,.3,1)}
-.mc-title.anim-in{opacity:1;transform:translateY(0)}
-.slide-btn{opacity:0;transition:all .8s cubic-bezier(.16,1,.3,1);will-change:transform,opacity}
-.slide-btn.from-left{transform:translateX(-120vw)}
-.slide-btn.from-right{transform:translateX(120vw)}
-.slide-btn.slide-done{opacity:1;transform:translateX(0)}
-.mc-btn{width:100%;padding:16px 22px;background:rgba(30,32,48,.85);color:#e8e8f0;border:2px solid rgba(74,108,247,.4);border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;transition:all .3s cubic-bezier(.16,1,.3,1);letter-spacing:2px;backdrop-filter:blur(12px);position:relative;overflow:hidden;text-shadow:0 1px 4px rgba(0,0,0,.6)}
-.mc-btn:hover{transform:translateY(-3px) scale(1.02);border-color:#4a6cf7;box-shadow:0 12px 40px rgba(74,108,247,.5)}
-.mc-btn.primary{background:linear-gradient(135deg,rgba(58,92,223,.9),rgba(74,108,247,.9));border-color:#4a6cf7;color:#fff}
-.mc-btn.danger{background:rgba(58,28,28,.9);border-color:rgba(255,128,128,.4);color:#ff8080}
+.home-box{width:100%;max-width:420px;display:flex;flex-direction:column;gap:14px;margin:auto}
+.home-title{font-size:56px;font-weight:900;text-align:center;letter-spacing:6px;background:linear-gradient(135deg,#6ee7b7,#3b82f6,#a855f7);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:30px}
+.mc-btn{width:100%;padding:16px 22px;background:rgba(30,32,48,.85);color:#e8e8f0;border:2px solid rgba(59,130,246,.3);border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;transition:all .3s;letter-spacing:2px;backdrop-filter:blur(12px)}
+.mc-btn:hover{transform:translateY(-2px);border-color:#3b82f6;box-shadow:0 12px 40px rgba(59,130,246,.4)}
+.mc-btn.primary{background:linear-gradient(135deg,rgba(59,130,246,.9),rgba(110,231,183,.8));border-color:transparent;color:#fff}
+.mc-btn.danger{background:rgba(58,28,28,.9);border-color:rgba(255,128,128,.3);color:#ff8080}
 
-/* 服务器与列表 */
+/* 列表与卡片 */
 .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-shrink:0}
 .topbar h1{font-size:22px;font-weight:800;letter-spacing:1px;color:#fff}
 .btn-icon{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#ccc;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s}
 .btn-icon:hover{background:rgba(59,130,246,.2);border-color:#3b82f6;color:#fff}
 .list-container{flex:1;overflow-y:auto;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(15,15,25,.7);backdrop-filter:blur(20px);padding:12px;max-width:900px;width:100%;margin:0 auto}
-.list-container::-webkit-scrollbar{width:6px}
-.list-container::-webkit-scrollbar-thumb{background:rgba(59,130,246,.4);border-radius:3px}
-.item-card{display:flex;align-items:center;padding:16px;background:rgba(255,255,255,.03);border:2px solid transparent;border-radius:12px;margin-bottom:8px;cursor:pointer;transition:all .2s;position:relative}
+.item-card{display:flex;align-items:center;padding:16px;background:rgba(255,255,255,.03);border:2px solid transparent;border-radius:12px;margin-bottom:8px;cursor:pointer;transition:all .2s}
 .item-card:hover{background:rgba(255,255,255,.06);transform:translateX(4px)}
 .item-card.selected{border-color:#3b82f6;background:rgba(59,130,246,.1);box-shadow:0 0 20px rgba(59,130,246,.15)}
 .card-icon{width:52px;height:52px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#6ee7b7);display:flex;align-items:center;justify-content:center;font-size:24px;margin-right:16px;flex-shrink:0}
@@ -97,44 +49,61 @@ body.ui-hidden #soundToggleBtn{opacity:.5}
 .card-name{font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card-desc{font-size:12px;color:#8890a0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .action-bar{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;justify-content:center}
-.btn-sm{padding:10px 18px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#ccc;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-sm{padding:10px 18px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#ccc;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
 .btn-sm:hover:not(:disabled){background:rgba(59,130,246,.2);border-color:#3b82f6;color:#fff}
 .btn-sm:disabled{opacity:.4;cursor:not-allowed}
 .btn-sm.green{background:rgba(110,231,183,.1);border-color:rgba(110,231,183,.3);color:#6ee7b7}
-.btn-sm.green:hover:not(:disabled){background:rgba(110,231,183,.2);box-shadow:0 0 16px rgba(110,231,183,.2)}
-.btn-sm.danger{background:rgba(255,128,128,.1);border-color:rgba(255,128,128,.3);color:#ff8080}
 
 /* 游戏视图 */
 #gameView{position:fixed;inset:0;z-index:9999998;background:#000;display:none;cursor:none}
 #gameView.show{display:block}
 #gameCanvas{width:100%;height:100%;display:block}
+
+/* 准心 */
 #crosshair{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:20px;height:20px;pointer-events:none;z-index:10}
 #crosshair::before,#crosshair::after{content:'';position:absolute;background:rgba(255,255,255,.8)}
 #crosshair::before{left:50%;top:0;width:2px;height:100%;transform:translateX(-50%)}
 #crosshair::after{top:50%;left:0;height:2px;width:100%;transform:translateY(-50%)}
+
+/* HUD */
 #gameHud{position:absolute;top:20px;left:20px;z-index:11;color:#fff;font-family:monospace;font-size:13px;line-height:1.8;text-shadow:0 2px 6px #000;pointer-events:none}
 #gamePing{color:#6ee7b7;font-weight:700;margin-top:6px;display:none}
-#gameHint{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);z-index:11;color:rgba(255,255,255,.4);font-size:13px;pointer-events:none}
-#pauseMenu{position:absolute;inset:0;z-index:20;background:rgba(11,12,16,.8);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;cursor:default}
+#gameMode{color:#ffaa00;font-weight:700}
+
+/* 暂停菜单 */
+#pauseMenu{position:absolute;inset:0;z-index:20;background:rgba(11,12,16,.85);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;cursor:default}
 #pauseMenu.show{display:flex}
 #pauseMenu h2{color:#fff;font-size:32px;margin-bottom:20px;letter-spacing:4px;font-weight:900}
-#pauseMenu button{width:320px;padding:14px;background:rgba(255,255,255,.06);color:#e8e8f0;border:1px solid rgba(255,255,255,.1);border-radius:10px;font-size:15px;cursor:pointer;transition:all .2s;font-family:inherit;font-weight:600}
+#pauseMenu button{width:320px;padding:14px;background:rgba(255,255,255,.06);color:#e8e8f0;border:1px solid rgba(255,255,255,.1);border-radius:10px;font-size:15px;cursor:pointer;transition:all .2s;font-weight:600}
 #pauseMenu button:hover{background:rgba(59,130,246,.2);border-color:#3b82f6;color:#fff}
-#inventoryBar{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:11;display:flex;gap:4px;padding:4px;background:rgba(0,0,0,.5);border-radius:8px;border:2px solid rgba(255,255,255,.15)}
-.inv-slot{width:42px;height:42px;background:rgba(30,30,30,.7);border:2px solid rgba(255,255,255,.2);border-radius:4px;display:flex;align-items:center;justify-content:center;position:relative}
-.inv-slot.selected{border-color:#fff;box-shadow:0 0 8px rgba(255,255,255,.4)}
-.inv-slot img{width:32px;height:32px;object-fit:contain;image-rendering:pixelated}
-.inv-slot .slot-num{position:absolute;top:1px;left:3px;font-size:10px;color:#aaa;font-family:monospace}
 
-/* 弹窗表单 */
+/* 背包界面 */
+#inventoryScreen{position:absolute;inset:0;z-index:15;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;cursor:default}
+#inventoryScreen.show{display:flex}
+.inv-panel{background:rgba(30,30,30,.95);border:4px solid #555;border-radius:8px;padding:20px;width:500px}
+.inv-panel h3{text-align:center;margin-bottom:16px;color:#fff;font-size:16px}
+.inv-grid{display:grid;grid-template-columns:repeat(9,1fr);gap:6px;margin-bottom:12px}
+.inv-slot{aspect-ratio:1;background:rgba(139,139,139,.3);border:2px solid #555;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.inv-slot:hover{border-color:#fff}
+.inv-slot.selected{border-color:#fff;box-shadow:0 0 0 2px #fff}
+.inv-slot img{width:80%;height:80%;object-fit:contain;image-rendering:pixelated}
+
+/* 快捷栏 */
+#hotbar{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:11;display:flex;gap:4px;padding:4px;background:rgba(0,0,0,.5);border-radius:8px;border:2px solid rgba(255,255,255,.15)}
+.hotbar-slot{width:42px;height:42px;background:rgba(30,30,30,.7);border:2px solid rgba(255,255,255,.2);border-radius:4px;display:flex;align-items:center;justify-content:center;position:relative}
+.hotbar-slot.selected{border-color:#fff;box-shadow:0 0 8px rgba(255,255,255,.4)}
+.hotbar-slot img{width:32px;height:32px;object-fit:contain;image-rendering:pixelated}
+.hotbar-slot .slot-num{position:absolute;top:1px;left:3px;font-size:10px;color:#aaa}
+
+/* 弹窗 */
 .modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:600}
 .modal-mask.show{display:flex}
 .modal{background:rgba(21,22,30,.98);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:28px;width:460px;max-width:92vw;box-shadow:0 20px 60px rgba(0,0,0,.8)}
-.modal h3{font-size:18px;color:#fff;margin-bottom:20px;font-weight:800;letter-spacing:1px}
+.modal h3{font-size:18px;color:#fff;margin-bottom:20px;font-weight:800}
 .modal label{display:block;font-size:12px;color:#8890a0;margin-bottom:6px;margin-top:14px;font-weight:600}
-.modal input{width:100%;background:rgba(15,15,25,.9);color:#e8e8f0;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:11px 14px;font-size:14px;outline:none;transition:border .2s}
-.modal input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.15)}
-.modal .hint{font-size:11px;color:#666;margin-top:6px;line-height:1.5}
+.modal input{width:100%;background:rgba(15,15,25,.9);color:#e8e8f0;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:11px 14px;font-size:14px;outline:none}
+.modal input:focus{border-color:#3b82f6}
+.modal .hint{font-size:11px;color:#666;margin-top:6px}
 .modal .btn-row{display:flex;justify-content:flex-end;gap:10px;margin-top:24px}
 
 .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(60px);background:rgba(30,32,48,.95);backdrop-filter:blur(12px);border:1px solid rgba(59,130,246,.3);border-radius:10px;padding:12px 24px;font-size:13px;color:#e8e8f0;opacity:0;transition:all .3s;pointer-events:none;z-index:999999;box-shadow:0 8px 32px rgba(0,0,0,.5)}
@@ -145,63 +114,24 @@ body.ui-hidden #soundToggleBtn{opacity:.5}
 
 <div id="mobileBlock"><div style="font-size:60px;margin-bottom:20px;">🚫</div><div style="font-size:20px;font-weight:bold;">手机端玩不了这个</div><div style="margin-top:10px;color:#888;">换电脑来吧，兄弟</div></div>
 
-<!-- 开场视频 -->
 <div id="startOverlay">
   <div class="title">我的世界 · 网页版</div>
   <button class="startBtn" onclick="startPlayback()">开始游戏</button>
 </div>
-<div id="introLayer">
-  <video id="introVideo" playsinline preload="auto"></video>
-  <div id="introSkip" onclick="finishIntro()">跳过 ▶</div>
-</div>
 
-<!-- 背景视频与音乐 -->
-<video id="bgVideo" loop playsinline preload="auto"></video>
-<audio id="bgMusic" loop preload="auto"></audio>
+<video id="bgVideo" loop muted playsinline></video>
 <div id="bgMask"></div>
 
-<!-- UI 控件 -->
-<div id="uiToggleBtn" onclick="toggleUI()" title="隐藏/显示UI">👁</div>
-<div id="soundToggleBtn" onclick="toggleSound()" title="静音/取消">🔊</div>
-
-<div id="settingsPanel" class="panel">
-  <h3>⚙️ 游戏设置</h3>
-  <div class="toggle-row"><span>背景音乐 (如果有)</span><input type="checkbox" id="musicToggle" checked onchange="toggleMusic()"></div>
-  <label>音量大小</label>
-  <input type="range" id="volumeSlider" min="0" max="100" value="50" oninput="changeVolume(this.value)">
-  <div class="toggle-row"><span>隐藏所有UI</span><button class="btn-sm" onclick="toggleUI(); closeSettings();">切换</button></div>
-  <div class="btn-row" style="justify-content:center;margin-top:20px;"><button class="btn-sm" onclick="closeSettings()">关闭</button></div>
-</div>
-
-<div id="topAvatarBtn" onclick="toggleProfile()">
-  <div class="avatar-img" id="topAvatarImg">😀</div>
-  <div class="nick-text" id="topNickText">史蒂夫</div>
-</div>
-
-<div id="profilePanel" class="panel">
-  <h3>👤 个人资料</h3>
-  <label>你的昵称</label>
-  <input type="text" id="profileNickInput" maxlength="12" placeholder="输入昵称" style="width:100%;background:rgba(15,15,25,.9);color:#e8e8f0;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px;font-size:14px;outline:none;">
-  <label>选个头像</label>
-  <div class="avatar-picker" id="avatarPicker"></div>
-  <div class="btn-row" style="justify-content:center;margin-top:20px;">
-    <button class="btn-sm" onclick="closeProfile()">取消</button>
-    <button class="btn-sm green" onclick="saveProfile()">保存</button>
-  </div>
-</div>
-
 <div class="app">
-  <!-- 主菜单 -->
   <div class="screen active" id="screenHome">
-    <div class="home-content">
-      <div class="mc-title" id="homeTitle">我的世界</div>
-      <button class="mc-btn primary slide-btn from-left" onclick="goScreen('screenSingleplayer')">🌍 单人世界</button>
-      <button class="mc-btn slide-btn from-right" onclick="goScreen('screenMultiplayer')">🌐 多人联机</button>
-      <button class="mc-btn slide-btn from-left" onclick="showAbout()">ℹ️ 这玩意咋用</button>
+    <div class="home-box">
+      <div class="home-title">我的世界</div>
+      <button class="mc-btn primary" onclick="goScreen('screenSingleplayer')">🌍 单人世界</button>
+      <button class="mc-btn" onclick="goScreen('screenMultiplayer')">🌐 多人联机</button>
+      <button class="mc-btn" onclick="showAbout()">ℹ️ 这玩意咋用</button>
     </div>
   </div>
 
-  <!-- 单人世界列表 -->
   <div class="screen" id="screenSingleplayer">
     <div class="topbar">
       <button class="btn-icon" onclick="goHome()">←</button>
@@ -217,7 +147,6 @@ body.ui-hidden #soundToggleBtn{opacity:.5}
     </div>
   </div>
 
-  <!-- 多人联机列表 -->
   <div class="screen" id="screenMultiplayer">
     <div class="topbar">
       <button class="btn-icon" onclick="goHome()">←</button>
@@ -238,30 +167,28 @@ body.ui-hidden #soundToggleBtn{opacity:.5}
   <div id="crosshair"></div>
   <div id="gameHud">
     <div id="gameCoord">X: 0 Y: 0 Z: 0</div>
-    <div id="gameFps">FPS: --</div>
+    <div id="gameMode">模式: 第一人称</div>
     <div id="gamePing">延迟: ---</div>
   </div>
-  <div id="gameHint">点击画面锁定鼠标 · WASD 移动 · ESC 暂停</div>
+  
   <div id="pauseMenu">
     <h2>游戏菜单</h2>
     <button onclick="resumeGame()">回到游戏</button>
-    <button onclick="openInGameSettings()">⚙ 选项</button>
     <button onclick="saveAndQuit()">保存并退回到标题画面</button>
   </div>
-  <div id="inventoryBar">
-    <div class="inv-slot selected" data-slot="0"><span class="slot-num">1</span><img src="https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/grass_block.png"></div>
-    <div class="inv-slot" data-slot="1"><span class="slot-num">2</span><img src="https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/dirt.png"></div>
-    <div class="inv-slot" data-slot="2"><span class="slot-num">3</span><img src="https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/stone.png"></div>
-    <div class="inv-slot" data-slot="3"><span class="slot-num">4</span><img src="https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/cobblestone.png"></div>
-    <div class="inv-slot" data-slot="4"><span class="slot-num">5</span><img src="https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/oak_planks.png"></div>
-    <div class="inv-slot" data-slot="5"><span class="slot-num">6</span><img src="https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/oak_log.png"></div>
-    <div class="inv-slot" data-slot="6"><span class="slot-num">7</span><img src="https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/sand.png"></div>
-    <div class="inv-slot" data-slot="7"><span class="slot-num">8</span><img src="https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/glass.png"></div>
-    <div class="inv-slot" data-slot="8"><span class="slot-num">9</span><img src="https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/bricks.png"></div>
+
+  <div id="inventoryScreen">
+    <div class="inv-panel">
+      <h3>物品栏</h3>
+      <div class="inv-grid" id="invGrid"></div>
+      <div class="inv-grid" id="hotbarGrid" style="margin-top:20px;"></div>
+    </div>
   </div>
+
+  <div id="hotbar"></div>
 </div>
 
-<!-- 弹窗们 -->
+<!-- 弹窗 -->
 <div class="modal-mask" id="modalCreateWorld">
   <div class="modal">
     <h3>新建世界</h3>
@@ -280,12 +207,7 @@ body.ui-hidden #soundToggleBtn{opacity:.5}
   <div class="modal">
     <h3>对局域网开放</h3>
     <div style="color:#8890a0;font-size:12px;line-height:1.6;margin-bottom:16px;">
-      先去把你的映射软件（NatGo / FRP 等）开好，把生成的公网地址粘下面。端口随便填，别跟别的程序打架就行。
-    </div>
-    <label>游戏端口</label>
-    <div style="display:flex;gap:8px;">
-      <input type="text" id="lanPortInput" placeholder="25565" style="flex:1;">
-      <button class="btn-sm" onclick="randomPort()" style="padding:0 14px;">🎲</button>
+      把你的映射软件（NatGo / FRP / Sakura）开好，把公网地址粘下面。
     </div>
     <label>映射后的公网地址（IP:端口）</label>
     <input type="text" id="lanAddressInput" placeholder="例如 123.45.67.89:25565 或 xxxx.frp.com">
@@ -313,17 +235,17 @@ body.ui-hidden #soundToggleBtn{opacity:.5}
 
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script>
-// ================= 设备检测 =================
+// ================= 全局变量 =================
 if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|HarmonyOS|Mobile/i.test(navigator.userAgent)){
   document.getElementById('mobileBlock').classList.add('show');
   document.getElementById('startOverlay').style.display = 'none';
   throw new Error('Mobile Blocked');
 }
 
-// ================= 全局变量 =================
-var worlds = JSON.parse(localStorage.getItem('mc_worlds_v5') || '[]');
-var servers = JSON.parse(localStorage.getItem('mc_servers_v5') || '[]');
+var worlds = JSON.parse(localStorage.getItem('mc_worlds_v7') || '[]');
+var servers = JSON.parse(localStorage.getItem('mc_servers_v7') || '[]');
 var selectedWorldIdx = -1, selectedServerIdx = -1;
 var currentRoom = null, currentAddress = '', currentNick = localStorage.getItem('mc_nick') || '史蒂夫';
 var currentAvatar = localStorage.getItem('mc_avatar') || '😀';
@@ -332,86 +254,42 @@ var sendChat = null, sendPing = null, sendPong = null;
 var joinRoomFn = null, trysteroReady = false;
 var myPeerId = '';
 var isMuted = false, uiHidden = false;
-var isIntroFinished = false;
 
-// ================= 视频路径 =================
-// 根据你的截图，视频文件叫这两个名字
-var VIDEO_INTRO = '进入主界面后的背景视频.mp4'; 
-var VIDEO_BG = '背景视频.mp4';
-var AUDIO_BG = '背景音乐.mp3'; // 如果你有加进来，没有就会静音
+// 游戏引擎状态
+var gameActive = false;
+var scene, camera, renderer, raycaster;
+var yaw = 0, pitch = 0, keys = {};
+var playerPos = new THREE.Vector3(0, 5, 15);
+var velocityY = 0, isGrounded = false, isSneaking = false;
+var cameraMode = 0; // 0: 第一人称, 1: 第三人称背面, 2: 第三人称正面
+var playerModel, highlightBox;
+var blocks = []; // 存储所有方块
+var selectedHotbarSlot = 0;
+var inventoryOpen = false;
 
-window.addEventListener('load', function() {
-  updateMyMini();
-  renderWorlds();
-  renderServers();
-  ensureTrystero();
-  
-  var isFirst = !sessionStorage.getItem('mc_intro_done_v6');
-  if(!isFirst){ 
-    isIntroFinished = true; 
-    afterIntro(); 
-    return; 
-  }
-  document.getElementById('startOverlay').style.display = 'flex'; 
-});
+// 默认快捷栏方块
+var hotbarBlocks = [
+  'grass_block', 'dirt', 'stone', 'cobblestone', 'oak_planks',
+  'oak_log', 'sand', 'glass', 'bricks'
+];
 
-async function startPlayback(){
-  var iv = document.getElementById('introVideo');
-  var bv = document.getElementById('bgVideo');
-  var bm = document.getElementById('bgMusic');
-  
-  var ov = document.getElementById('startOverlay'); 
-  ov.classList.add('hide'); 
-  setTimeout(() => ov.style.display = 'none', 500);
-  
-  iv.src = VIDEO_INTRO; 
-  bv.src = VIDEO_BG; 
-  bm.src = AUDIO_BG;
-  
-  var il = document.getElementById('introLayer'); 
-  il.classList.add('active'); il.style.display = 'flex';
-  iv.muted = false; iv.volume = 1.0;
-  
-  try { 
-    await iv.play(); 
-  } catch(e) { 
-    // 如果浏览器阻止播放，静音播放或直接跳过
-    iv.muted = true;
-    iv.play().catch(()=> finishIntro());
-  }
-  
-  sessionStorage.setItem('mc_intro_done_v6', '1');
-  iv.onended = finishIntro;
-  setTimeout(() => { if(il.classList.contains('active')) finishIntro(); }, 25000);
-}
+// 方块纹理映射
+var blockTextures = {
+  'grass_block': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/grass_block.png',
+  'dirt': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/dirt.png',
+  'stone': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/stone.png',
+  'cobblestone': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/cobblestone.png',
+  'oak_planks': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/oak_planks.png',
+  'oak_log': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/oak_log.png',
+  'sand': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/sand.png',
+  'glass': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/glass.png',
+  'bricks': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/bricks.png'
+};
 
-function finishIntro(){
-  if(isIntroFinished) return; 
-  isIntroFinished = true;
-  var il = document.getElementById('introLayer'), iv = document.getElementById('introVideo');
-  try { iv.pause(); } catch(e) {}
-  il.classList.add('fade-out');
-  setTimeout(() => {
-    il.classList.remove('active'); il.style.display = 'none'; 
-    afterIntro();
-  }, 800);
-}
+// 史蒂夫皮肤（默认皮肤）
+var STEVE_SKIN_URL = 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.1/assets/minecraft/textures/entity/steve.png';
 
-function afterIntro(){
-  var bv = document.getElementById('bgVideo');
-  var bm = document.getElementById('bgMusic');
-  bv.muted = isMuted; bv.volume = 0.5;
-  bm.muted = isMuted; bm.volume = 0.3;
-  bv.play().catch(()=>{});
-  bm.play().catch(()=>{});
-  
-  var t = document.getElementById('homeTitle');
-  var bs = document.querySelectorAll('.slide-btn');
-  setTimeout(() => t.classList.add('anim-in'), 200);
-  bs.forEach((b, i) => { setTimeout(() => b.classList.add('slide-done'), 400 + i * 150); });
-}
-
-// ================= 界面与设置 =================
+// ================= UI 导航 =================
 function goScreen(id){
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -431,76 +309,29 @@ function toast(msg){
   t._t = setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-function toggleUI(){
-  uiHidden = !uiHidden;
-  document.body.classList.toggle('ui-hidden', uiHidden);
-  var btn = document.getElementById('uiToggleBtn');
-  if(uiHidden){ btn.classList.add('hidden-mode'); } else { btn.classList.remove('hidden-mode'); }
-}
-function toggleSound(){
-  isMuted = !isMuted;
-  var bv = document.getElementById('bgVideo'), bm = document.getElementById('bgMusic');
-  bv.muted = isMuted; bm.muted = isMuted;
-  var btn = document.getElementById('soundToggleBtn');
-  if(isMuted){ btn.textContent = '🔇'; btn.classList.add('muted'); } else { btn.textContent = '🔊'; btn.classList.remove('muted'); }
-}
-function toggleMusic(){
-  var chk = document.getElementById('musicToggle').checked;
-  var bm = document.getElementById('bgMusic');
-  if(chk) bm.play().catch(()=>{}); else bm.pause();
-}
-function changeVolume(v){
-  document.getElementById('bgMusic').volume = v / 100;
-}
-function toggleSettings(){
-  var p = document.getElementById('settingsPanel');
-  p.classList.toggle('show');
-  closeProfile();
-}
-function closeSettings(){ document.getElementById('settingsPanel').classList.remove('show'); }
+// ================= 启动动画 =================
+window.addEventListener('load', function() {
+  renderWorlds();
+  renderServers();
+  initHotbarUI();
+});
 
-// ================= 头像与昵称 =================
-var AVATARS = ['😀','😎','🐱','🐶','🦊','🐼','🐸','🦄','👻','🤖','🐧','🐨','🐯','🦁','🐵','🐙'];
-function toggleProfile(){
-  var p = document.getElementById('profilePanel');
-  p.classList.toggle('show');
-  closeSettings();
+function startPlayback(){
+  var ov = document.getElementById('startOverlay');
+  ov.classList.add('hide');
+  setTimeout(() => ov.style.display = 'none', 500);
   
-  if(p.classList.contains('show')){
-    document.getElementById('profileNickInput').value = currentNick;
-    var picker = document.getElementById('avatarPicker');
-    var h = '';
-    AVATARS.forEach(av => {
-      var cls = av === currentAvatar ? 'avatar-option selected' : 'avatar-option';
-      h += `<div class="${cls}" onclick="pickAvatar('${av}')">${av}</div>`;
-    });
-    picker.innerHTML = h;
-  }
-}
-function closeProfile(){ document.getElementById('profilePanel').classList.remove('show'); }
-function pickAvatar(av){
-  currentAvatar = av;
-  document.querySelectorAll('.avatar-option').forEach(o => o.classList.toggle('selected', o.textContent === av));
-}
-function saveProfile(){
-  var nick = document.getElementById('profileNickInput').value.trim() || '史蒂夫';
-  currentNick = nick;
-  localStorage.setItem('mc_nick', nick);
-  localStorage.setItem('mc_avatar', currentAvatar);
-  updateMyMini();
-  closeProfile();
-  toast('资料已保存');
-}
-function updateMyMini(){
-  document.getElementById('topAvatarImg').textContent = currentAvatar;
-  document.getElementById('topNickText').textContent = currentNick;
+  var bg = document.getElementById('bgVideo');
+  bg.src = '背景视频.mp4';
+  bg.play().catch(()=>{});
+  ensureTrystero();
 }
 
-// ================= 单人世界逻辑 =================
+// ================= 单人世界 =================
 function renderWorlds(){
   var box = document.getElementById('worldList');
   if(worlds.length === 0){
-    box.innerHTML = '<div style="text-align:center;padding:60px;color:#666;font-size:14px;">还没开过世界呢，点下面整一个呗</div>';
+    box.innerHTML = '<div style="text-align:center;padding:60px;color:#666;">还没开过世界呢，点下面整一个呗</div>';
     return;
   }
   var html = '';
@@ -531,7 +362,7 @@ function doCreateWorld(){
   var name = document.getElementById('worldNameInput').value.trim() || '新的世界';
   var seed = document.getElementById('worldSeedInput').value.trim() || Math.random().toString(36).substring(2, 8);
   worlds.push({ name, seed, lastPlayed: new Date().toLocaleDateString() });
-  localStorage.setItem('mc_worlds_v5', JSON.stringify(worlds));
+  localStorage.setItem('mc_worlds_v7', JSON.stringify(worlds));
   closeModal('modalCreateWorld');
   selectedWorldIdx = worlds.length - 1;
   renderWorlds();
@@ -541,13 +372,12 @@ function deleteSelectedWorld(){
   if(selectedWorldIdx < 0) return;
   if(!confirm('删了可就找不回来了，确定？')) return;
   worlds.splice(selectedWorldIdx, 1);
-  localStorage.setItem('mc_worlds_v5', JSON.stringify(worlds));
+  localStorage.setItem('mc_worlds_v7', JSON.stringify(worlds));
   selectedWorldIdx = -1;
   renderWorlds();
   document.getElementById('btnPlayWorld').disabled = true;
   document.getElementById('btnOpenLan').disabled = true;
   document.getElementById('btnDeleteWorld').disabled = true;
-  toast('世界已删除');
 }
 function playSelectedWorld(){
   if(selectedWorldIdx >= 0) enterWorld(selectedWorldIdx);
@@ -555,19 +385,15 @@ function playSelectedWorld(){
 function enterWorld(i){
   var w = worlds[i];
   w.lastPlayed = new Date().toLocaleDateString();
-  localStorage.setItem('mc_worlds_v5', JSON.stringify(worlds));
+  localStorage.setItem('mc_worlds_v7', JSON.stringify(worlds));
   launchGame(w.name, w.seed, false);
 }
 
-// ================= 局域网开放 =================
+// ================= 局域网与联机 =================
 function openLanSettings(){
   if(selectedWorldIdx < 0) return;
-  document.getElementById('lanPortInput').value = Math.floor(Math.random() * 10000) + 25565;
   document.getElementById('lanAddressInput').value = '';
   document.getElementById('modalLan').classList.add('show');
-}
-function randomPort(){
-  document.getElementById('lanPortInput').value = Math.floor(Math.random() * 10000) + 20000;
 }
 async function doOpenLan(){
   var addr = document.getElementById('lanAddressInput').value.trim();
@@ -587,11 +413,10 @@ async function doOpenLan(){
   }, 1200);
 }
 
-// ================= 多人联机 =================
 function renderServers(){
   var box = document.getElementById('serverList');
   if(servers.length === 0){
-    box.innerHTML = '<div style="text-align:center;padding:60px;color:#666;font-size:14px;">还没添加过服务器，把朋友发的IP粘进来就行</div>';
+    box.innerHTML = '<div style="text-align:center;padding:60px;color:#666;">还没添加过服务器，把朋友发的IP粘进来就行</div>';
     return;
   }
   var html = '';
@@ -621,7 +446,7 @@ function doAddServer(){
   var addr = document.getElementById('addServerAddr').value.trim();
   if(!addr){ toast('地址不能空着'); return; }
   servers.push({ name, addr });
-  localStorage.setItem('mc_servers_v5', JSON.stringify(servers));
+  localStorage.setItem('mc_servers_v7', JSON.stringify(servers));
   closeModal('modalAddServer');
   selectedServerIdx = servers.length - 1;
   renderServers();
@@ -638,14 +463,12 @@ function joinServer(i){
   launchGame(s.name, 'remote', true);
 }
 
-// ================= WebRTC 联机 =================
 async function ensureTrystero(){
   if(trysteroReady) return true;
   try {
     var mod = await import('https://cdn.jsdelivr.net/npm/trystero@0.21.5/+esm');
     if(mod && mod.joinRoom){ joinRoomFn = mod.joinRoom; trysteroReady = true; return true; }
   } catch(e){}
-  toast('联机组件没加载出来，检查下网络');
   return false;
 }
 
@@ -656,13 +479,10 @@ async function connectToRoom(addr, nick, host){
 
   try {
     currentRoom = joinRoomFn({
-      appId: 'mc-web-ip-direct-v6',
+      appId: 'mc-web-ip-direct-v7',
       rtcConfig: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }
     }, addr);
-  } catch(e){
-    toast('连不上，地址是不是填错了');
-    return;
-  }
+  } catch(e){ return; }
 
   myPeerId = currentRoom.selfId || 'local';
 
@@ -691,19 +511,18 @@ async function connectToRoom(addr, nick, host){
 }
 
 // ================= 游戏引擎 =================
-var gameActive = false;
-var scene, camera, renderer;
-var yaw = 0, pitch = 0, keys = {};
-var gameInited = false;
-var lastTime = 0;
-
 function launchGame(worldName, seed, isMultiplayer){
-  if(!gameInited){ initEngine(); gameInited = true; }
+  if(!renderer) initEngine();
   document.getElementById('gameView').classList.add('show');
   gameActive = true;
-  camera.position.set(0, 8, 16);
+  
+  playerPos.set(0, 5, 15);
+  velocityY = 0;
   yaw = 0; pitch = 0;
+  cameraMode = 0;
+  
   document.getElementById('gameCanvas').requestPointerLock();
+  updateCameraModeText();
 }
 
 function initEngine(){
@@ -712,88 +531,326 @@ function initEngine(){
   scene.background = new THREE.Color(0x87CEEB);
   scene.fog = new THREE.Fog(0x87CEEB, 30, 80);
   camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 1000);
-  renderer = new THREE.WebGLRenderer({ canvas, antialias: false });
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setSize(innerWidth, innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-  var dir = new THREE.DirectionalLight(0xffffff, 0.8);
+  raycaster = new THREE.Raycaster();
+
+  // 光照
+  scene.add(new THREE.AmbientLight(0xffffff, 0.65));
+  var dir = new THREE.DirectionalLight(0xffffff, 0.75);
   dir.position.set(50, 100, 50);
   scene.add(dir);
 
-  var geo = new THREE.BoxGeometry(1, 1, 1);
-  var mat = new THREE.MeshLambertMaterial({ color: 0x55AA55 });
-  for(var x = -12; x < 12; x++){
-    for(var z = -12; z < 12; z++){
-      var b = new THREE.Mesh(geo, mat);
-      b.position.set(x, 0, z);
-      scene.add(b);
-    }
-  }
+  // 生成地形
+  generateTerrain();
 
-  document.addEventListener('keydown', e => {
-    keys[e.code] = true;
-    if(e.key === 'Escape' && gameActive){
-      if(document.pointerLockElement){
-        document.exitPointerLock();
-        document.getElementById('pauseMenu').classList.add('show');
-      }
-    }
-  });
-  document.addEventListener('keyup', e => keys[e.code] = false);
-  document.addEventListener('mousemove', e => {
-    if(!gameActive || !document.pointerLockElement) return;
-    yaw -= e.movementX * 0.002;
-    pitch -= e.movementY * 0.002;
-    pitch = Math.max(-Math.PI/2 + 0.01, Math.min(Math.PI/2 - 0.01, pitch));
-  });
-  canvas.addEventListener('click', () => {
-    if(gameActive && !document.pointerLockElement){
-      document.getElementById('pauseMenu').classList.remove('show');
-      canvas.requestPointerLock();
-    }
-  });
-  addEventListener('resize', () => {
-    if(renderer){
-      renderer.setSize(innerWidth, innerHeight);
-      camera.aspect = innerWidth/innerHeight;
-      camera.updateProjectionMatrix();
+  // 创建玩家模型 (史蒂夫)
+  createPlayerModel();
+
+  // 创建高亮线框
+  var geo = new THREE.EdgesGeometry(new THREE.BoxGeometry(1.002, 1.002, 1.002));
+  var mat = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
+  highlightBox = new THREE.LineSegments(geo, mat);
+  highlightBox.visible = false;
+  scene.add(highlightBox);
+
+  // 事件监听
+  document.addEventListener('keydown', onKeyDown);
+  document.addEventListener('keyup', onKeyUp);
+  document.addEventListener('mousemove', onMouseMove);
+  canvas.addEventListener('click', onCanvasClick);
+  canvas.addEventListener('mousedown', onCanvasMouseDown);
+  addEventListener('resize', onResize);
+  
+  // 全局屏蔽 F5 刷新
+  window.addEventListener('keydown', function(e) {
+    if(e.key === 'F5' || e.keyCode === 116) {
+      e.preventDefault();
+      return false;
     }
   });
 
   loop();
 }
 
+function generateTerrain(){
+  var geo = new THREE.BoxGeometry(1, 1, 1);
+  var size = 16;
+  
+  for(var x = -size; x < size; x++){
+    for(var z = -size; z < size; z++){
+      // 简单正弦波地形
+      var h = Math.floor(Math.sin(x * 0.3) * 2 + Math.cos(z * 0.3) * 2 + 4);
+      for(var y = 0; y < h; y++){
+        var type = y === h - 1 ? 'grass_block' : (y > h - 3 ? 'dirt' : 'stone');
+        addBlock(x, y, z, type);
+      }
+    }
+  }
+}
+
+function addBlock(x, y, z, type){
+  var geo = new THREE.BoxGeometry(1, 1, 1);
+  var tex = new THREE.TextureLoader().load(blockTextures[type] || blockTextures['stone']);
+  tex.magFilter = THREE.NearestFilter;
+  tex.minFilter = THREE.NearestFilter;
+  var mat = new THREE.MeshLambertMaterial({ map: tex });
+  var mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(x, y, z);
+  mesh.userData = { type: type, x: x, y: y, z: z };
+  scene.add(mesh);
+  blocks.push(mesh);
+}
+
+function createPlayerModel(){
+  playerModel = new THREE.Group();
+  
+  var tex = new THREE.TextureLoader().load(STEVE_SKIN_URL);
+  tex.magFilter = THREE.NearestFilter;
+  tex.minFilter = THREE.NearestFilter;
+  
+  // 身体 (8x12x4 像素 -> 比例 0.5x0.75x0.25)
+  var bodyMat = new THREE.MeshLambertMaterial({ map: tex });
+  var body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.75, 0.25), bodyMat);
+  body.position.y = 0.375;
+  playerModel.add(body);
+
+  // 头 (8x8x8 像素 -> 0.5x0.5x0.5)
+  var head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), bodyMat);
+  head.position.y = 1.0;
+  playerModel.add(head);
+
+  // 简单的手脚
+  var limbMat = new THREE.MeshLambertMaterial({ color: 0x2D2D2D });
+  var arm = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.75, 0.25), limbMat);
+  arm.position.set(-0.375, 0.375, 0);
+  playerModel.add(arm);
+  
+  var arm2 = arm.clone();
+  arm2.position.x = 0.375;
+  playerModel.add(arm2);
+
+  var leg = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.75, 0.25), limbMat);
+  leg.position.set(-0.125, -0.375, 0);
+  playerModel.add(leg);
+  
+  var leg2 = leg.clone();
+  leg2.position.x = 0.125;
+  playerModel.add(leg2);
+  
+  scene.add(playerModel);
+}
+
+function onKeyDown(e){
+  if(!gameActive) return;
+  keys[e.code] = true;
+
+  // ESC 暂停
+  if(e.code === 'Escape'){
+    if(document.pointerLockElement){
+      document.exitPointerLock();
+      document.getElementById('pauseMenu').classList.add('show');
+    }
+  }
+
+  // F5 切换视角
+  if(e.code === 'F5'){
+    e.preventDefault();
+    cameraMode = (cameraMode + 1) % 3;
+    updateCameraModeText();
+  }
+
+  // E 打开背包
+  if(e.code === 'KeyE'){
+    e.preventDefault();
+    inventoryOpen = !inventoryOpen;
+    document.getElementById('inventoryScreen').classList.toggle('show', inventoryOpen);
+    if(inventoryOpen && document.pointerLockElement) document.exitPointerLock();
+    if(!inventoryOpen) document.getElementById('gameCanvas').requestPointerLock();
+  }
+
+  // Shift 潜行
+  if(e.code === 'ShiftLeft' || e.code === 'ShiftRight') isSneaking = true;
+
+  // 数字键 1-9 切换物品
+  if(e.code.startsWith('Digit') && e.code.length === 6){
+    var num = parseInt(e.code[5]);
+    if(num >= 1 && num <= 9){
+      selectedHotbarSlot = num - 1;
+      updateHotbarUI();
+    }
+  }
+}
+
+function onKeyUp(e){
+  if(!gameActive) return;
+  keys[e.code] = false;
+  if(e.code === 'ShiftLeft' || e.code === 'ShiftRight') isSneaking = false;
+}
+
+function onMouseMove(e){
+  if(!gameActive || !document.pointerLockElement) return;
+  var sensitivity = 0.002;
+  yaw -= e.movementX * sensitivity;
+  pitch -= e.movementY * sensitivity;
+  pitch = Math.max(-Math.PI/2 + 0.01, Math.min(Math.PI/2 - 0.01, pitch));
+}
+
+function onCanvasClick(){
+  if(gameActive && !document.pointerLockElement && !inventoryOpen){
+    document.getElementById('pauseMenu').classList.remove('show');
+    document.getElementById('gameCanvas').requestPointerLock();
+  }
+}
+
+function onCanvasMouseDown(e){
+  if(!gameActive || !document.pointerLockElement) return;
+  
+  // 射线检测
+  raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+  var hits = raycaster.intersectObjects(blocks);
+  
+  if(hits.length > 0){
+    var hit = hits[0];
+    
+    if(e.button === 0){ // 左键破坏
+      scene.remove(hit.object);
+      blocks = blocks.filter(b => b !== hit.object);
+    } else if(e.button === 2){ // 右键放置
+      var normal = hit.face.normal;
+      var pos = hit.object.position;
+      var newPos = new THREE.Vector3(pos.x + normal.x, pos.y + normal.y, pos.z + normal.z);
+      
+      // 检查是否已有方块
+      var occupied = blocks.some(b => b.position.distanceTo(newPos) < 0.1);
+      if(!occupied){
+        var blockType = hotbarBlocks[selectedHotbarSlot];
+        addBlock(newPos.x, newPos.y, newPos.z, blockType);
+      }
+    }
+  }
+}
+
+function onResize(){
+  if(renderer){
+    renderer.setSize(innerWidth, innerHeight);
+    camera.aspect = innerWidth/innerHeight;
+    camera.updateProjectionMatrix();
+  }
+}
+
+function updateCameraModeText(){
+  var text = '第一人称';
+  if(cameraMode === 1) text = '第三人称 (背面)';
+  if(cameraMode === 2) text = '第三人称 (正面)';
+  document.getElementById('gameMode').textContent = '模式: ' + text;
+}
+
 function loop(){
   requestAnimationFrame(loop);
   if(!gameActive) return;
-  var now = performance.now();
-  var dt = (now - lastTime) / 1000;
-  lastTime = now;
+
+  // 玩家移动
+  var moveSpeed = isSneaking ? 4 : 8;
+  var forward = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw));
+  var right = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
+  
+  if(keys['KeyW']) playerPos.addScaledVector(forward, moveSpeed * 0.016);
+  if(keys['KeyS']) playerPos.addScaledVector(forward, -moveSpeed * 0.016);
+  if(keys['KeyA']) playerPos.addScaledVector(right, -moveSpeed * 0.016);
+  if(keys['KeyD']) playerPos.addScaledVector(right, moveSpeed * 0.016);
+
+  // 简单的重力
+  velocityY -= 9.8 * 0.016;
+  playerPos.y += velocityY * 0.016;
+  
+  // 地面碰撞 (简易)
+  if(playerPos.y < 5){
+    playerPos.y = 5;
+    velocityY = 0;
+    isGrounded = true;
+  } else {
+    isGrounded = false;
+  }
+
+  if(keys['Space'] && isGrounded){
+    velocityY = 8;
+    isGrounded = false;
+  }
+
+  // 更新玩家模型位置
+  playerModel.position.copy(playerPos);
+  playerModel.position.y -= 1.5; // 模型原点在中心，脚在底部
+  playerModel.rotation.y = yaw;
+
+  // 根据视角模式设置相机位置
+  if(cameraMode === 0){
+    // 第一人称
+    camera.position.copy(playerPos);
+    camera.position.y += 0.6; // 眼睛高度
+    playerModel.visible = false;
+  } else if(cameraMode === 1){
+    // 第三人称背面
+    var offset = new THREE.Vector3(Math.sin(yaw) * 4, 2, Math.cos(yaw) * 4);
+    camera.position.copy(playerPos).add(offset);
+    camera.lookAt(playerPos);
+    playerModel.visible = true;
+  } else {
+    // 第三人称正面
+    var offset = new THREE.Vector3(-Math.sin(yaw) * 4, 2, -Math.cos(yaw) * 4);
+    camera.position.copy(playerPos).add(offset);
+    camera.lookAt(playerPos);
+    playerModel.visible = true;
+  }
 
   camera.rotation.order = 'YXZ';
   camera.rotation.y = yaw;
   camera.rotation.x = pitch;
 
-  var spd = 8 * dt;
-  var fw = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw));
-  var rt = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
-  if(keys['KeyW']) camera.position.addScaledVector(fw, spd);
-  if(keys['KeyS']) camera.position.addScaledVector(fw, -spd);
-  if(keys['KeyA']) camera.position.addScaledVector(rt, -spd);
-  if(keys['KeyD']) camera.position.addScaledVector(rt, spd);
-  camera.position.y = Math.max(camera.position.y, 2);
+  // 射线检测高亮
+  raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+  var hits = raycaster.intersectObjects(blocks);
+  if(hits.length > 0 && hits[0].distance < 8){
+    highlightBox.position.copy(hits[0].object.position);
+    highlightBox.visible = true;
+  } else {
+    highlightBox.visible = false;
+  }
 
-  document.getElementById('gameCoord').textContent = `X: ${camera.position.x.toFixed(1)} Y: ${camera.position.y.toFixed(1)} Z: ${camera.position.z.toFixed(1)}`;
+  // 更新 HUD
+  document.getElementById('gameCoord').textContent = `X: ${playerPos.x.toFixed(1)} Y: ${playerPos.y.toFixed(1)} Z: ${playerPos.z.toFixed(1)}`;
+
   renderer.render(scene, camera);
+}
+
+// ================= 快捷栏与背包 UI =================
+function initHotbarUI(){
+  var hotbar = document.getElementById('hotbar');
+  hotbar.innerHTML = '';
+  hotbarBlocks.forEach((type, i) => {
+    var slot = document.createElement('div');
+    slot.className = 'hotbar-slot' + (i === 0 ? ' selected' : '');
+    slot.innerHTML = `<span class="slot-num">${i+1}</span><img src="${blockTextures[type]}">`;
+    slot.onclick = () => {
+      selectedHotbarSlot = i;
+      updateHotbarUI();
+    };
+    hotbar.appendChild(slot);
+  });
+}
+
+function updateHotbarUI(){
+  document.querySelectorAll('.hotbar-slot').forEach((slot, i) => {
+    slot.classList.toggle('selected', i === selectedHotbarSlot);
+  });
 }
 
 // ================= 暂停与退出 =================
 function resumeGame(){
   document.getElementById('pauseMenu').classList.remove('show');
   document.getElementById('gameCanvas').requestPointerLock();
-}
-function openInGameSettings(){
-  toast('设置还没做，先凑合玩');
 }
 function saveAndQuit(){
   gameActive = false;
@@ -806,10 +863,8 @@ function saveAndQuit(){
 }
 
 function showAbout(){
-  alert('咋联机？\n\n房主：单人世界 -> 选中一个 -> 对局域网开放 -> 填端口和映射地址 -> 开服。\n\n朋友：多人联机 -> 添加服务器 -> 把房主发的地址粘进去 -> 进服。\n\n就这么简单，别搞复杂了。');
+  alert('咋联机？\n\n房主：单人世界 -> 选中一个 -> 对局域网开放 -> 填映射地址 -> 开服。\n\n朋友：多人联机 -> 添加服务器 -> 把房主发的地址粘进去 -> 进服。\n\n游戏内快捷键：\nE: 背包\nF5: 切换视角\nShift: 潜行\n左键: 破坏\n右键: 放置');
 }
 </script>
-
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 </body>
 </html>
