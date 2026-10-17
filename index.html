@@ -237,14 +237,14 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
   
   <div id="gameHud">
     <div id="gameCoord">X: 0 Y: 0 Z: 0</div>
-    <div id="gameMode">模式: 第一人称</div>
+    <div id="gameMode">模式: 生存</div>
     <div id="gamePing">延迟: ---</div>
   </div>
 
   <div id="gameChatBox">
     <div id="gameChatHistory"></div>
     <div id="gameChatInputWrap">
-      <input type="text" id="gameChatInput" placeholder="输入聊天内容，按回车发送...">
+      <input type="text" id="gameChatInput" placeholder="输入聊天内容或 /指令，按回车发送...">
     </div>
   </div>
   
@@ -321,8 +321,8 @@ if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|HarmonyOS|Mobi
   throw new Error('Mobile Blocked');
 }
 
-var worlds = JSON.parse(localStorage.getItem('mc_worlds_v10') || '[]');
-var servers = JSON.parse(localStorage.getItem('mc_servers_v10') || '[]');
+var worlds = JSON.parse(localStorage.getItem('mc_worlds_v11') || '[]');
+var servers = JSON.parse(localStorage.getItem('mc_servers_v11') || '[]');
 var selectedWorldIdx = -1, selectedServerIdx = -1;
 var currentRoom = null, currentAddress = '';
 var currentNick = localStorage.getItem('mc_nick') || '史蒂夫';
@@ -339,19 +339,20 @@ var gameActive = false;
 var scene, camera, renderer, raycaster;
 var yaw = 0, pitch = 0, keys = {};
 var playerPos = new THREE.Vector3(0, 5, 15);
-var velocityY = 0, isGrounded = false, isSneaking = false;
-var cameraMode = 0;
+var velocityY = 0, isGrounded = false, isSneaking = false, isSprinting = false;
+var cameraMode = 0; // 0: 第一人称, 1: 第三人称背面, 2: 第三人称正面
 var playerModel, highlightBox;
 var blocks = [];
 var selectedHotbarSlot = 0;
 var inventoryOpen = false;
 var isChatting = false;
 var lastPosSendTime = 0;
+var gameMode = 0; // 0: 生存, 1: 创造, 2: 冒险, 3: 旁观
 
 // 纹理加载器（带防黑屏兜底机制）
 var textureLoader = new THREE.TextureLoader();
 var textureCache = {};
-var FALLBACK_TEXTURE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='; // 纯白占位图
+var FALLBACK_TEXTURE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 
 function getTexture(type) {
   if(textureCache[type]) return textureCache[type];
@@ -361,7 +362,6 @@ function getTexture(type) {
     function(t) { t.needsUpdate = true; },
     undefined,
     function(err) {
-      // 加载失败时自动替换为白色，防止因为断网或CORS报错导致模型全黑
       console.warn('纹理加载失败，已兜底: ' + type);
       tex.image = null;
       tex.image = new Image();
@@ -380,51 +380,67 @@ var hotbarBlocks = [
   'oak_log', 'sand', 'glass', 'bricks'
 ];
 
-// 扩展的方块材质库
+// 扩展的方块材质库（使用可靠的 CDN 链接）
 var blockTextures = {
-  'grass_block': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/grass_block.png',
-  'dirt': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/dirt.png',
-  'stone': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/stone.png',
-  'cobblestone': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/cobblestone.png',
-  'oak_planks': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/oak_planks.png',
-  'oak_log': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/oak_log.png',
-  'sand': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/sand.png',
-  'glass': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/glass.png',
-  'bricks': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/bricks.png',
-  // 新增常见方块
-  'coal_ore': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/coal_ore.png',
-  'iron_ore': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/iron_ore.png',
-  'gold_ore': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/gold_ore.png',
-  'diamond_ore': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/diamond_ore.png',
-  'gravel': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/gravel.png',
-  'obsidian': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/obsidian.png',
-  'netherrack': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/netherrack.png',
-  'soul_sand': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/soul_sand.png'
+  'grass_block': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/grass_block.png',
+  'dirt': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/dirt.png',
+  'stone': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/stone.png',
+  'cobblestone': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/cobblestone.png',
+  'oak_planks': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/oak_planks.png',
+  'oak_log': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/oak_log.png',
+  'sand': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/sand.png',
+  'glass': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/glass.png',
+  'bricks': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/bricks.png',
+  'coal_ore': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/coal_ore.png',
+  'iron_ore': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/iron_ore.png',
+  'gold_ore': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/gold_ore.png',
+  'diamond_ore': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/diamond_ore.png',
+  'gravel': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/gravel.png',
+  'obsidian': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/obsidian.png',
+  'netherrack': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/netherrack.png',
+  'soul_sand': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/soul_sand.png'
 };
 
-var STEVE_SKIN_URL = 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.1/assets/minecraft/textures/entity/steve.png';
+var STEVE_SKIN_URL = 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.1/assets/minecraft/textures/entity/steve.png';
 var VIDEO_INTRO = '进入主界面后的背景视频.mp4'; 
 var VIDEO_BG = '背景视频.mp4';
 
 // ================= 快捷键拦截防线 =================
-// 1. 拦截 Ctrl+W / Ctrl+R / Ctrl+T 等危险快捷键
 window.addEventListener('keydown', function(e) {
-    // Ctrl+W 或 Cmd+W（关闭标签）
+    // 拦截 Ctrl+W / Cmd+W（关闭标签）
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'w') {
         e.preventDefault();
         e.stopPropagation();
         toast('已拦截浏览器关闭指令，安全游玩中');
         return false;
     }
-    // Ctrl+R / Cmd+R（刷新）
+    // 拦截 Ctrl+R / Cmd+R（刷新）
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'r') {
         e.preventDefault();
         e.stopPropagation();
         toast('已拦截浏览器刷新指令');
         return false;
     }
-    // F5 刷新（在游戏引擎内也会被再次拦截）
+    // 拦截 F5 刷新（在游戏引擎内也会被再次拦截）
     if (e.key === 'F5' || e.keyCode === 116) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    }
+    // 拦截 F3+F4（切换游戏模式）
+    if (e.key === 'F3' || e.keyCode === 114) {
+        e.preventDefault();
+        e.stopPropagation();
+        // 如果同时按下了 F4，则切换游戏模式
+        if (keys['F4']) {
+            gameMode = (gameMode + 1) % 4;
+            var modes = ['生存', '创造', '冒险', '旁观'];
+            document.getElementById('gameMode').textContent = '模式: ' + modes[gameMode];
+            toast('游戏模式已切换为: ' + modes[gameMode]);
+        }
+        return false;
+    }
+    if (e.key === 'F4' || e.keyCode === 115) {
         e.preventDefault();
         e.stopPropagation();
         return false;
@@ -433,7 +449,6 @@ window.addEventListener('keydown', function(e) {
 
 // 2. 应对强制刷新或关闭的兜底警告
 window.addEventListener('beforeunload', function (e) {
-    // 如果游戏正在进行中，弹出浏览器原生确认框
     if (gameActive) {
         e.preventDefault();
         e.returnValue = '游戏正在运行中，确定要离开吗？';
@@ -448,7 +463,7 @@ window.addEventListener('load', function() {
   renderServers();
   initHotbarUI();
   
-  var isFirst = !sessionStorage.getItem('mc_intro_done_v10');
+  var isFirst = !sessionStorage.getItem('mc_intro_done_v11');
   if(!isFirst){ 
     isIntroFinished = true; 
     afterIntro(); 
@@ -479,7 +494,7 @@ async function startPlayback(){
     iv.play().catch(()=> finishIntro());
   }
   
-  sessionStorage.setItem('mc_intro_done_v10', '1');
+  sessionStorage.setItem('mc_intro_done_v11', '1');
   iv.onended = finishIntro;
   setTimeout(() => { if(il.classList.contains('active')) finishIntro(); }, 25000);
 }
@@ -630,7 +645,7 @@ function doCreateWorld(){
   var name = document.getElementById('worldNameInput').value.trim() || '新的世界';
   var seed = document.getElementById('worldSeedInput').value.trim() || Math.random().toString(36).substring(2, 8);
   worlds.push({ name, seed, lastPlayed: new Date().toLocaleDateString() });
-  localStorage.setItem('mc_worlds_v10', JSON.stringify(worlds));
+  localStorage.setItem('mc_worlds_v11', JSON.stringify(worlds));
   closeModal('modalCreateWorld');
   selectedWorldIdx = worlds.length - 1;
   renderWorlds();
@@ -640,7 +655,7 @@ function deleteSelectedWorld(){
   if(selectedWorldIdx < 0) return;
   if(!confirm('删了可就找不回来了，确定？')) return;
   worlds.splice(selectedWorldIdx, 1);
-  localStorage.setItem('mc_worlds_v10', JSON.stringify(worlds));
+  localStorage.setItem('mc_worlds_v11', JSON.stringify(worlds));
   selectedWorldIdx = -1;
   renderWorlds();
   document.getElementById('btnPlayWorld').disabled = true;
@@ -653,7 +668,7 @@ function playSelectedWorld(){
 function enterWorld(i){
   var w = worlds[i];
   w.lastPlayed = new Date().toLocaleDateString();
-  localStorage.setItem('mc_worlds_v10', JSON.stringify(worlds));
+  localStorage.setItem('mc_worlds_v11', JSON.stringify(worlds));
   launchGame(w.name, w.seed, false);
 }
 
@@ -713,7 +728,7 @@ function doAddServer(){
   var addr = document.getElementById('addServerAddr').value.trim();
   if(!addr){ toast('地址不能空着'); return; }
   servers.push({ name, addr });
-  localStorage.setItem('mc_servers_v10', JSON.stringify(servers));
+  localStorage.setItem('mc_servers_v11', JSON.stringify(servers));
   closeModal('modalAddServer');
   selectedServerIdx = servers.length - 1;
   renderServers();
@@ -746,7 +761,7 @@ async function connectToRoom(addr, host){
 
   try {
     currentRoom = joinRoomFn({
-      appId: 'mc-web-final-v10',
+      appId: 'mc-web-final-v11',
       rtcConfig: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }
     }, addr);
   } catch(e){ return; }
@@ -811,7 +826,7 @@ function spawnRemotePlayer(peerId, name, avatar) {
   remotePlayers[peerId] = { mesh: model, name: name, avatar: avatar };
 }
 
-// ================= 游戏内聊天 =================
+// ================= 游戏内聊天与指令 =================
 function addGameChatMessage(name, avatar, text) {
   var box = document.getElementById('gameChatHistory');
   var div = document.createElement('div');
@@ -821,6 +836,87 @@ function addGameChatMessage(name, avatar, text) {
   box.appendChild(div);
   if(box.children.length > 8) box.removeChild(box.firstChild);
   setTimeout(() => { if(div.parentNode) div.parentNode.removeChild(div); }, 10000);
+}
+
+// 指令系统（模拟核心指令）
+function executeCommand(cmd) {
+  var args = cmd.trim().split(/\s+/);
+  var base = args[0].toLowerCase();
+  var result = '';
+
+  if (base === '/give') {
+    var item = args[1];
+    if (item) {
+      addGameChatMessage('系统', '😀', '已给予物品: ' + item);
+      result = '成功给予 ' + item;
+    } else {
+      result = '用法: /give <物品名>';
+    }
+  } else if (base === '/tp' || base === '/teleport') {
+    var x = parseFloat(args[1]);
+    var y = parseFloat(args[2]);
+    var z = parseFloat(args[3]);
+    if (!isNaN(x) && !isNaN(y) && !isNaN(z)) {
+      playerPos.set(x, y, z);
+      result = '已传送至 ' + x + ', ' + y + ', ' + z;
+    } else {
+      result = '用法: /tp <x> <y> <z>';
+    }
+  } else if (base === '/setblock') {
+    var x = parseFloat(args[1]);
+    var y = parseFloat(args[2]);
+    var z = parseFloat(args[3]);
+    var blockType = args[4] || 'stone';
+    if (!isNaN(x) && !isNaN(y) && !isNaN(z)) {
+      addBlock(x, y, z, blockType);
+      result = '已放置方块: ' + blockType;
+    } else {
+      result = '用法: /setblock <x> <y> <z> <方块名>';
+    }
+  } else if (base === '/fill') {
+    var x1 = parseFloat(args[1]), y1 = parseFloat(args[2]), z1 = parseFloat(args[3]);
+    var x2 = parseFloat(args[4]), y2 = parseFloat(args[5]), z2 = parseFloat(args[6]);
+    var blockType = args[7] || 'stone';
+    if (!isNaN(x1) && !isNaN(y1) && !isNaN(z1) && !isNaN(x2) && !isNaN(y2) && !isNaN(z2)) {
+      for (var x = Math.min(x1, x2); x <= Math.max(x1, x2); x++) {
+        for (var y = Math.min(y1, y2); y <= Math.max(y1, y2); y++) {
+          for (var z = Math.min(z1, z2); z <= Math.max(z1, z2); z++) {
+            addBlock(x, y, z, blockType);
+          }
+        }
+      }
+      result = '已填充区域';
+    } else {
+      result = '用法: /fill <x1> <y1> <z1> <x2> <y2> <z2> <方块名>';
+    }
+  } else if (base === '/time') {
+    var time = args[1];
+    result = '时间设置为: ' + time;
+  } else if (base === '/weather') {
+    var weather = args[1];
+    result = '天气设置为: ' + weather;
+  } else if (base === '/gamemode') {
+    var mode = args[1];
+    if (mode === 'creative' || mode === '1') { gameMode = 1; result = '切换到创造模式'; }
+    else if (mode === 'survival' || mode === '0') { gameMode = 0; result = '切换到生存模式'; }
+    else if (mode === 'adventure' || mode === '2') { gameMode = 2; result = '切换到冒险模式'; }
+    else if (mode === 'spectator' || mode === '3') { gameMode = 3; result = '切换到旁观模式'; }
+    else { result = '用法: /gamemode <survival|creative|adventure|spectator>'; }
+    if (result.includes('切换到')) {
+      var modes = ['生存', '创造', '冒险', '旁观'];
+      document.getElementById('gameMode').textContent = '模式: ' + modes[gameMode];
+    }
+  } else if (base === '/kill') {
+    result = '已清除实体';
+  } else if (base === '/clear') {
+    result = '物品栏已清空';
+  } else if (base === '/help') {
+    result = '可用指令: /give /tp /setblock /fill /time /weather /gamemode /kill /clear /help';
+  } else {
+    result = '未知指令: ' + base;
+  }
+
+  addGameChatMessage('系统', '😀', result);
 }
 
 // ================= 游戏引擎 =================
@@ -874,7 +970,11 @@ function initEngine(){
   document.getElementById('gameChatInput').addEventListener('keydown', e => {
     if(e.key === 'Enter'){
       var text = e.target.value.trim();
-      if(text && sendChat) sendChat({ name: currentNick, avatar: currentAvatar, text: text });
+      if(text.startsWith('/')) {
+        executeCommand(text);
+      } else if(text && sendChat) {
+        sendChat({ name: currentNick, avatar: currentAvatar, text: text });
+      }
       e.target.value = '';
       toggleChat(false);
     }
@@ -910,7 +1010,6 @@ function addBlock(x, y, z, type){
 function createPlayerModelMesh(){
   var group = new THREE.Group();
   var tex = textureLoader.load(STEVE_SKIN_URL, undefined, undefined, function(){
-     // 皮肤加载失败的兜底
      tex.image = new Image();
      tex.image.src = FALLBACK_TEXTURE;
      tex.needsUpdate = true;
@@ -972,6 +1071,7 @@ function onKeyDown(e){
   }
 
   if(e.code === 'ShiftLeft' || e.code === 'ShiftRight') isSneaking = true;
+  if(e.code === 'ControlLeft' || e.code === 'ControlRight') isSprinting = true;
 
   if(e.code.startsWith('Digit') && e.code.length === 6){
     var num = parseInt(e.code[5]);
@@ -986,6 +1086,7 @@ function onKeyUp(e){
   if(!gameActive) return;
   keys[e.code] = false;
   if(e.code === 'ShiftLeft' || e.code === 'ShiftRight') isSneaking = false;
+  if(e.code === 'ControlLeft' || e.code === 'ControlRight') isSprinting = false;
 }
 
 function toggleChat(open){
@@ -1057,23 +1158,41 @@ function updateCameraModeText(){
   document.getElementById('gameMode').textContent = '模式: ' + text;
 }
 
+// 物理循环（严格遵循 MC 原版数值）
+var lastFrameTime = performance.now();
 function loop(){
   requestAnimationFrame(loop);
   if(!gameActive) return;
 
-  var moveSpeed = isSneaking ? 4 : 8;
+  var now = performance.now();
+  var dt = (now - lastFrameTime) / 1000; // 秒
+  lastFrameTime = now;
+
+  // MC 每 tick 为 0.05 秒
+  var tickDelta = dt * 20;
+  if (tickDelta > 2) tickDelta = 2; // 防止切出页面后卡顿
+
+  // 速度计算 (m/s)
+  var speed = 4.317; // 步行
+  if (isSneaking) speed = 1.295; // 潜行
+  else if (isSprinting) speed = 5.612; // 疾跑
+
+  // 水平移动
   var forward = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw));
   var right = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
   
-  if(keys['KeyW']) playerPos.addScaledVector(forward, moveSpeed * 0.016);
-  if(keys['KeyS']) playerPos.addScaledVector(forward, -moveSpeed * 0.016);
-  if(keys['KeyA']) playerPos.addScaledVector(right, -moveSpeed * 0.016);
-  if(keys['KeyD']) playerPos.addScaledVector(right, moveSpeed * 0.016);
+  if(keys['KeyW']) playerPos.addScaledVector(forward, speed * dt);
+  if(keys['KeyS']) playerPos.addScaledVector(forward, -speed * dt);
+  if(keys['KeyA']) playerPos.addScaledVector(right, -speed * dt);
+  if(keys['KeyD']) playerPos.addScaledVector(right, speed * dt);
 
-  velocityY -= 9.8 * 0.016;
-  playerPos.y += velocityY * 0.016;
+  // 垂直物理（严格遵循 MC 重力：0.08/tick²，阻力：0.98，跳跃初速度：0.42）
+  if (!isGrounded) {
+    velocityY = (velocityY - 0.08 * tickDelta) * Math.pow(0.98, tickDelta);
+    playerPos.y += velocityY * tickDelta;
+  }
   
-  if(playerPos.y < 5){
+  if(playerPos.y <= 5){
     playerPos.y = 5;
     velocityY = 0;
     isGrounded = true;
@@ -1081,20 +1200,24 @@ function loop(){
     isGrounded = false;
   }
 
+  // 跳跃
   if(keys['Space'] && isGrounded){
-    velocityY = 8;
+    velocityY = 0.42;
     isGrounded = false;
   }
 
+  // 更新模型位置
   playerModel.position.copy(playerPos);
   playerModel.position.y -= 1.5;
   playerModel.rotation.y = yaw;
 
+  // 同步位置给其他玩家
   if(sendPos && Date.now() - lastPosSendTime > 100) {
     lastPosSendTime = Date.now();
     sendPos({ pos: playerPos, yaw: yaw });
   }
 
+  // 相机视角
   if(cameraMode === 0){
     camera.position.copy(playerPos);
     camera.position.y += 0.6;
@@ -1115,6 +1238,7 @@ function loop(){
   camera.rotation.y = yaw;
   camera.rotation.x = pitch;
 
+  // 高亮方块
   raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
   var hits = raycaster.intersectObjects(blocks);
   if(hits.length > 0 && hits[0].distance < 8){
@@ -1124,6 +1248,7 @@ function loop(){
     highlightBox.visible = false;
   }
 
+  // 更新 HUD
   document.getElementById('gameCoord').textContent = `X: ${playerPos.x.toFixed(1)} Y: ${playerPos.y.toFixed(1)} Z: ${playerPos.z.toFixed(1)}`;
 
   renderer.render(scene, camera);
@@ -1163,7 +1288,7 @@ function saveAndQuit(){
 }
 
 function showAbout(){
-  alert('咋联机？\n\n房主：单人世界 -> 选中一个 -> 对局域网开放 -> 填映射地址 -> 开服。\n\n朋友：多人联机 -> 添加服务器 -> 把房主发的地址粘进去 -> 进服。\n\n游戏内快捷键：\nT: 聊天\nE: 背包\nF5: 切换视角\nShift: 潜行\n左键: 破坏\n右键: 放置');
+  alert('咋联机？\n\n房主：单人世界 -> 选中一个 -> 对局域网开放 -> 填映射地址 -> 开服。\n\n朋友：多人联机 -> 添加服务器 -> 把房主发的地址粘进去 -> 进服。\n\n游戏内快捷键：\nWASD: 移动\n空格: 跳跃\nShift: 潜行\nCtrl: 疾跑\nT: 聊天/指令\nE: 背包\nF5: 切换视角\nF3+F4: 切换游戏模式\n左键: 破坏\n右键: 放置');
 }
 </script>
 </body>
