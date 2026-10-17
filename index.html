@@ -219,6 +219,11 @@ body.ui-hidden #soundToggleBtn:hover{opacity:1}
 .mc-alert-box .desc { font-size: 14px; line-height: 1.6; margin-bottom: 24px; color: #ddd; }
 .mc-alert-box .btn-ok { padding: 10px 40px; background: #5a5a5a; border: 2px solid #8a8a8a; color: #fff; font-family: inherit; font-size: 14px; cursor: pointer; transition: all 0.2s; }
 .mc-alert-box .btn-ok:hover { background: #7a7a7a; border-color: #aaa; }
+
+/* 穿透工具选择下拉框 */
+.map-select-wrap { margin-top: 14px; }
+.map-select-wrap select { width: 100%; padding: 11px 14px; background: rgba(26,28,40,0.9); color: #55ff55; border: 1px solid rgba(74,108,247,0.25); border-radius: 10px; font-size: 14px; outline: none; cursor: pointer; font-family: inherit; appearance: auto; }
+.map-select-wrap select:focus { border-color: #4a6cf7; box-shadow: 0 0 0 3px rgba(74,108,247,0.2); }
 </style>
 </head>
 <body>
@@ -375,13 +380,29 @@ body.ui-hidden #soundToggleBtn:hover{opacity:1}
       <button onclick="regenCreateCode()" title="重新生成">🔄</button>
     </div>
 
-    <!-- NatGo 端口设置 -->
-    <label>NatGo 映射端口（可选，装逼/备用，填了能复制 IP）</label>
+    <!-- 穿透工具选择 -->
+    <label>使用的内网穿透工具</label>
+    <div class="map-select-wrap">
+      <select id="createMapTool" onchange="onMapToolChange()">
+        <option value="natgo">NatGo 端口映射</option>
+        <option value="frp">FRP 系列</option>
+        <option value="ngrok">Ngrok 系列</option>
+        <option value="ph">花生壳</option>
+        <option value="nat123">nat123</option>
+        <option value="sakura">Sakura Frp</option>
+        <option value="natapp">NATAPP</option>
+        <option value="nps">NPS</option>
+        <option value="openfrp">OpenFrp / ChmlFrp</option>
+        <option value="other">其他 / 自建服务器</option>
+      </select>
+    </div>
+
+    <label>映射的公网端口 / 地址</label>
     <div class="row">
-      <input type="text" id="createPort" placeholder="例如 1234" maxlength="5">
+      <input type="text" id="createPort" placeholder="例如 1234 或 abc.ngrok.io">
       <button onclick="copyPublicIP()" title="复制 IP:端口">📋</button>
     </div>
-    <div class="hint">填你 NatGo 映射出来的端口，点 📋 可复制 IP:端口。不填也无所谓，不影响聊天。</div>
+    <div class="hint" id="mapToolHint">NatGo: 填本地端口，点 📋 复制 IP:端口。不填也无所谓。</div>
 
     <div class="btn-row" style="margin-top:24px;">
       <button class="mc-btn small" onclick="goBack()">取消</button>
@@ -400,7 +421,7 @@ body.ui-hidden #soundToggleBtn:hover{opacity:1}
     <div class="about-box">
       <h2>这玩意儿到底是个啥？</h2>
       <p>简单来说，这就是个<b>纯网页版的私密聊天室</b>。不需要下载任何软件，不需要注册账号，也不用你懂什么复杂的网络技术。只要你打开这个网页，创建个房间，把房间码发给朋友，你们就能直接隔着屏幕吹牛逼了。</p>
-      <p>它用的是 WebRTC 黑科技（跟你平时打微信语音电话用的技术差不多），消息直接从你的电脑传到你朋友的电脑，<span class="highlight">不经过任何中转服务器</span>，安全得很。</p>
+      <p>它用的是 WebRTC 黑科技，消息直接从你的电脑传到你朋友的电脑，<span class="highlight">不经过任何中转服务器</span>，安全得很。</p>
 
       <h2>怎么用？教你两步搞定</h2>
       <p><b>第一步：房主（也就是你）开房</b></p>
@@ -409,15 +430,19 @@ body.ui-hidden #soundToggleBtn:hover{opacity:1}
       <p><b>第二步：朋友进来</b></p>
       <p>让你朋友也打开这个网页，点 <b>🚪 多人游戏</b>，然后点 <b>“加入房间”</b>，把你复制的那串房间码粘贴进去，填个名字，点连接。只要网通，一秒钟就能连上，直接开始聊。</p>
 
-      <h2>关于那个 NatGo 端口是咋回事？</h2>
-      <p>你之前说的那个 NatGo 内网穿透，其实在这个纯网页里<span class="warn">完全不需要</span>！浏览器自己会打洞，也就是 NAT 穿透。只要你们不是那种极其变态的公司内网或者死胡同网络，正常家宽、手机热点，它自己就能连上。</p>
-      <p>我在创建房间那里加了个“填端口复制 IP”的按钮，那是为了满足你“手里有 IP 心里不慌”的需求。填个端口点 📋，它会给你复制个 `IP:端口` 的格式，你可以当备用地址发给朋友。但说实话，正常玩，直接发房间码就行了。</p>
+      <h2>关于内网穿透工具（重点）</h2>
+      <p>你之前提到的 NatGo 内网穿透，其实在这个纯网页里<span class="warn">大部分情况完全不需要</span>！浏览器自己会打洞（NAT 穿透），正常家宽、手机热点它自己就能连。</p>
+      <p>但是，如果你确实在用某个映射工具，或者你们俩网络环境特别恶劣（比如公司内网、对称型NAT），我在创建房间那里加了一个<b>「内网穿透工具」下拉框</b>。你选一下你用的工具，它会自动调整复制的格式：</p>
+      <p>1. <b>NatGo：</b>直接填端口，复制 `IP:端口`。</p>
+      <p>2. <b>Ngrok / NATAPP / Sakura Frp：</b>这些通常是给你一个域名（如 `xxxx.ngrok.io`），直接填域名即可。</p>
+      <p>3. <b>FRP / NPS / OpenFrp：</b>填你服务端配置的公网 IP 和端口。</p>
+      <p>总之，不管你用啥，选好工具、填好地址、点 📋，然后把房间码发给朋友就行了。</p>
 
       <h2>连不上怎么办？（老司机避坑指南）</h2>
-      <p>如果你朋友输进去提示“无该房间码 / 房间无人”，或者卡住了，千万别慌。这不代表代码坏了，通常是网络在抽风。你可以试试这几招：</p>
-      <p>1. <b>换个网试试：</b>如果你俩都在连着同一个特别垃圾的公共 Wi-Fi，可能被限制了。让你朋友开个手机热点给电脑连上，通常瞬间就能连上。</p>
-      <p>2. <b>检查房间码：</b>房间码必须一模一样，没有空格，全大写字母。如果你复制的时候多带了个空格，它当然找不到。</p>
-      <p>3. <b>刷新网页：</b>如果实在连不上，俩人一起按 F5 刷新一下网页，重新建、重新进。这玩意儿用的是免费的公共节点做牵线，偶尔抽风也正常。</p>
+      <p>如果你朋友输进去提示“无法连接至服务器”或卡住，千万别慌。通常是网络在抽风，试试这几招：</p>
+      <p>1. <b>换个网试试：</b>让你朋友开个手机热点给电脑连上，通常瞬间就能连上。</p>
+      <p>2. <b>检查房间码：</b>房间码必须一模一样，没有空格，全大写字母。</p>
+      <p>3. <b>刷新网页：</b>俩人一起按 F5 刷新，重新建、重新进。</p>
 
       <h2>还能干啥？</h2>
       <p>房主进去之后，点右上角的 <b>⋮</b>，你可以看看谁在线，可以封禁别人（让他们闭嘴 10 分钟或者永远滚蛋），还可以改违禁词。这功能主要防小人发广告用的。</p>
@@ -750,6 +775,8 @@ function openCreateRoom(){
   document.getElementById('createName').value = ''; document.getElementById('createMotd').value = '&7欢迎来到 &a说话大厅';
   document.getElementById('createNick').value = currentNick; document.getElementById('createCode').value = generateRoomCode();
   document.getElementById('createPort').value = ''; // 重置端口
+  document.getElementById('createMapTool').value = 'natgo';
+  onMapToolChange();
   buildColorPanel('createNamePanel','createName'); buildColorPanel('createMotdPanel','createMotd'); goHome('screenCreate');
 }
 function openAddServer(){ document.getElementById('addName').value=''; document.getElementById('addCode').value=''; goScreen('screenAdd'); }
@@ -758,15 +785,61 @@ function openDirectConnect(){ document.getElementById('directCode').value=''; do
 function copyCreateCode(){ var c=document.getElementById('createCode').value; if(!c) return; navigator.clipboard.writeText(c).then(function(){ toast('已复制：'+c); }); }
 function regenCreateCode(){ var c=generateRoomCode(); document.getElementById('createCode').value=c; toast('新房间码：'+c); }
 
-// 复制 IP:端口
+function onMapToolChange(){
+  var tool = document.getElementById('createMapTool').value;
+  var hint = document.getElementById('mapToolHint');
+  var input = document.getElementById('createPort');
+  
+  if(tool === 'natgo'){
+    input.placeholder = '例如 1234（填本地端口）';
+    hint.textContent = 'NatGo: 填本地端口，点 📋 复制 IP:端口。不填也无所谓。';
+  } else if(tool === 'frp'){
+    input.placeholder = '例如 your_ip:7000（填公网IP:端口）';
+    hint.textContent = 'FRP: 填你服务端配置的公网 IP:端口，点 📋 复制。';
+  } else if(tool === 'ngrok'){
+    input.placeholder = '例如 xxxx.ngrok.io（填域名）';
+    hint.textContent = 'Ngrok: 填免费或付费分配的域名，点 📋 复制。';
+  } else if(tool === 'ph'){
+    input.placeholder = '例如 域名 或 IP:端口';
+    hint.textContent = '花生壳: 填花生壳分配的域名或地址，点 📋 复制。';
+  } else if(tool === 'nat123'){
+    input.placeholder = '例如 域名 或 IP:端口';
+    hint.textContent = 'nat123: 填nat123分配的域名或地址，点 📋 复制。';
+  } else if(tool === 'sakura'){
+    input.placeholder = '例如 域名 或 IP:端口';
+    hint.textContent = 'Sakura Frp: 填分配的域名或IP:端口，点 📋 复制。';
+  } else if(tool === 'natapp'){
+    input.placeholder = '例如 xxxx.natapp.cc（填域名）';
+    hint.textContent = 'NATAPP: 填免费隧道分配的域名，点 📋 复制。';
+  } else if(tool === 'nps'){
+    input.placeholder = '例如 your_ip:端口';
+    hint.textContent = 'NPS: 填你NPS服务端的公网IP:端口，点 📋 复制。';
+  } else if(tool === 'openfrp'){
+    input.placeholder = '例如 域名 或 IP:端口';
+    hint.textContent = 'OpenFrp / ChmlFrp: 填分配的公网地址，点 📋 复制。';
+  } else {
+    input.placeholder = '填自定义公网 IP:端口 或 域名';
+    hint.textContent = '其他: 填你的公网地址，点 📋 复制。';
+  }
+}
+
+// 复制公网地址
 function copyPublicIP(){
   var port = document.getElementById('createPort').value.trim();
-  if(!port){ toast('请先填写 NatGo 映射端口'); return; }
-  if(!/^\d{1,5}$/.test(port) || parseInt(port) < 1 || parseInt(port) > 65535){ toast('端口无效（1-65535）'); return; }
-  var host = window.location.hostname || '127.0.0.1';
-  if(host === 'localhost' || host === '127.0.0.1'){ host = '你的公网IP'; }
-  var ipStr = host + ':' + port;
-  navigator.clipboard.writeText(ipStr).then(function(){ toast('已复制：' + ipStr); }).catch(function(){ toast('复制失败，请手动复制：' + ipStr); });
+  if(!port){ toast('请先填写公网地址或端口'); return; }
+  
+  var tool = document.getElementById('createMapTool').value;
+  var address = port;
+  
+  // 如果是纯数字端口，并且是 NatGo，加上当前 hostname
+  if(tool === 'natgo' && /^\d+$/.test(port)){
+    if(!/^\d{1,5}$/.test(port) || parseInt(port) < 1 || parseInt(port) > 65535){ toast('端口无效（1-65535）'); return; }
+    var host = window.location.hostname || '127.0.0.1';
+    if(host === 'localhost' || host === '127.0.0.1'){ host = '你的公网IP'; }
+    address = host + ':' + port;
+  }
+  
+  navigator.clipboard.writeText(address).then(function(){ toast('已复制：' + address); }).catch(function(){ toast('复制失败，请手动复制：' + address); });
 }
 
 function doAddServer(){
