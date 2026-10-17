@@ -88,9 +88,6 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
 #gamePing{color:#6ee7b7;font-weight:700;margin-top:6px;display:none}
 #gameMode{color:#ffaa00;font-weight:700}
 
-#debugScreen { position: absolute; top: 20px; left: 20px; z-index: 12; color: #fff; font-family: monospace; font-size: 13px; line-height: 1.5; text-shadow: 1px 1px 2px #000; display: none; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 4px; }
-#debugScreen.show { display: block; }
-
 #gameChatBox { position: absolute; left: 20px; bottom: 80px; width: 400px; height: 250px; z-index: 11; display: flex; flex-direction: column; justify-content: flex-end; pointer-events: none; }
 #gameChatHistory { display: flex; flex-direction: column; gap: 4px; overflow-y: hidden; margin-bottom: 8px; }
 .chat-msg { background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 4px; color: #fff; font-size: 14px; display: flex; align-items: center; gap: 8px; animation: fadeInOut 10s forwards; text-shadow: 1px 1px 0 #000; }
@@ -230,9 +227,6 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
     <div id="gamePing">延迟: ---</div>
   </div>
 
-  <!-- F3 调试界面 -->
-  <div id="debugScreen"></div>
-
   <div id="gameChatBox">
     <div id="gameChatHistory"></div>
     <div id="gameChatInputWrap">
@@ -323,8 +317,8 @@ if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|HarmonyOS|Mobi
   throw new Error('Mobile Blocked');
 }
 
-var worlds = JSON.parse(localStorage.getItem('mc_worlds_v14') || '[]');
-var servers = JSON.parse(localStorage.getItem('mc_servers_v14') || '[]');
+var worlds = JSON.parse(localStorage.getItem('mc_worlds_v15') || '[]');
+var servers = JSON.parse(localStorage.getItem('mc_servers_v15') || '[]');
 var selectedWorldIdx = -1, selectedServerIdx = -1;
 var currentRoom = null, currentAddress = '';
 var currentNick = localStorage.getItem('mc_nick') || '史蒂夫';
@@ -340,7 +334,7 @@ var isIntroFinished = false;
 var gameActive = false;
 var scene, camera, renderer, raycaster;
 var yaw = 0, pitch = 0, keys = {};
-var playerPos = new THREE.Vector3(0, 20, 0); // 初始高度调整
+var playerPos = new THREE.Vector3(0, 20, 0); 
 var velocityY = 0, isGrounded = false, isSneaking = false, isSprinting = false;
 var cameraMode = 0; 
 var playerModel, highlightBox;
@@ -355,9 +349,8 @@ var gameMode = 0;
 var isF3Held = false;
 var isGMSwitcherOpen = false;
 var selectedGMOption = 0;
-var isDebugOpen = false;
 
-// 物理常量 (基于 MC 1.20.1)
+// 物理常量
 var GRAVITY = 0.08;
 var JUMP_VELOCITY = 0.42;
 var AIR_RESISTANCE = 0.98;
@@ -365,20 +358,42 @@ var WALK_SPEED = 4.317;
 var SPRINT_SPEED = 5.612;
 var SNEAK_SPEED = 1.295;
 
-// 区块与渲染距离设置
-var renderDistance = 6; // 渲染距离（区块数）
-var simulationDistance = 4; // 模拟距离（区块数）
+// 区块设置
+var renderDistance = 2; // 2x2 区块，保证性能
 var CHUNK_SIZE = 16;
+var blockMeshes = []; 
 
-// 纹理加载器 (使用 jsDelivr CDN 的 PrismarineJS 1.20.2 纹理)
+// 可靠的贴图直链 (使用 raw.githubusercontent.com 并强制 CORS)
+var blockTextures = {
+  'grass_block': 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.1/assets/minecraft/textures/block/grass_block_top.png',
+  'dirt': 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.1/assets/minecraft/textures/block/dirt.png',
+  'stone': 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.1/assets/minecraft/textures/block/stone.png',
+  'cobblestone': 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.1/assets/minecraft/textures/block/cobblestone.png',
+  'oak_planks': 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.1/assets/minecraft/textures/block/oak_planks.png',
+  'oak_log': 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.1/assets/minecraft/textures/block/oak_log.png',
+  'sand': 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.1/assets/minecraft/textures/block/sand.png',
+  'glass': 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.1/assets/minecraft/textures/block/glass.png',
+  'bricks': 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.1/assets/minecraft/textures/block/bricks.png',
+  'bedrock': 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.1/assets/minecraft/textures/block/bedrock.png',
+  'oak_leaves': 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.1/assets/minecraft/textures/block/oak_leaves.png'
+};
+var STEVE_SKIN_URL = 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.1/assets/minecraft/textures/entity/steve.png';
+
+var VIDEO_INTRO = '进入主界面后的背景视频.mp4'; 
+var VIDEO_BG = '背景视频.mp4';
+
+// 加载器与缓存
 var textureLoader = new THREE.TextureLoader();
+textureLoader.setCrossOrigin('anonymous');
 var textureCache = {};
 var FALLBACK_TEXTURE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 
 function getTexture(type) {
   if(textureCache[type]) return textureCache[type];
   var url = blockTextures[type] || blockTextures['stone'];
-  var tex = textureLoader.load(url, function(t) { t.needsUpdate = true; }, undefined, function(err) {
+  var tex = textureLoader.load(url, function(t) { 
+      t.needsUpdate = true; 
+  }, undefined, function(err) {
       console.warn('纹理加载失败，已兜底: ' + type);
       tex.image = new Image();
       tex.image.src = FALLBACK_TEXTURE;
@@ -390,43 +405,15 @@ function getTexture(type) {
   return tex;
 }
 
-var hotbarBlocks = [
-  'grass_block', 'dirt', 'stone', 'cobblestone', 'oak_planks',
-  'oak_log', 'sand', 'glass', 'bricks'
-];
-
-var blockTextures = {
-  'grass_block': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/grass_block.png',
-  'dirt': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/dirt.png',
-  'stone': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/stone.png',
-  'cobblestone': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/cobblestone.png',
-  'oak_planks': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/oak_planks.png',
-  'oak_log': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/oak_log.png',
-  'sand': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/sand.png',
-  'glass': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/glass.png',
-  'bricks': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/bricks.png',
-  'coal_ore': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/coal_ore.png',
-  'iron_ore': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/iron_ore.png',
-  'gold_ore': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/gold_ore.png',
-  'diamond_ore': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/diamond_ore.png',
-  'oak_leaves': 'https://cdn.jsdelivr.net/gh/PrismarineJS/minecraft-assets@master/data/1.20.2/blocks/oak_leaves.png'
-};
-
-var STEVE_SKIN_URL = 'https://cdn.jsdelivr.net/gh/InventivetalexDev/minecraft-assets@1.20.1/assets/minecraft/textures/entity/steve.png';
-var VIDEO_INTRO = '进入主界面后的背景视频.mp4'; 
-var VIDEO_BG = '背景视频.mp4';
-
 // ================= 快捷键与拦截 =================
 window.addEventListener('keydown', function(e) {
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'w') { e.preventDefault(); e.stopPropagation(); toast('已拦截浏览器关闭'); return false; }
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'r') { e.preventDefault(); e.stopPropagation(); toast('已拦截浏览器刷新'); return false; }
-    if (e.key === 'F5' || e.keyCode === 116) { e.preventDefault(); e.stopPropagation(); return false; }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'w') { e.preventDefault(); return false; }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'r') { e.preventDefault(); return false; }
+    if (e.key === 'F5' || e.keyCode === 116) { e.preventDefault(); return false; }
     
-    if (e.key === 'F3' || e.keyCode === 114) {
-        e.preventDefault(); e.stopPropagation(); isF3Held = true; return false;
-    }
+    if (e.key === 'F3' || e.keyCode === 114) { e.preventDefault(); isF3Held = true; return false; }
     if ((e.key === 'F4' || e.keyCode === 115) && isF3Held) {
-        e.preventDefault(); e.stopPropagation();
+        e.preventDefault();
         if (!isGMSwitcherOpen) {
             isGMSwitcherOpen = true; selectedGMOption = gameMode; updateGMSwitcherUI();
             document.getElementById('gamemodeSwitcher').classList.add('show');
@@ -468,14 +455,26 @@ document.getElementById('gamemodeSwitcher').addEventListener('click', function(e
     }
 });
 
+// 退出前保存位置和视角
 window.addEventListener('beforeunload', function (e) {
-    if (gameActive) { e.preventDefault(); e.returnValue = '游戏正在运行中，确定要离开吗？'; return e.returnValue; }
+    if (gameActive) { 
+        saveGameState(); 
+        e.preventDefault(); e.returnValue = '游戏正在运行中，确定要离开吗？'; return e.returnValue; 
+    }
 });
+
+function saveGameState() {
+    var state = {
+        x: playerPos.x, y: playerPos.y, z: playerPos.z,
+        yaw: yaw, pitch: pitch
+    };
+    localStorage.setItem('mc_saved_state', JSON.stringify(state));
+}
 
 // ================= 视频与资料 =================
 window.addEventListener('load', function() {
   updateMyMini(); renderWorlds(); renderServers(); initHotbarUI();
-  var isFirst = !sessionStorage.getItem('mc_intro_done_v14');
+  var isFirst = !sessionStorage.getItem('mc_intro_done_v15');
   if(!isFirst){ isIntroFinished = true; afterIntro(); return; }
   document.getElementById('startOverlay').style.display = 'flex'; 
 });
@@ -487,7 +486,7 @@ async function startPlayback(){
   var il = document.getElementById('introLayer'); il.classList.add('active'); il.style.display = 'flex';
   iv.muted = false; iv.volume = 1.0;
   try { await iv.play(); } catch(e) { iv.muted = true; iv.play().catch(()=> finishIntro()); }
-  sessionStorage.setItem('mc_intro_done_v14', '1');
+  sessionStorage.setItem('mc_intro_done_v15', '1');
   iv.onended = finishIntro; setTimeout(() => { if(il.classList.contains('active')) finishIntro(); }, 25000);
 }
 
@@ -546,17 +545,17 @@ function selectWorld(i){ selectedWorldIdx = i; renderWorlds(); document.getEleme
 function openCreateWorld(){ document.getElementById('worldNameInput').value = ''; document.getElementById('worldSeedInput').value = ''; document.getElementById('modalCreateWorld').classList.add('show'); }
 function doCreateWorld(){
   var name = document.getElementById('worldNameInput').value.trim() || '新的世界'; var seed = document.getElementById('worldSeedInput').value.trim() || Math.random().toString(36).substring(2, 8);
-  worlds.push({ name, seed, lastPlayed: new Date().toLocaleDateString() }); localStorage.setItem('mc_worlds_v14', JSON.stringify(worlds)); closeModal('modalCreateWorld');
+  worlds.push({ name, seed, lastPlayed: new Date().toLocaleDateString() }); localStorage.setItem('mc_worlds_v15', JSON.stringify(worlds)); closeModal('modalCreateWorld');
   selectedWorldIdx = worlds.length - 1; renderWorlds(); toast('世界建好了，进吧');
 }
 function deleteSelectedWorld(){
   if(selectedWorldIdx < 0) return; if(!confirm('删了可就找不回来了，确定？')) return;
-  worlds.splice(selectedWorldIdx, 1); localStorage.setItem('mc_worlds_v14', JSON.stringify(worlds)); selectedWorldIdx = -1; renderWorlds();
+  worlds.splice(selectedWorldIdx, 1); localStorage.setItem('mc_worlds_v15', JSON.stringify(worlds)); selectedWorldIdx = -1; renderWorlds();
   document.getElementById('btnPlayWorld').disabled = true; document.getElementById('btnOpenLan').disabled = true; document.getElementById('btnDeleteWorld').disabled = true;
 }
 function playSelectedWorld(){ if(selectedWorldIdx >= 0) enterWorld(selectedWorldIdx); }
 function enterWorld(i){
-  var w = worlds[i]; w.lastPlayed = new Date().toLocaleDateString(); localStorage.setItem('mc_worlds_v14', JSON.stringify(worlds)); launchGame(w.name, w.seed, false);
+  var w = worlds[i]; w.lastPlayed = new Date().toLocaleDateString(); localStorage.setItem('mc_worlds_v15', JSON.stringify(worlds)); launchGame(w.name, w.seed, false);
 }
 
 // ================= 局域网与联机 =================
@@ -587,7 +586,7 @@ function openAddServer(){ document.getElementById('addServerName').value = ''; d
 function doAddServer(){
   var name = document.getElementById('addServerName').value.trim() || '兄弟的服'; var addr = document.getElementById('addServerAddr').value.trim();
   if(!addr){ toast('端口不能空着'); return; }
-  servers.push({ name, addr }); localStorage.setItem('mc_servers_v14', JSON.stringify(servers)); closeModal('modalAddServer');
+  servers.push({ name, addr }); localStorage.setItem('mc_servers_v15', JSON.stringify(servers)); closeModal('modalAddServer');
   selectedServerIdx = servers.length - 1; renderServers(); toast('服务器加好了');
 }
 function joinSelectedServer(){ if(selectedServerIdx >= 0) joinServer(selectedServerIdx); }
@@ -607,7 +606,7 @@ async function connectToRoom(addr, host){
   if(currentRoom){ try { currentRoom.leave(); } catch(e){} }
 
   try {
-    currentRoom = joinRoomFn({ appId: 'mc-web-final-v14', rtcConfig: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } }, addr);
+    currentRoom = joinRoomFn({ appId: 'mc-web-final-v15', rtcConfig: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } }, addr);
   } catch(e){ toast('端口格式有误，无法建立连接'); return; }
 
   myPeerId = currentRoom.selfId || 'local';
@@ -665,25 +664,46 @@ function executeCommand(cmd) {
   addGameChatMessage('系统', '😀', result);
 }
 
-// ================= 游戏引擎与物理 =================
+// ================= 游戏引擎与真实物理 =================
 function launchGame(worldName, seed, isMultiplayer){
   if(!renderer) initEngine();
   document.getElementById('gameView').classList.add('show'); gameActive = true;
-  playerPos.set(0, 20, 0); velocityY = 0; isGrounded = false; yaw = 0; pitch = 0; cameraMode = 0;
+  
+  // 恢复上次退出的位置和视角
+  var saved = localStorage.getItem('mc_saved_state');
+  if (saved) {
+      try {
+          var state = JSON.parse(saved);
+          playerPos.set(state.x, state.y, state.z);
+          yaw = state.yaw;
+          pitch = state.pitch;
+      } catch(e) {
+          playerPos.set(0, 30, 0); // 没存档的话从高空出生
+          yaw = 0; pitch = 0;
+      }
+  } else {
+      playerPos.set(0, 30, 0); 
+      yaw = 0; pitch = 0;
+  }
+  
+  velocityY = 0; cameraMode = 0;
   document.getElementById('gameCanvas').requestPointerLock(); updateCameraModeText();
 }
 
 function initEngine(){
   var canvas = document.getElementById('gameCanvas');
-  scene = new THREE.Scene(); scene.background = new THREE.Color(0x87CEEB); scene.fog = new THREE.Fog(0x87CEEB, renderDistance * 16 - 16, renderDistance * 16);
+  scene = new THREE.Scene(); scene.background = new THREE.Color(0x87CEEB); scene.fog = new THREE.Fog(0x87CEEB, 30, 60);
   camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 1000);
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true }); renderer.setSize(innerWidth, innerHeight); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   raycaster = new THREE.Raycaster(); scene.add(new THREE.AmbientLight(0xffffff, 0.65));
   var dir = new THREE.DirectionalLight(0xffffff, 0.75); dir.position.set(50, 100, 50); scene.add(dir);
 
-  generateWorld(); // 生成带有树木的多区块地形
+  generateWorld(); 
   playerModel = createPlayerModelMesh(); scene.add(playerModel);
-  var geo = new THREE.EdgesGeometry(new THREE.BoxGeometry(1.002, 1.002, 1.002)); var mat = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
+  
+  // 方块高亮线框
+  var geo = new THREE.EdgesGeometry(new THREE.BoxGeometry(1.002, 1.002, 1.002)); 
+  var mat = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 }); // MC是黑框
   highlightBox = new THREE.LineSegments(geo, mat); highlightBox.visible = false; scene.add(highlightBox);
 
   document.addEventListener('keydown', onKeyDown); document.addEventListener('keyup', onKeyUp); document.addEventListener('mousemove', onMouseMove);
@@ -697,18 +717,18 @@ function initEngine(){
       e.target.value = ''; toggleChat(false);
     }
   });
-
-  // 启动 F3 调试界面刷新
-  setInterval(updateDebugScreen, 100);
   
   loop();
 }
 
 function generateWorld() {
-  // 生成一个 3x3 的区块区域 (48x48 格)
-  var halfChunks = Math.floor(renderDistance / 2);
-  for(var cx = -halfChunks; cx <= halfChunks; cx++) {
-    for(var cz = -halfChunks; cz <= halfChunks; cz++) {
+  // 清理旧数据
+  blocks.forEach(b => scene.remove(b)); blocks = []; blockMeshes = [];
+  
+  var half = Math.floor(renderDistance / 2);
+  // 生成多区块
+  for(var cx = -half; cx <= half; cx++) {
+    for(var cz = -half; cz <= half; cz++) {
       generateChunk(cx, cz);
     }
   }
@@ -718,20 +738,28 @@ function generateChunk(cx, cz) {
   var startX = cx * CHUNK_SIZE;
   var startZ = cz * CHUNK_SIZE;
   
-  // 生成地表 (简易噪声高度)
+  // 高度图数组
+  var heightMap = {};
+  
   for(var x = 0; x < CHUNK_SIZE; x++) {
     for(var z = 0; z < CHUNK_SIZE; z++) {
       var wx = startX + x;
       var wz = startZ + z;
-      var h = Math.floor(Math.sin(wx * 0.1) * 3 + Math.cos(wz * 0.1) * 3 + 10);
+      // 生成波浪地形
+      var h = Math.floor(Math.sin(wx * 0.1) * 4 + Math.cos(wz * 0.1) * 4 + 12);
+      heightMap[x + ',' + z] = h;
       
-      for(var y = 0; y < h; y++) {
+      // 最底层基岩
+      addBlock(wx, 0, wz, 'bedrock');
+      
+      // 填充泥土和石头
+      for(var y = 1; y < h; y++) {
         var type = y === h - 1 ? 'grass_block' : (y > h - 4 ? 'dirt' : 'stone');
         addBlock(wx, y, wz, type);
       }
       
-      // 概率生成树木
-      if (Math.random() < 0.02) { // 2% 概率生成树木
+      // 种树
+      if (Math.random() < 0.01 && h > 5) { 
         generateTree(wx, h, wz);
       }
     }
@@ -739,20 +767,16 @@ function generateChunk(cx, cz) {
 }
 
 function generateTree(x, groundY, z) {
-  var trunkHeight = 4 + Math.floor(Math.random() * 2); // 4-5 高
+  var trunkHeight = 4 + Math.floor(Math.random() * 2); 
   for (var i = 0; i < trunkHeight; i++) {
     addBlock(x, groundY + i, z, 'oak_log');
   }
   
-  // 生成树叶 (简单球形)
   for (var dx = -2; dx <= 2; dx++) {
     for (var dz = -2; dz <= 2; dz++) {
       for (var dy = 0; dy <= 2; dy++) {
-        // 剔除四个角使其更圆润
         if (Math.abs(dx) === 2 && Math.abs(dz) === 2) continue; 
         if (dy === 2 && (Math.abs(dx) > 1 || Math.abs(dz) > 1)) continue;
-        
-        // 避免覆盖树干顶部
         if (dx === 0 && dz === 0 && dy < 2) continue; 
         
         addBlock(x + dx, groundY + trunkHeight - 1 + dy, z + dz, 'oak_leaves');
@@ -762,16 +786,23 @@ function generateTree(x, groundY, z) {
 }
 
 function addBlock(x, y, z, type){
-  // 简易优化：如果是相同位置则跳过
   var geo = new THREE.BoxGeometry(1, 1, 1); var tex = getTexture(type); var mat = new THREE.MeshLambertMaterial({ map: tex });
-  var mesh = new THREE.Mesh(geo, mat); mesh.position.set(x, y, z); mesh.userData = { type: type }; scene.add(mesh); blocks.push(mesh);
+  var mesh = new THREE.Mesh(geo, mat); 
+  mesh.position.set(x, y, z); 
+  mesh.userData = { type: type }; 
+  scene.add(mesh); 
+  blocks.push(mesh);
 }
 
 function createPlayerModelMesh(){
-  var group = new THREE.Group(); var tex = textureLoader.load(STEVE_SKIN_URL, undefined, undefined, function(){ tex.image = new Image(); tex.image.src = FALLBACK_TEXTURE; tex.needsUpdate = true; });
-  tex.magFilter = THREE.NearestFilter; tex.minFilter = THREE.NearestFilter; var bodyMat = new THREE.MeshLambertMaterial({ map: tex });
+  var group = new THREE.Group(); 
+  var tex = textureLoader.load(STEVE_SKIN_URL, undefined, undefined, function(){ tex.image = new Image(); tex.image.src = FALLBACK_TEXTURE; tex.needsUpdate = true; });
+  tex.magFilter = THREE.NearestFilter; tex.minFilter = THREE.NearestFilter; 
+  var bodyMat = new THREE.MeshLambertMaterial({ map: tex });
+  
   var body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.75, 0.25), bodyMat); body.position.y = 0.375; group.add(body);
   var head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), bodyMat); head.position.y = 1.0; group.add(head);
+  
   var limbMat = new THREE.MeshLambertMaterial({ color: 0x2D2D2D });
   var armL = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.75, 0.25), limbMat); armL.position.set(-0.375, 0.375, 0); group.add(armL);
   var armR = armL.clone(); armR.position.x = 0.375; group.add(armR);
@@ -784,8 +815,6 @@ function onKeyDown(e){
   if(!gameActive) return;
   if(isChatting){ if(e.code === 'Escape') toggleChat(false); return; }
   keys[e.code] = true;
-  
-  if(e.code === 'F3') { e.preventDefault(); isDebugOpen = !isDebugOpen; document.getElementById('debugScreen').classList.toggle('show', isDebugOpen); }
   
   if(e.code === 'Escape'){ if(document.pointerLockElement){ document.exitPointerLock(); document.getElementById('pauseMenu').classList.add('show'); } }
   if(e.code === 'F5'){ e.preventDefault(); cameraMode = (cameraMode + 1) % 3; updateCameraModeText(); }
@@ -831,41 +860,17 @@ function updateCameraModeText(){
   document.getElementById('gameMode').textContent = '模式: ' + text;
 }
 
-function updateDebugScreen() {
-  if (!isDebugOpen || !gameActive) return;
-  var debug = document.getElementById('debugScreen');
-  var cX = Math.floor(playerPos.x / 16);
-  var cZ = Math.floor(playerPos.z / 16);
-  
-  var facing = '南 (Z+)';
-  if (Math.abs(yaw) < Math.PI/4) facing = '南 (Z+)';
-  else if (Math.abs(yaw - Math.PI) < Math.PI/4) facing = '北 (Z-)';
-  else if (Math.abs(yaw - Math.PI/2) < Math.PI/4) facing = '东 (X+)';
-  else if (Math.abs(yaw + Math.PI/2) < Math.PI/4) facing = '西 (X-)';
-  
-  debug.innerHTML = `Minecraft 1.20.1 (Web)<br>
-  X: ${playerPos.x.toFixed(2)} Y: ${playerPos.y.toFixed(2)} Z: ${playerPos.z.toFixed(2)}<br>
-  Chunk: ${cX}, ${cZ}<br>
-  Facing: ${facing}<br>
-  Render Distance: ${renderDistance} chunks<br>
-  Simulation Distance: ${simulationDistance} chunks<br>
-  FPS: ${renderer.info.render.fps || 'N/A'}`;
-}
-
-// 物理循环 (严格遵循 MC 1.20.1)
+// 真正的重力与碰撞物理循环
 var lastFrameTime = performance.now();
-var lastGroundY = 20; // 记录上一次站在地面上的 Y 坐标
 function loop(){
   requestAnimationFrame(loop); if(!gameActive) return;
   var now = performance.now(); var dt = (now - lastFrameTime) / 1000; lastFrameTime = now;
   
-  // 限制单帧时间，防止卡顿导致穿模
+  // 防止切出页面导致巨大物理跳跃
   if (dt > 0.1) dt = 0.1;
-  
   var tickDelta = dt * 20; 
-  if (tickDelta > 2) tickDelta = 2; // 防止切出页面卡顿
+  if (tickDelta > 2) tickDelta = 2; 
   
-  // 速度计算
   var speed = WALK_SPEED; 
   if (isSneaking) speed = SNEAK_SPEED; 
   else if (isSprinting) speed = SPRINT_SPEED;
@@ -877,44 +882,32 @@ function loop(){
   if(keys['KeyA']) playerPos.addScaledVector(right, -speed * dt);
   if(keys['KeyD']) playerPos.addScaledVector(right, speed * dt);
 
-  // 垂直物理 (跳跃与重力)
-  if (!isGrounded) { 
-    // 垂直速度衰减：先减重力，再乘空气阻力
-    velocityY = (velocityY - GRAVITY * tickDelta) * Math.pow(AIR_RESISTANCE, tickDelta); 
-    playerPos.y += velocityY * tickDelta; 
-  }
+  // 重力下落
+  velocityY -= GRAVITY * tickDelta;
+  if(velocityY < -50) velocityY = -50; // 终端速度限制
   
-  // 地面碰撞检测
-  // 计算脚底所在的方块 Y 坐标
-  var footY = Math.floor(playerPos.y);
+  var nextY = playerPos.y + velocityY * tickDelta;
   
-  // 简易碰撞检测：如果玩家在某个方块上方，则停止下坠
+  // 射线检测地面碰撞
   var onGround = false;
-  for (var i = 0; i < blocks.length; i++) {
-     var b = blocks[i];
-     // 检查水平方向是否重叠，且玩家脚部刚好在方块顶部附近
-     if (Math.abs(b.position.x - playerPos.x) < 0.5 && 
-         Math.abs(b.position.z - playerPos.z) < 0.5 &&
-         playerPos.y >= b.position.y + 1 - 0.1 && 
-         playerPos.y <= b.position.y + 1 + 0.1) {
-         onGround = true;
-         lastGroundY = b.position.y + 1;
-         break;
-     }
+  var rayStart = new THREE.Vector3(playerPos.x, nextY - 1.5 + 0.1, playerPos.z); // 从脚部往下打
+  var rayDir = new THREE.Vector3(0, -1, 0);
+  raycaster.set(rayStart, rayDir);
+  var hits = raycaster.intersectObjects(blocks);
+  
+  if (hits.length > 0 && hits[0].distance < Math.abs(velocityY * tickDelta) + 0.1) {
+      // 如果脚下有方块，并且距离小于下落距离，说明撞到地面了
+      onGround = true;
+      playerPos.y = hits[0].point.y + 1.5 - 0.1; // 校准高度 (模型原点在中心)
+      velocityY = 0;
+  } else {
+      playerPos.y = nextY;
   }
   
-  if (onGround) {
-     playerPos.y = lastGroundY;
-     velocityY = 0;
-     isGrounded = true;
-  } else {
-     isGrounded = false;
-  }
-
   // 跳跃
-  if(keys['Space'] && isGrounded){
+  if(keys['Space'] && onGround){
     velocityY = JUMP_VELOCITY;
-    isGrounded = false;
+    onGround = false;
   }
 
   // 更新模型位置
@@ -927,11 +920,11 @@ function loop(){
   else { var offset = new THREE.Vector3(-Math.sin(yaw) * 4, 2, -Math.cos(yaw) * 4); camera.position.copy(playerPos).add(offset); camera.lookAt(playerPos); playerModel.visible = true; }
   camera.rotation.order = 'YXZ'; camera.rotation.y = yaw; camera.rotation.x = pitch;
 
-  // 方块高亮
-  raycaster.setFromCamera(new THREE.Vector2(0, 0), camera); var hits = raycaster.intersectObjects(blocks);
-  if(hits.length > 0 && hits[0].distance < 8){ highlightBox.position.copy(hits[0].object.position); highlightBox.visible = true; } else { highlightBox.visible = false; }
+  // 方块高亮 (黑框)
+  raycaster.setFromCamera(new THREE.Vector2(0, 0), camera); var targetHits = raycaster.intersectObjects(blocks);
+  if(targetHits.length > 0 && targetHits[0].distance < 8){ highlightBox.position.copy(targetHits[0].object.position); highlightBox.visible = true; } else { highlightBox.visible = false; }
 
-  // 更新 HUD 坐标
+  // 更新 HUD
   document.getElementById('gameCoord').textContent = `X: ${playerPos.x.toFixed(1)} Y: ${playerPos.y.toFixed(1)} Z: ${playerPos.z.toFixed(1)}`;
   
   renderer.render(scene, camera);
@@ -947,8 +940,17 @@ function initHotbarUI(){
 }
 function updateHotbarUI(){ document.querySelectorAll('.hotbar-slot').forEach((slot, i) => { slot.classList.toggle('selected', i === selectedHotbarSlot); }); }
 function resumeGame(){ document.getElementById('pauseMenu').classList.remove('show'); document.getElementById('gameCanvas').requestPointerLock(); }
-function saveAndQuit(){ gameActive = false; document.getElementById('gameView').classList.remove('show'); document.getElementById('pauseMenu').classList.remove('show'); document.getElementById('gamePing').style.display = 'none'; if(document.pointerLockElement) document.exitPointerLock(); if(currentRoom){ try { currentRoom.leave(); } catch(e){} currentRoom = null; } goHome(); }
-function showAbout(){ alert('咋联机？\n\n房主：单人世界 -> 选中一个 -> 对局域网开放。\n\n只需要填一个端口号，朋友在多人联机里输入同样的端口就行。\n\n游戏内快捷键：\nWASD: 移动\n空格: 跳跃\nShift: 潜行\nCtrl: 疾跑\nT: 聊天/指令\nE: 背包\nF5: 切换视角\nF3: 调试界面\nF3+F4: 切换游戏模式\n左键: 破坏\n右键: 放置'); }
+function saveAndQuit(){ 
+    saveGameState(); 
+    gameActive = false; 
+    document.getElementById('gameView').classList.remove('show'); 
+    document.getElementById('pauseMenu').classList.remove('show'); 
+    document.getElementById('gamePing').style.display = 'none'; 
+    if(document.pointerLockElement) document.exitPointerLock(); 
+    if(currentRoom){ try { currentRoom.leave(); } catch(e){} currentRoom = null; } 
+    goHome(); 
+}
+function showAbout(){ alert('咋联机？\n\n房主：单人世界 -> 选中一个 -> 对局域网开放。\n\n只需要填一个端口号，朋友在多人联机里输入同样的端口就行。\n\n游戏内快捷键：\nWASD: 移动\n空格: 跳跃\nShift: 潜行\nCtrl: 疾跑\nT: 聊天/指令\nE: 背包\nF5: 切换视角\nF3+F4: 切换游戏模式\n左键: 破坏\n右键: 放置'); }
 </script>
 </body>
 </html>
