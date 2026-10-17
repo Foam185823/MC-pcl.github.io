@@ -153,7 +153,7 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
 
 <div id="mobileBlock"><div style="font-size:60px;margin-bottom:20px;">🚫</div><div style="font-size:20px;font-weight:bold;">手机端玩不了这个</div><div style="margin-top:10px;color:#888;">换电脑来吧，兄弟</div></div>
 
-<!-- 开场视频逻辑（完全保留） -->
+<!-- 开场视频 -->
 <div id="startOverlay">
   <div class="title">我的世界 · 网页版</div>
   <button class="startBtn" onclick="startPlayback()">开始游戏</button>
@@ -241,7 +241,6 @@ body{background:#0f0f14;color:#e8e8f0;height:100vh;overflow:hidden;user-select:n
     <div id="gamePing">延迟: ---</div>
   </div>
 
-  <!-- 游戏内聊天 -->
   <div id="gameChatBox">
     <div id="gameChatHistory"></div>
     <div id="gameChatInputWrap">
@@ -322,8 +321,8 @@ if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|HarmonyOS|Mobi
   throw new Error('Mobile Blocked');
 }
 
-var worlds = JSON.parse(localStorage.getItem('mc_worlds_v9') || '[]');
-var servers = JSON.parse(localStorage.getItem('mc_servers_v9') || '[]');
+var worlds = JSON.parse(localStorage.getItem('mc_worlds_v10') || '[]');
+var servers = JSON.parse(localStorage.getItem('mc_servers_v10') || '[]');
 var selectedWorldIdx = -1, selectedServerIdx = -1;
 var currentRoom = null, currentAddress = '';
 var currentNick = localStorage.getItem('mc_nick') || '史蒂夫';
@@ -349,11 +348,39 @@ var inventoryOpen = false;
 var isChatting = false;
 var lastPosSendTime = 0;
 
+// 纹理加载器（带防黑屏兜底机制）
+var textureLoader = new THREE.TextureLoader();
+var textureCache = {};
+var FALLBACK_TEXTURE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='; // 纯白占位图
+
+function getTexture(type) {
+  if(textureCache[type]) return textureCache[type];
+  
+  var url = blockTextures[type] || blockTextures['stone'];
+  var tex = textureLoader.load(url, 
+    function(t) { t.needsUpdate = true; },
+    undefined,
+    function(err) {
+      // 加载失败时自动替换为白色，防止因为断网或CORS报错导致模型全黑
+      console.warn('纹理加载失败，已兜底: ' + type);
+      tex.image = null;
+      tex.image = new Image();
+      tex.image.src = FALLBACK_TEXTURE;
+      tex.needsUpdate = true;
+    }
+  );
+  tex.magFilter = THREE.NearestFilter;
+  tex.minFilter = THREE.NearestFilter;
+  textureCache[type] = tex;
+  return tex;
+}
+
 var hotbarBlocks = [
   'grass_block', 'dirt', 'stone', 'cobblestone', 'oak_planks',
   'oak_log', 'sand', 'glass', 'bricks'
 ];
 
+// 扩展的方块材质库
 var blockTextures = {
   'grass_block': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/grass_block.png',
   'dirt': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/dirt.png',
@@ -363,21 +390,65 @@ var blockTextures = {
   'oak_log': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/oak_log.png',
   'sand': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/sand.png',
   'glass': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/glass.png',
-  'bricks': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/bricks.png'
+  'bricks': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/bricks.png',
+  // 新增常见方块
+  'coal_ore': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/coal_ore.png',
+  'iron_ore': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/iron_ore.png',
+  'gold_ore': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/gold_ore.png',
+  'diamond_ore': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/diamond_ore.png',
+  'gravel': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/gravel.png',
+  'obsidian': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/obsidian.png',
+  'netherrack': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/netherrack.png',
+  'soul_sand': 'https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/master/data/1.20.2/blocks/soul_sand.png'
 };
 
 var STEVE_SKIN_URL = 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.1/assets/minecraft/textures/entity/steve.png';
 var VIDEO_INTRO = '进入主界面后的背景视频.mp4'; 
 var VIDEO_BG = '背景视频.mp4';
 
-// ================= 视频播放逻辑（核心保留） =================
+// ================= 快捷键拦截防线 =================
+// 1. 拦截 Ctrl+W / Ctrl+R / Ctrl+T 等危险快捷键
+window.addEventListener('keydown', function(e) {
+    // Ctrl+W 或 Cmd+W（关闭标签）
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'w') {
+        e.preventDefault();
+        e.stopPropagation();
+        toast('已拦截浏览器关闭指令，安全游玩中');
+        return false;
+    }
+    // Ctrl+R / Cmd+R（刷新）
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'r') {
+        e.preventDefault();
+        e.stopPropagation();
+        toast('已拦截浏览器刷新指令');
+        return false;
+    }
+    // F5 刷新（在游戏引擎内也会被再次拦截）
+    if (e.key === 'F5' || e.keyCode === 116) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    }
+}, true);
+
+// 2. 应对强制刷新或关闭的兜底警告
+window.addEventListener('beforeunload', function (e) {
+    // 如果游戏正在进行中，弹出浏览器原生确认框
+    if (gameActive) {
+        e.preventDefault();
+        e.returnValue = '游戏正在运行中，确定要离开吗？';
+        return e.returnValue;
+    }
+});
+
+// ================= 视频播放逻辑 =================
 window.addEventListener('load', function() {
   updateMyMini();
   renderWorlds();
   renderServers();
   initHotbarUI();
   
-  var isFirst = !sessionStorage.getItem('mc_intro_done_v9');
+  var isFirst = !sessionStorage.getItem('mc_intro_done_v10');
   if(!isFirst){ 
     isIntroFinished = true; 
     afterIntro(); 
@@ -408,7 +479,7 @@ async function startPlayback(){
     iv.play().catch(()=> finishIntro());
   }
   
-  sessionStorage.setItem('mc_intro_done_v9', '1');
+  sessionStorage.setItem('mc_intro_done_v10', '1');
   iv.onended = finishIntro;
   setTimeout(() => { if(il.classList.contains('active')) finishIntro(); }, 25000);
 }
@@ -559,7 +630,7 @@ function doCreateWorld(){
   var name = document.getElementById('worldNameInput').value.trim() || '新的世界';
   var seed = document.getElementById('worldSeedInput').value.trim() || Math.random().toString(36).substring(2, 8);
   worlds.push({ name, seed, lastPlayed: new Date().toLocaleDateString() });
-  localStorage.setItem('mc_worlds_v9', JSON.stringify(worlds));
+  localStorage.setItem('mc_worlds_v10', JSON.stringify(worlds));
   closeModal('modalCreateWorld');
   selectedWorldIdx = worlds.length - 1;
   renderWorlds();
@@ -569,7 +640,7 @@ function deleteSelectedWorld(){
   if(selectedWorldIdx < 0) return;
   if(!confirm('删了可就找不回来了，确定？')) return;
   worlds.splice(selectedWorldIdx, 1);
-  localStorage.setItem('mc_worlds_v9', JSON.stringify(worlds));
+  localStorage.setItem('mc_worlds_v10', JSON.stringify(worlds));
   selectedWorldIdx = -1;
   renderWorlds();
   document.getElementById('btnPlayWorld').disabled = true;
@@ -582,7 +653,7 @@ function playSelectedWorld(){
 function enterWorld(i){
   var w = worlds[i];
   w.lastPlayed = new Date().toLocaleDateString();
-  localStorage.setItem('mc_worlds_v9', JSON.stringify(worlds));
+  localStorage.setItem('mc_worlds_v10', JSON.stringify(worlds));
   launchGame(w.name, w.seed, false);
 }
 
@@ -642,7 +713,7 @@ function doAddServer(){
   var addr = document.getElementById('addServerAddr').value.trim();
   if(!addr){ toast('地址不能空着'); return; }
   servers.push({ name, addr });
-  localStorage.setItem('mc_servers_v9', JSON.stringify(servers));
+  localStorage.setItem('mc_servers_v10', JSON.stringify(servers));
   closeModal('modalAddServer');
   selectedServerIdx = servers.length - 1;
   renderServers();
@@ -675,7 +746,7 @@ async function connectToRoom(addr, host){
 
   try {
     currentRoom = joinRoomFn({
-      appId: 'mc-web-final-v9',
+      appId: 'mc-web-final-v10',
       rtcConfig: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }
     }, addr);
   } catch(e){ return; }
@@ -799,7 +870,6 @@ function initEngine(){
   canvas.addEventListener('click', onCanvasClick);
   canvas.addEventListener('mousedown', onCanvasMouseDown);
   addEventListener('resize', onResize);
-  window.addEventListener('keydown', e => { if(e.key === 'F5' || e.keyCode === 116) e.preventDefault(); });
 
   document.getElementById('gameChatInput').addEventListener('keydown', e => {
     if(e.key === 'Enter'){
@@ -828,9 +898,7 @@ function generateTerrain(){
 
 function addBlock(x, y, z, type){
   var geo = new THREE.BoxGeometry(1, 1, 1);
-  var tex = new THREE.TextureLoader().load(blockTextures[type] || blockTextures['stone']);
-  tex.magFilter = THREE.NearestFilter;
-  tex.minFilter = THREE.NearestFilter;
+  var tex = getTexture(type);
   var mat = new THREE.MeshLambertMaterial({ map: tex });
   var mesh = new THREE.Mesh(geo, mat);
   mesh.position.set(x, y, z);
@@ -841,7 +909,12 @@ function addBlock(x, y, z, type){
 
 function createPlayerModelMesh(){
   var group = new THREE.Group();
-  var tex = new THREE.TextureLoader().load(STEVE_SKIN_URL);
+  var tex = textureLoader.load(STEVE_SKIN_URL, undefined, undefined, function(){
+     // 皮肤加载失败的兜底
+     tex.image = new Image();
+     tex.image.src = FALLBACK_TEXTURE;
+     tex.needsUpdate = true;
+  });
   tex.magFilter = THREE.NearestFilter;
   tex.minFilter = THREE.NearestFilter;
   var bodyMat = new THREE.MeshLambertMaterial({ map: tex });
